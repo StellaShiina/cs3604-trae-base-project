@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: 12306_postgres
+    environment:
+      POSTGRES_DB: railway_booking
+      POSTGRES_USER: railway_user
+      POSTGRES_PASSWORD: railway_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - railway_network
+
+  postgres_test:
+    image: postgres:16-alpine
+    container_name: 12306_postgres_test
+    environment:
+      POSTGRES_DB: railway_booking_test
+      POSTGRES_USER: railway_user
+      POSTGRES_PASSWORD: railway_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+    networks:
+      - railway_network
+
+volumes:
+  postgres_data:
+  postgres_test_data:
+
+networks:
+  railway_network:
+    driver: bridge

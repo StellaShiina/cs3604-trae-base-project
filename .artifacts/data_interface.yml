@@ -1,0 +1,136 @@
+# 数据库操作接口定义
+# 12306 火车票订票系统
+
+# 用户认证相关数据库接口
+- type: Database
+  id: DB-CreateUser
+  description: 在数据库中创建一个新的用户记录，包含用户基本信息和认证信息。
+  dependencies:
+    - none
+  acceptanceCriteria:
+    - 成功执行后，users表中会增加一条新记录。
+    - 如果用户名或手机号已存在，操作应失败并抛出唯一性约束错误。
+    - 密码必须经过加密存储。
+    - 证件号码必须通过格式验证。
+  changeLog:
+    - date: "2025-01-20"
+      description: "初始创建。"
+
+- type: Database
+  id: DB-FindUserByCredentials
+  description: 根据用户名/手机号/邮箱查找用户记录，用于登录验证。
+  dependencies:
+    - none
+  acceptanceCriteria:
+    - 支持通过用户名、手机号或邮箱任一方式查找用户。
+    - 返回用户的完整信息包括加密后的密码用于验证。
+    - 如果用户不存在，返回空结果。
+  changeLog:
+    - date: "2025-01-20"
+      description: "初始创建。"
+
+- type: Database
+  id: DB-UpdateUserInfo
+  description: 更新用户的基本信息，如联系方式、邮箱等。
+  dependencies:
+    - none
+  acceptanceCriteria:
+    - 只允许更新非敏感信息（联系手机、邮箱等）。
+    - 用户名、证件信息等关键字段不可修改。
+    - 更新操作需要验证用户身份。
+  changeLog:
+    - date: "2025-01-20"
+      description: "初始创建。"
+
+# 乘车人管理相关数据库接口
+- type: Database
+  id: DB-CreatePassenger
+  description: 为用户添加新的乘车人信息记录。
+  dependencies:
+    - none
+  acceptanceCriteria:
+    - 成功执行后，passengers表中会增加一条新记录。
+    - 同一用户下的乘车人证件号码不能重复。
+    - 证件号码必须通过格式验证。
+  changeLog:
+    - date: "2025-01-20"
+      description: "初始创建。"
+
+- type: Database
+  id: DB-GetUserPassengers
+  description: 获取指定用户的所有乘车人信息列表。
+  dependencies:
+    - none
+  acceptanceCriteria:
+    - 返回该用户添加的所有乘车人信息。
+    - 支持按姓名或证件号进行筛选。
+    - 包含核验状态信息。
+  changeLog:
+    - date: "2025-01-20"
+      description: "初始创建。"
+
+- type: Database
+  id: DB-UpdatePassenger
+  description: 更新指定乘车人的信息。
+  dependencies:
+    - none
+  acceptanceCriteria:
+    - 只能更新属于当前用户的乘车人信息。
+    - 证件号码修改需要重新进行核验。
+    - 更新成功后返回更新后的完整信息。
+  changeLog:
+    - date: "2025-01-20"
+      description: "初始创建。"
+
+- type: Database
+  id: DB-DeletePassenger
+  description: 删除指定的乘车人记录。
+  dependencies:
+    - none
+  acceptanceCriteria:
+    - 只能删除属于当前用户的乘车人。
+    - 如果该乘车人有未完成的订单，不允许删除。
+    - 删除操作不可逆。
+  changeLog:
+    - date: "2025-01-20"
+      description: "初始创建。"
+
+# 订单管理相关数据库接口
+- type: Database
+  id: DB-CreateOrder
+  description: 创建新的火车票订单记录。
+  dependencies:
+    - none
+  acceptanceCriteria:
+    - 成功创建订单后，订单状态为"待支付"。
+    - 订单包含完整的车次、座位、乘车人信息。
+    - 生成唯一的订单号。
+  changeLog:
+    - date: "2025-01-20"
+      description: "初始创建。"
+
+- type: Database
+  id: DB-GetUserOrders
+  description: 获取指定用户的订单列表，支持按状态筛选。
+  dependencies:
+    - none
+  acceptanceCriteria:
+    - 支持获取全部订单或按状态筛选（待支付、已完成、已取消等）。
+    - 订单按创建时间倒序排列。
+    - 包含订单的完整信息和关联的乘车人信息。
+  changeLog:
+    - date: "2025-01-20"
+      description: "初始创建。"
+
+- type: Database
+  id: DB-UpdateOrderStatus
+  description: 更新订单状态（如支付完成、取消等）。
+  dependencies:
+    - none
+  acceptanceCriteria:
+    - 只能更新属于当前用户的订单。
+    - 状态变更必须符合业务规则（如已支付的订单不能直接取消）。
+    - 状态更新后记录变更时间。
+  changeLog:
+    - date: "2025-01-20"
+      description: "初始创建。"

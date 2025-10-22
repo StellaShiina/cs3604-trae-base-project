@@ -1,0 +1,299 @@
+# 前端UI接口定义
+# 12306 火车票订票系统
+
+# 用户认证相关UI组件
+- type: Frontend
+  id: UI-LoginForm
+  description: 用户登录表单组件，支持账号登录和扫码登录切换。
+  properties:
+    - name: onLoginSuccess
+      type: function
+      description: "登录成功后的回调函数，接收用户信息和token。"
+    - name: onSwitchToRegister
+      type: function
+      description: "切换到注册页面的回调函数。"
+    - name: initialLoginType
+      type: string
+      description: "初始登录方式，'account'或'qrcode'，默认为'account'。"
+  state:
+    - loginType  # 'account' | 'qrcode'
+    - username
+    - password
+    - isLoading
+    - error
+    - rememberMe
+  dependencies:
+    - API-POST-Login
+  acceptanceCriteria:
+    - 组件应渲染账号登录和扫码登录的切换标签。
+    - 账号登录模式下显示用户名/手机号/邮箱输入框、密码输入框。
+    - 包含"记住我"复选框和"立即登录"按钮。
+    - 提供"忘记密码"和"立即注册"链接。
+    - 当isLoading状态为true时，登录按钮应被禁用并显示加载状态。
+    - 登录失败时显示错误信息。
+  changeLog:
+    - date: "2025-01-20"
+      description: "初始创建。"
+
+- type: Frontend
+  id: UI-RegisterForm
+  description: 用户注册表单组件，包含完整的注册信息输入。
+  properties:
+    - name: onRegisterSuccess
+      type: function
+      description: "注册成功后的回调函数。"
+    - name: onSwitchToLogin
+      type: function
+      description: "切换到登录页面的回调函数。"
+  state:
+    - username
+    - password
+    - confirmPassword
+    - realName
+    - idType
+    - idNumber
+    - passengerType
+    - phoneNumber
+    - email
+    - agreeTerms
+    - isLoading
+    - errors
+    - validationStatus
+  dependencies:
+    - API-POST-Register
+  acceptanceCriteria:
+    - 组件应渲染所有必填的注册字段输入框。
+    - 实时验证输入格式（用户名、密码强度、证件号码等）。
+    - 密码和确认密码不一致时显示错误提示。
+    - 包含服务条款同意复选框，未同意时不能提交。
+    - 提交时显示加载状态，成功后显示成功消息。
+    - 各字段验证失败时在对应位置显示错误提示。
+  changeLog:
+    - date: "2025-01-20"
+      description: "初始创建。"
+
+# 个人中心相关UI组件
+- type: Frontend
+  id: UI-ProfileSidebar
+  description: 个人中心侧边栏导航组件。
+  properties:
+    - name: activeMenuItem
+      type: string
+      description: "当前激活的菜单项。"
+    - name: onMenuItemClick
+      type: function
+      description: "菜单项点击回调函数。"
+    - name: userInfo
+      type: object
+      description: "用户基本信息对象。"
+  state:
+    - selectedItem
+  dependencies:
+    - none
+  acceptanceCriteria:
+    - 显示用户头像和基本信息概要。
+    - 包含"个人信息"、"乘车人管理"、"订单管理"等导航链接。
+    - 当前激活的菜单项应有视觉高亮显示。
+    - 点击菜单项时触发相应的回调函数。
+  changeLog:
+    - date: "2025-01-20"
+      description: "初始创建。"
+
+- type: Frontend
+  id: UI-UserProfileView
+  description: 用户基本信息展示和编辑组件。
+  properties:
+    - name: userInfo
+      type: object
+      description: "用户信息对象。"
+    - name: onUpdateProfile
+      type: function
+      description: "更新用户信息的回调函数。"
+    - name: editable
+      type: boolean
+      description: "是否允许编辑，默认为false。"
+  state:
+    - isEditing
+    - editForm
+    - isLoading
+    - error
+    - successMessage
+  dependencies:
+    - API-GET-UserProfile
+    - API-PUT-UserProfile
+  acceptanceCriteria:
+    - 以只读形式展示用户的基本信息。
+    - 敏感信息（如证件号）应部分遮掩显示。
+    - 提供"编辑"按钮切换到编辑模式。
+    - 编辑模式下只允许修改手机号和邮箱。
+    - 保存成功后显示成功消息并退出编辑模式。
+  changeLog:
+    - date: "2025-01-20"
+      description: "初始创建。"
+
+- type: Frontend
+  id: UI-PassengerManagement
+  description: 乘车人管理组件，包含列表展示和增删改操作。
+  properties:
+    - name: onPassengerChange
+      type: function
+      description: "乘车人信息变更后的回调函数。"
+  state:
+    - passengers
+    - isLoading
+    - searchKeyword
+    - selectedPassengers
+    - showAddForm
+    - editingPassenger
+    - error
+  dependencies:
+    - API-GET-Passengers
+    - API-POST-Passenger
+    - API-PUT-Passenger
+    - API-DELETE-Passenger
+  acceptanceCriteria:
+    - 以表格形式展示乘车人列表，包含序号、姓名、证件类型、证件号码、手机号、核验状态。
+    - 每行记录提供"编辑"和"删除"操作按钮。
+    - 提供搜索框支持按姓名或证件号搜索。
+    - 包含"添加乘车人"和"批量删除"功能按钮。
+    - 删除操作前应显示确认对话框。
+    - 添加/编辑乘车人时显示模态表单。
+  changeLog:
+    - date: "2025-01-20"
+      description: "初始创建。"
+
+- type: Frontend
+  id: UI-PassengerForm
+  description: 乘车人信息添加/编辑表单组件。
+  properties:
+    - name: passenger
+      type: object
+      description: "乘车人信息对象，编辑时传入现有信息。"
+    - name: onSubmit
+      type: function
+      description: "表单提交回调函数。"
+    - name: onCancel
+      type: function
+      description: "取消操作回调函数。"
+    - name: mode
+      type: string
+      description: "表单模式，'add'或'edit'。"
+  state:
+    - formData
+    - isLoading
+    - errors
+    - validationStatus
+  dependencies:
+    - none
+  acceptanceCriteria:
+    - 包含姓名、证件类型、证件号码、手机号、旅客类型等输入字段。
+    - 实时验证证件号码格式。
+    - 提供"保存"和"取消"按钮。
+    - 表单验证失败时在对应字段显示错误提示。
+    - 提交时显示加载状态。
+  changeLog:
+    - date: "2025-01-20"
+      description: "初始创建。"
+
+- type: Frontend
+  id: UI-OrderManagement
+  description: 订单管理组件，支持查看历史订单和未出行订单。
+  properties:
+    - name: onOrderAction
+      type: function
+      description: "订单操作（支付、取消等）回调函数。"
+  state:
+    - orders
+    - activeTab  # 'upcoming' | 'history'
+    - isLoading
+    - error
+    - selectedOrders
+  dependencies:
+    - API-GET-Orders
+    - API-POST-OrderPayment
+  acceptanceCriteria:
+    - 提供"未出行订单"和"历史订单"标签页切换。
+    - 以列表形式展示订单信息，包含订票日期、车次、出发地、目的地、时间、乘车人、座位、票价、状态。
+    - 根据订单状态显示相应的操作按钮（支付、取消、查看详情）。
+    - 支付操作成功后刷新订单列表。
+    - 显示订单相关的温馨提示信息。
+  changeLog:
+    - date: "2025-01-20"
+      description: "初始创建。"
+
+- type: Frontend
+  id: UI-OrderCard
+  description: 单个订单信息卡片组件。
+  properties:
+    - name: order
+      type: object
+      description: "订单信息对象。"
+    - name: onPayment
+      type: function
+      description: "支付操作回调函数。"
+    - name: onCancel
+      type: function
+      description: "取消订单回调函数。"
+    - name: onViewDetails
+      type: function
+      description: "查看详情回调函数。"
+  state:
+    - isProcessing
+  dependencies:
+    - none
+  acceptanceCriteria:
+    - 清晰展示订单的关键信息（车次、时间、乘车人、价格等）。
+    - 根据订单状态显示不同的视觉样式。
+    - 操作按钮根据订单状态动态显示/隐藏。
+    - 操作进行中时显示加载状态。
+  changeLog:
+    - date: "2025-01-20"
+      description: "初始创建。"
+
+# 通用UI组件
+- type: Frontend
+  id: UI-LoadingSpinner
+  description: 通用加载状态指示器组件。
+  properties:
+    - name: size
+      type: string
+      description: "加载器大小，'small'、'medium'、'large'。"
+    - name: message
+      type: string
+      description: "加载提示文本。"
+  state:
+    - none
+  dependencies:
+    - none
+  acceptanceCriteria:
+    - 提供不同尺寸的加载动画。
+    - 可选择性显示加载提示文本。
+    - 动画应平滑且不影响页面性能。
+  changeLog:
+    - date: "2025-01-20"
+      description: "初始创建。"
+
+- type: Frontend
+  id: UI-ErrorMessage
+  description: 通用错误信息展示组件。
+  properties:
+    - name: error
+      type: string
+      description: "错误信息文本。"
+    - name: type
+      type: string
+      description: "错误类型，'error'、'warning'、'info'。"
+    - name: onClose
+      type: function
+      description: "关闭错误信息的回调函数。"
+  state:
+    - visible
+  dependencies:
+    - none
+  acceptanceCriteria:
+    - 根据错误类型显示不同的视觉样式。
+    - 提供关闭按钮允许用户手动关闭。
+    - 支持自动消失功能。
+  changeLog:
+    - date: "2025-01-20"
+      description: "初始创建。"
