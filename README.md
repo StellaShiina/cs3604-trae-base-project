@@ -40,3 +40,4 @@
 - `frontend/` 前端代码（Vue 页与组件、测试）
 - `init-scripts/` 数据库初始化与滚动逻辑（14 天数据与库存）
 - `.github/workflows/ci.yml` GitHub Actions 工作流（CI 与部署通知）
+
