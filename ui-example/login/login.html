@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>12306 CHINA RAILWAY</title>
+<link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
+<meta name="description" content="">
+<meta name="keywords" content="">
+<!-- <link href="css/style.css" rel="stylesheet">
+<link href="css/loginReg.css" rel="stylesheet"> -->
+<link href="fonts/iconfont.css" rel="stylesheet">
+<!-- 压缩 -->
+<link rel="stylesheet" href="css/forgotPassword_v20001.css">
+</head>
+<body class="page-login">
+<!-- header -->
+<div class="header">
+  <div class="wrapper">
+    <div class="header-con">
+      <h1 class="logo"><a href="index.html">中国铁路12306</a></h1>
+      <!-- <div class="header-welcome">Welcome to login 12306！</div> -->
+    </div>
+  </div>
+</div>
+<!-- 登录区域 -->
+<div class="login-panel">
+  <!-- 轮播图 -->
+  <div class="loginSlide" id="J-login-slide">
+    <div class="bd">
+<!--       <ul>
+        <li style="background: url(images/pic/banner-login.jpg) center center no-repeat;"><a href="javascript:;"></a></li>
+        <li style="background: url(images/pic/banner-login.jpg) center center no-repeat;"><a href="javascript:;"></a></li>
+      </ul> -->
+    </div>
+    <div class="hd"><ul></ul></div>
+  </div>
+  <!--  仅显示账户登录添加样式login-box-account，验证码隐藏添加样式 login-box-account-nocode -->
+  <div class="login-box" id="J-login-box" data-popup="0">
+    <ul class="login-hd">
+      <li class="login-hd-account">Login</li>
+    </ul>
+    <div class="login-bd">
+      <!-- 账号登录 -->
+      <div class="login-account">
+        <div class="login-item">
+          <label for="user" class="item-label"><i class="icon icon-user"></i></label>
+          <input type="text" class="input" id="user" placeholder="Email/Username/Mobile number">
+        </div>
+        <div class="login-item">
+          <label for="pwd" class="item-label"><i class="icon icon-pwd"></i></label>
+          <input type="password" class="input" id="pwd" placeholder="Password">
+        </div>
+
+        <div id="J-slide-passcode" class="nc-container"></div>
+        <!--No-Captcha渲染的位置，其中 class 中必须包含 nc-container-->
+
+        <div class="login-error" id="J-login-error"><i class="icon icon-error"></i><span>The password you entered is incorrect. Please check and re-enter</span></div>
+        <div class="login-item text-light">
+         <!-- <label class="pull-left"><input type="checkbox"><span class="ml">Remember me</span></label> -->
+         <a id="J-forgot-password" href="javascript:;" class="pull-right text-light">Forgot your password</a>
+        </div>
+        <div class="login-btn">
+          <a id="J-login" href="javascript:;" class="btn btn-primary form-block">LOGIN</a>
+        </div>
+        <div class="login-txt">
+          No account yet?<a id="J-register" href="javascript:;" class="text-primary text-underline">Register now</a>!
+        </div>
+      </div>
+    </div>
+    <div class="login-ft">
+      <p>1. The 12306.cn website provides information query and ticket refund services 24 hours a day, and the ticket sales and endorsement services from 5:00 to 1:00 the next day (5:00 to :30 on Tuesday).</p>
+      <p>2. For ticket endorsement and refund on the 12306.cn website, the endorsement should be no later than 24:00 on the date shown on the ticket, the change of destination no later than 48 hours before departure, and the ticket refund should be no later than the train’s departure.</p>
+    </div>
+  </div>
+</div>
+<!-- footer -->
+<div class="footer footer-fixed" id="J-g-footer">
+  <div class="wrapper">
+    <div class="footer-text">
+      COPYRIGHT©2008-2025 CHINA ACADEMY OF RAILWAY SCIENCES CORPORATION LIMITED，ALL RIGHTS RESERVED
+    </div>
+    <div class="footer-text">
+      <span class="mr">
+        <img src="https://www.12306.cn/en/images/gongan.png" alt="公安" style="width:13px">
+        <a target="blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=11010802038392" style="color:#999">京公网安备 11010802038392号</a>
+        <a href="javascript:;"> | 京ICP备05020493号-4 | ICP证：京B2-20202537</a>
+      </span>
+      
+    </div>
+    <div class="footer-text"><span class="mr"><a href="privacy.html" target="_blank">Privacy Policy</a>|<a
+          href="privacy.html#cookies" target="_blank">Cookie Statement</a></span></div>
+  </div>
+</div>
+
+<!-- 返回顶部 -->
+<div class="gototop js-top">
+  <a href="javascript:;" class="js-gotop" title="backtotop"><i class="icon icon-gotop"></i></a>
+</div>
+
+
+<!-- loading -->
+<!-- loading -->
+<div class="mask mask-loading">
+    <img style="display: block;position: absolute;left: 0;right: 0;top: 0;bottom: 0;margin: auto;width: 60px;" src="images/loading_en.gif">
+</div>
+
+<!-- template start -->
+<script type="text/template" id="J-temp-login-fullSlide">
+<ul>
+	<%if(obj && obj.length > 0){%>
+		<%_.each(obj, function(v, i){%>
+			<li style="background: url(<%=v.url%>) center center no-repeat;"><a <%if(v.src && typeof(v.src) !== undefined){%>href="<%=v.src%>"<%}else{%>href="javascript:;" style="cursor: default;"<%}%> <%if(v.src && typeof(v.src) !== undefined && v.target==1){%>target="_blank"<%}%>></a></li>
+		<%})%>
+	<%}else{%>
+        <li style="background: url(images/pic/banner-login.jpg) center center no-repeat;"><a href="javascript:;"></a></li>
+        <li style="background: url(images/pic/banner-login.jpg) center center no-repeat;"><a href="javascript:;"></a></li>
+	<%}%>
+</ul>
+</script>
+
+
+
+<!-- template end -->
+<!-- <script data-main="js/login/main" src="js/core/libs/require.js"></script> -->
+<script data-main="js/dist/login/main_v20004" src="js/core/libs/require.js"></script>
+</body>
+</html>

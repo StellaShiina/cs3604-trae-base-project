@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>12306 CHINA RAILWAY</title>
+<link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
+<meta name="description" content="">
+<meta name="keywords" content="">
+<!-- <link href="css/style.css" rel="stylesheet"> -->
+<!-- 登录页面样式 -->
+<!-- <link href="css/loginReg.css" rel="stylesheet"> -->
+<link href="fonts/iconfont.css" rel="stylesheet">
+<!-- 日期城市控件 -->
+<!-- <link href="css/common/calendarNew.css" rel="stylesheet">
+<link href="css/common/table.css" rel="stylesheet">
+<link href="css/common/station.css" rel="stylesheet"> -->
+<!-- 压缩 -->
+<link rel="stylesheet" href="css/leftTicket_v20002.css">
+</head>
+<body id="J-left-ticket">
+<!-- header -->
+<div class="header" id="J-g-header">
+  <div class="header-top-bar" style='display: none;'>
+    <div class="wrapper">
+      <div class="cookies">By using this website, you are deemed to consent to our <a id="J-goUserOfCookies" style="font-style:italic; color:#3B99FC;" href="privacy.html#cookies" target="_blank">Use of cookies</a>. <span class="agree-btn">ok</span></div>
+      <a href="javascript:;" class="close"><i class="icon icon-close" title="Close"></i></a>
+    </div>
+  </div>
+  <div class="header-bd">
+    <div class="wrapper">
+      <h1 class="logo"><a href="index.html"><img src="images/logo.png" alt=""></a></h1>
+      <div class="header-right">
+        <ul class="header-menu">
+          <li class="menu-item menu-login" id="J-header-name"></li>
+          <li class="menu-item menu-login"><a id="J-signin" href="javascript:;">Login</a></li>
+          <li class="menu-item menu-login"><a id="J-register" href="javascript:;">Register</a></li>
+          <li class="menu-item menu-nav">
+            <a href="center-index.html" class="menu-nav-hd">My 12306<i class="icon icon-caret-down"></i></a>
+            <ul class="menu-nav-bd">
+              <li><a href="train-tickets.html">Order center</a></li>
+              <li><a href="personal-information.html">User information</a></li>
+              <li><a href="account-security.html">Account security</a></li>
+              <li><a href="contacts.html">My passengers</a></li>
+            </ul>
+          </li>
+          <li class="menu-item menu-nav">
+            <a href="https://www.12306.cn" class="menu-nav-hd">简体中文<i class="icon icon-down"></i></a>
+            <ul class="menu-nav-bd">
+              <li><a href="https://www.12306.cn">简体中文</a></li>
+              <li><a href="index.html">English</a></li>
+            </ul>
+          </li>
+                    <li class="menu-item menu-contact">
+            <a href="javascript:;"><i class="icon icon-contact mr"></i>Contact us</a>
+              <div class="panel-tooltips tooltips03 bottom-left">
+                <div class="tooltip-arw"></div>
+                <div class="tooltip-hd">
+                  Contact us
+                </div>
+                <div class="tooltip-bd">
+                  <ul class="contact-cont">
+                    <li class="list-item">
+                      <i class="icon icon-tel"></i>
+                      <div class="list-bd">
+                        <div class="list-title">Phone number</div>
+                        <div class="list-txt">+86 12306</div>
+                      </div>
+                    </li>
+                    <!-- <li class="list-item">
+                      <i class="icon icon-mail1"></i>
+                      <div class="list-bd">
+                        <div class="list-title">E-mail</div>
+                        <div class="list-txt">kyfw@12306.cn</div>
+                      </div>
+                    </li> -->
+                  </ul>
+                </div>
+              </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="nav-box">
+    <ul class="nav">
+      <li id="J-header-index" class="nav-item"><a href="index.html" class="nav-hd">Home</a></li>
+      <li id="J-header-ticket" class="nav-item">
+        <a href="javascript:;" class="nav-hd">Booking<i class="icon icon-down"></i></a>
+        <div class="nav-bd nav-bd-col2">
+          <div class="nav-bd-top"></div>
+          <div class="nav-bd-con">
+            <div class="nav-bd-item">
+              <ul class="nav-con">
+                <li><a id="J-location-oneWayTrip" href="javascript:;">Tickets</a></li>
+                <li><a id="J-location-refund" href="javascript:;">Refund</a></li>
+              </ul>
+            </div>
+            <div class="nav-bd-item">
+              <ul class="nav-con">
+                <li><a id="J-location-resign" href="javascript:;">Endorsement</a></li>
+                <li><a id="J-location-cs_resign" href="javascript:;">Change of destination</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </li>
+      <li id="J-header-travelGuide" class="nav-item">
+        <a href="faq.html" target="_blank" class="nav-hd">Travel guides<i class="icon icon-down"></i></a>
+        <div class="nav-bd nav-bd-col3">
+          <div class="nav-bd-top"></div>
+          <div class="nav-bd-con">
+            <div class="nav-bd-item">
+              <h3 class="nav-tit">Ticketing</h3>
+              <ul class="nav-con">
+                <li><a href="faq.html#item0q01" target="_blank" title="What is real-name ticketing?">What is real-name ticketing?</a></li>
+                <li><a href="faq.html" target="_blank" title="How many kinds of tickets are there?">How many kinds of tickets are there?</a></li>
+                <li><a href="faq.html" target="_blank" title="What is the validity period of tickets?">What is the validity period of tickets?</a></li>
+                <li><a href="faq.html" target="_blank" title="Where can I buy the ticket?">Where can I buy the ticket?</a></li>
+                <li><a href="faq.html" class="text-lighter" target="_blank">More></a></li>
+              </ul>
+            </div>
+            <div class="nav-bd-item">
+              <h3 class="nav-tit">Endorsement and refund</h3>
+              <ul class="nav-con">
+                <li><a href="faq.html?item=1" target="_blank" title="What is endorsement?">What is endorsement?</a></li>
+                <li><a href="faq.html?item=1" target="_blank" title="What are the rules of ticket endorsement?">What are the rules of ticket endorsement?</a></li>
+                <li><a href="faq.html?item=1" target="_blank" title="What are the rules of ticket ensorsement on the 12306.cn English website?">What are the rules of ticket ensorsement on the 12306.cn English website?</a></li>
+                <li><a href="faq.html?item=1" target="_blank" title="What is change of destination?">What is change of destination?</a></li>
+                <li><a href="faq.html?item=1" class="text-lighter" target="_blank">More></a></li>
+              </ul>
+            </div>
+            <div class="nav-bd-item">
+              <h3 class="nav-tit">Miscellaneous</h3>
+              <ul class="nav-con">
+                <li><a href="faq.html?item=2" target="_blank" title="Are children allowed to take the train alone?">Are children allowed to take the train alone?</a></li>
+                <li><a href="faq.html?item=2" target="_blank" title="How to buy child tickets?">How to buy child tickets?</a></li>
+                <li><a href="faq.html?item=2" target="_blank" title="Is an ID card required to buy a child ticket?">Is an ID card required to buy a child ticket?/a></li>
+                <li><a href="faq.html?item=2" target="_blank" title="Is there any discount for child tickets?">Is there any discount for child tickets?</a></li>
+                <li><a href="faq.html?item=2" class="text-lighter" target="_blank">More></a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+
+
+<!-- content -->
+<div class="wrapper content" style="min-height: 800px;">
+  <!-- search -->
+  <ul class="ticket-search">
+    <li class="search-item">
+      <label for="" class="form-label">From</label>
+      <div class="input-box input-city w170">
+        <input id="fromStation" name="from_station" type="hidden" class="input">
+        <input id="fromStationText" type="text" class="input" placeholder="Station" autocomplete="off">
+        <i class="icon icon-place"></i>
+      </div>
+    </li>
+    <li class="search-item">
+      <div id="J-switchFromTo" class="search-city-change"><i class="icon icon-qiehuan"></i></div>
+    </li>
+    <li class="search-item">
+      <label for="" class="form-label">To</label>
+      <div class="input-box input-city w170">
+        <input id="toStation" name="to_station" type="hidden" class="input">
+        <input id="toStationText" type="text" class="input" placeholder="Station" autocomplete="off">
+        <i class="icon icon-place"></i>
+      </div>
+    </li>
+    <li class="search-item">
+      <label for="" class="form-label">Date</label>
+      <div class="input-box input-date w140">
+        <input id="departDateText" type="text" class="input" readonly placeholder="Departure date">
+        <i class="icon icon-date"></i>
+      </div>
+    </li>
+    <li class="search-item pull-right"><a id="J-search" href="javascript:;" class="btn btn-primary w100">Search</a></li>
+  </ul>
+
+  <div id="J-left-ticket-main" class="ticket-main">
+    <!-- 车票筛选左侧 -->
+    <div id="J-left-ticket-filter" class="ticket-side">
+      <!-- 模板内容 -->
+    </div>
+    <!-- 车票列表 -->
+    <div id="J-left-ticket-content" class="ticket-content">
+      <!-- 模板内容 -->
+    </div>
+  </div>
+</div>
+<!-- footer -->
+<div class="footer footer-fixed" id="J-g-footer">
+  <div class="wrapper">
+    <div class="footer-text">
+      COPYRIGHT©2008-2025 CHINA ACADEMY OF RAILWAY SCIENCES CORPORATION LIMITED，ALL RIGHTS RESERVED
+    </div>
+    <div class="footer-text">
+      <span class="mr">
+        <img src="https://www.12306.cn/en/images/gongan.png" alt="公安" style="width:13px">
+        <a target="blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=11010802038392" style="color:#999">京公网安备 11010802038392号</a>
+        <a href="javascript:;"> | 京ICP备05020493号-4 | ICP证：京B2-20202537</a>
+      </span>
+      
+    </div>
+    <div class="footer-text"><span class="mr"><a href="privacy.html" target="_blank">Privacy Policy</a>|<a
+          href="privacy.html#cookies" target="_blank">Cookie Statement</a></span></div>
+  </div>
+</div>
+
+<!-- 返回顶部 -->
+<div class="gototop js-top">
+  <a href="javascript:;" class="js-gotop" title="backtotop"><i class="icon icon-gotop"></i></a>
+</div>
+
+
+<!-- template start -->
+<script type="text/template" id="J-temp-left-ticket-filter">
+<%if(obj && obj.trainList) {%>
+<div class="ticket-filter-list">
+  <div class="filter-head">Filter</div>
+  <div class="filter-item">
+    <div class="filter-hd">Train type</div>
+    <div class="filter-bd">
+      <ul class="filter-key-list train-type">
+        <li class="key-item"><label class="check-inline"><input class="allCheckTrainType" filter-type="train-type" value="All" type="checkbox"<%if(obj.filterList && obj.filterList.trainType && obj.filterList.trainType.indexOf('All')>-1){%> checked<%}%>>All</label></li>
+        <li class="key-item"><label class="check-inline"><input class="checkTrainType" name="train-type" value="G/C/D" type="checkbox"<%if(obj.filterList && obj.filterList.trainType && obj.filterList.trainType.indexOf('G/C/D')>-1){%> checked<%}%>>G/C/D</label></li>
+        <li class="key-item"><label class="check-inline"><input class="checkTrainType" name="train-type" value="Other" type="checkbox"<%if(obj.filterList && obj.filterList.trainType && obj.filterList.trainType.indexOf('Other')>-1){%> checked<%}%>>Other</label></li>
+      </ul>
+    </div>
+  </div>
+  <%if(obj.filterFromStationList && obj.filterFromStationList.length>0){%>
+  <div class="filter-item">
+    <div class="filter-hd">From Station</div>
+    <div class="filter-bd">
+      <ul class="filter-key-list from-station">
+        <li class="key-item"><label class="check-inline"><input class="allCheckFromStation" filter-type="from-station" value="All" type="checkbox"<%if(obj.filterList && obj.filterList.fromStation && obj.filterList.fromStation.indexOf('All')>-1){%> checked<%}%>>All</label></li>
+        <%_.each(obj.filterFromStationList, function(val, key){%>
+          <%var code = Object.keys(val)[0];%>
+          <li class="key-item"><label class="check-inline"><input class="checkFromStation" filter-type="from-station" type="checkbox"<%if(obj.filterList && obj.filterList.fromStation && obj.filterList.fromStation.indexOf(code)>-1){%> checked<%}%> value='<%=code%>'><%=_._getStationEnNameByCode(code)%></label></li>
+        <%})%>
+      </ul>
+    </div>
+  </div>
+  <%}%>
+  <%if(obj.filterToStationList && obj.filterToStationList.length>0){%>
+  <div class="filter-item">
+    <div class="filter-hd">To Station</div>
+    <div class="filter-bd">
+      <ul class="filter-key-list to-station">
+        <li class="key-item"><label class="check-inline"><input class="allCheckToStation" filter-type="to-station" value="All" type="checkbox"<%if(obj.filterList && obj.filterList.toStation && obj.filterList.toStation.indexOf('All')>-1){%> checked<%}%>>All</label></li>
+        <%_.each(obj.filterToStationList, function(val, key){%>
+          <%var code = Object.keys(val)[0];%>
+          <li class="key-item"><label class="check-inline"><input class="checkToStation" filter-type="to-station" type="checkbox" value='<%=code%>'<%if(obj.filterList && obj.filterList.toStation && obj.filterList.toStation.indexOf(code)>-1){%> checked<%}%>><%=_._getStationEnNameByCode(code)%></label></li>
+        <%})%>
+      </ul>
+    </div>
+  </div>
+  <%}%>
+  <div class="filter-item filter-item-last">
+    <div class="filter-hd">Departure Time</div>
+    <div class="filter-bd">
+      <ul class="filter-key-list departure-time">
+        <li class="key-item mr0">
+          <%var _departureTime = obj.departureTime;%>
+          <div class="sel form-block">
+            <div class="sel-hd">
+              <div class="sel-inner"><%=_departureTime%></div>
+              <i class="icon icon-caret-down"></i>
+            </div>
+            <div class="sel-bd">
+              <ul class="sel-list">
+                <li <%if(_departureTime === '00:00-24:00'){%>class="active"<%}%>>00:00-24:00</li>
+                <li <%if(_departureTime === '00:00-06:00'){%>class="active"<%}%>>00:00-06:00</li>
+                <li <%if(_departureTime === '06:00-12:00'){%>class="active"<%}%>>06:00-12:00</li>
+                <li <%if(_departureTime === '12:00-18:00'){%>class="active"<%}%>>12:00-18:00</li>
+                <li <%if(_departureTime === '18:00-24:00'){%>class="active"<%}%>>18:00-24:00</li>
+              </ul>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+<%}%>
+</script>
+<script type="text/template" id="J-temp-left-ticket-content">
+  <%if(obj && obj.trainList) {%>
+  <div class="ticket-filter-date">
+    <div class="filter-date-prev disabled"><i class="icon icon-left"></i></div>
+    <div class="filter-date-list-box">
+      <ul class="filter-date-list">
+        <%if(obj.filterAllData && obj.filterAllData.length > 0) {%>
+            <%_.each(obj.filterAllData, function(val, key){%>
+                <%var value = Object.keys(val);%>
+                <%if(value == obj.trainDate) {%>
+                <li class="active" data-date="<%=value%>"><%=val[value]%></li>
+                <%}else{%>
+                <li data-date="<%=value%>"><%=val[value]%></li>
+                <%}%>
+            <%})%>
+        <%}%>
+      </ul>
+    </div>
+    <div class="filter-date-next"><i class="icon icon-right"></i></div>
+  </div>
+  <div class="ticket-list-box">
+    <!-- 搜索结果顶部 -->
+    <div class="ticket-result-top">
+      <div class="search-citys">
+        <span class="citys-item"><%=obj.fromStation%></span>
+        <i class="citys-to"></i>
+        <span class="citys-item"><%=obj.toStation%></span></a>
+      </div>
+      <div class="pull-left text-lighter mr-lg">（<%=obj.trainList.length%> results）</div>
+    </div>
+    <!-- 搜索结果列表 -->
+    <div class="ticket-result-box">
+      <div class="ticket-result-hd">
+        <div class="ticket-result-titlist">
+          <%var sort = obj.sort;%>
+          <div class="ticket-number" style="width:120px;">Train No.</div>
+          <div class="ticket-time sort-departure">Departure time<span class="btn-sort"><%if(sort == -1){%><i class="sort-top active"></i><i class="sort-down"></i><%}else if(sort == 1){%><i class="sort-top"></i><i class="sort-down active"></i><%}else{%><i class="sort-top"></i><i class="sort-down"></i><%}%></span></div>
+          <div class="ticket-alltime sort-duration">Travel time<span class="btn-sort"><%if(sort == -2){%><i class="sort-top active"></i><i class="sort-down"></i><%}else if(sort == 2){%><i class="sort-top"></i><i class="sort-down active"></i><%}else{%><i class="sort-top"></i><i class="sort-down"></i><%}%></span></div>
+          <div class="ticket-time sort-arrival">Arrival time<span class="btn-sort"><%if(sort == -3){%><i class="sort-top active"></i><i class="sort-down"></i><%}else if(sort == 3){%><i class="sort-top"></i><i class="sort-down active"></i><%}else{%><i class="sort-top"></i><i class="sort-down"></i><%}%></span></div>
+          <div class="ticket-price" style="width: 238px;">Price</div>
+          <div class="ticket-btn"></div>
+        </div>
+      </div>
+      <div class="ticket-result-bd">
+        <%if(obj.trainList && obj.trainList.length > 0) {%>
+            <%_.each(obj.trainList, function(item, index){%>
+
+                <%if(item.controlledFlag == 0) {%>
+                <div class="ticket-result-item">
+                    <!-- 车次相关 -->
+                    <div class="ticket-item-info">
+                        <div class="ticket-number" style="width:120px;">
+                            <div class="ticket-number-num">
+                              <div class="ticket-number-num">
+                                <a title="点击查看停靠站信息" href="javascript:;" data-train_no="<%=item.allStationCode%>" data-from_station_telecode="<%=item.fromStationCode%>"
+                                data-to_station_telecode="<%=item.toStationCode%>" data-depart-date="<%=item.departDate%>"><%=item.trainType%><i></i></a>
+                                <div class="panel-tooltips right tooltips02" style="display: none;">
+                                  <div class="tooltip-arw"></div>
+                                  <a href="javascript:;" class="tooltip-close icon icon-close" title="Close"><i class=""></i></a>
+                                  <div class="tooltip-bd">
+                                    <!-- 模板渲染 -->
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="ticket-time">
+                          <div class="ticket-time-num text-primary"><%=item.departureTime%></div>
+                          <div class="ticket-time-info"><%=_._getStationEnNameByCode(item.fromStationCode, true)%><a href="javascript:;" class="icon icon-weizhi gmap" data-city="<%=_._getStationNameByCode(item.fromStationCode)%>"></a></div>
+                        </div>
+                        <div class="ticket-alltime">
+                          <div class="ticket-alltime-txt"><%=item.duration%></div>
+                          <div class="ticket-train-type"></div>
+                        </div>
+                        <div class="ticket-time">
+                          <div class="ticket-time-num"><%=item.arrivalTime%><span class="text-md ml"><%if(item.days > 0) {%>+<%=item.days%><%}%></span></div>
+                          <div class="ticket-time-info"><%=_._getStationEnNameByCode(item.toStationCode, true)%><a href="javascript:;" class="icon icon-weizhi gmap" data-city="<%=_._getStationNameByCode(item.toStationCode)%>"></a></div>
+                        </div>
+                    </div>
+                    <!-- 购买相关 -->
+                    <div class="ticket-item-buy">
+                        <%if(item.seatInfo && item.seatInfo.length > 0) {%>
+                            <%_.each(item.seatInfo, function(_seatInfo_item, _seatInfo_index) {%>
+                            <div class="ticket-item-buy-item-drop">
+                            <div class="ticket-item-buy-item" style="width: 338px;">
+                              <div class="ticket-price" style="width: 238px;">
+                                <div class="ticket-price-seat" style="width: 69.2%;"><%=_seatInfo_item.seat_type_name%></div>
+                                <div class="ticket-price-num" style="width: 30.8%;">
+                                  <span class="text-price"><i class="rmb">¥</i><%=_seatInfo_item.money%>
+                                  </span>
+                                    <!-- 硬卧向下箭头 -->
+                                    <%if((_seatInfo_item.upperPrice&&_seatInfo_item.upperPrice!='')||(_seatInfo_item.middlePrice&&_seatInfo_item.middlePrice!='')||(_seatInfo_item.lowerPrice&&_seatInfo_item.lowerPrice!='')){%>
+                                      <i class="icon icon-caret-down text-primary text-md priceDetail" style="cursor: pointer;"></i>
+                                    <%}%>
+                                    <%if(item.fromStationCode == 'XJA' || item.toStationCode == 'XJA'){%>
+                                      <%if(_seatInfo_item.tickets_count && _seatInfo_item.seat_type_name != 'standing ticket' && _seatInfo_item.tickets_count.indexOf('&nbsp') != -1){%>
+                                        <%if(_seatInfo_item.discount&&_seatInfo_item.discount!=''){%>
+                                          <div class="left-num" style="left:-27px;padding-left:0px;padding-bottom:0px;">
+                                          <span style="background-color:#FFF5EE;color:#F57B1E;"><%=(100-_seatInfo_item.discount*1)%>%&nbsp;off&nbsp;&nbsp;</span>
+                                        <%}else{%>
+                                          <div class="left-num">
+                                        <%}%>  
+                                        <%=_seatInfo_item.tickets_count%>
+                                        </div>
+                                      <%}else{%>
+                                        <%if(_seatInfo_item.discount&&_seatInfo_item.discount!=''){%>
+                                          <div class="left-num" style="padding:0;">
+                                            <span style="background-color:#FFF5EE;color:#F57B1E;"><%=(100-_seatInfo_item.discount*1)%>%&nbsp;off&nbsp;&nbsp;</span>
+                                          </div>
+                                        <%}%>
+                                      <%}%>
+                                    <%}else{%>
+                                      <%if(_seatInfo_item.tickets_count && _seatInfo_item.tickets_count.indexOf('&nbsp') != -1){%>
+                                        <%if(_seatInfo_item.discount&&_seatInfo_item.discount!=''){%>
+                                          <div class="left-num" style="left:-27px;padding-left:0px;padding-bottom:0px;">
+                                          <span style="background-color:#FFF5EE;color:#F57B1E;"><%=(100-_seatInfo_item.discount*1)%>%&nbsp;off&nbsp;&nbsp;</span>
+                                        <%}else{%>
+                                          <div class="left-num">
+                                        <%}%>
+                                        <%=_seatInfo_item.tickets_count%>
+                                        </div>
+                                      <%}else{%>
+                                        <%if(_seatInfo_item.discount&&_seatInfo_item.discount!=''){%>
+                                          <div class="left-num" style="padding:0;">
+                                            <span style="background-color:#FFF5EE;color:#F57B1E;"><%=(100-_seatInfo_item.discount*1)%>%&nbsp;off&nbsp;&nbsp;</span>
+                                          </div>
+                                        <%}%>
+                                      <%}%>
+                                    <%}%>
+                                    
+                                </div>
+                              </div>
+                                <%if(_seatInfo_item.tickets_count === 'None left' || _seatInfo_item.tickets_count === '*'){%>
+                                <div class="ticket-btn">
+                                    <a href="javascript:;" class="btn btn-disabled btn-sm" style="width:78px;">Sold out</a>
+                                </div>
+                                <%} else {%>
+                                  <%if((item.fromStationCode == 'XJA' || item.toStationCode == 'XJA') && _seatInfo_item.seat_type_name == 'standing ticket'){%>
+                                    <div class="ticket-btn">
+                                      <a href="javascript:;" class="btn btn-disabled btn-sm" style="width:78px;">Sold out</a>
+                                    </div>
+                                  <%}else{%>
+                                      <div class="ticket-btn">
+                                        <a id="J-booking-<%=index%>-<%=_seatInfo_index%>" href="javascript:;" class="btn btn-primary btn-sm ticketSubmit"
+                                            style="width:78px;" data-seatsName="<%=_seatInfo_item.seat_type_name%>" data-bookIndex="<%=index%>"
+                                            data-secretStr="<%=item.secretStr%>"
+                                            data-money="<%=_seatInfo_item.money%>"><%=_._handleButtonWords(item.btnText)%></a>
+                                      </div>
+                                  <%}%>
+                                <%}%>
+                            </div>
+                            <!-- 铺别票价 -->
+                            <%if((_seatInfo_item.upperPrice&&_seatInfo_item.upperPrice!='')||(_seatInfo_item.middlePrice&&_seatInfo_item.middlePrice!='')||(_seatInfo_item.lowerPrice&&_seatInfo_item.lowerPrice!='')){%>
+                              <div class="ticket-item-buy-item-group" style="border: 1px solid #acd1f9; background-color: #F0F8FF; margin-bottom: 15px; padding: 5px 0; display: none;">
+                                <%if(_seatInfo_item.upperPrice&&_seatInfo_item.upperPrice!=''){%>
+                                <div class="ticket-item-buy-item" style="margin-bottom: 0px;width:338px;">
+                                  <div class="ticket-price" style="float: none; width: 100%;">
+                                    <div class="ticket-price-seat" style="width: 47%; height: 24px; line-height: 24px; margin-top: 0;">upper sleeper</div>
+                                    <div class="ticket-price-num" style="width: 20%; height: 24px; line-height: 24px;"><span class="text-price"><i class="rmb">¥</i><%=(_seatInfo_item.upperPrice/10).toFixed(1)%></span></div>
+                                    <%if(_seatInfo_item.upperDiscount&&_seatInfo_item.upperDiscount!=''){%>
+                                      <div class="text-lighter" style="float: left; width: 33%; text-align: left;"><%=(100-_seatInfo_item.upperDiscount*1)%>% off</div>
+                                    <%}%>
+                                  </div>
+                                </div>
+                                <%}%>
+                                <%if(_seatInfo_item.middlePrice&&_seatInfo_item.middlePrice!=''){%>
+                                <div class="ticket-item-buy-item" style="margin-bottom: 0px;width:338px;">
+                                  <div class="ticket-price" style="float: none; width: 100%;">
+                                    <div class="ticket-price-seat" style="width: 47%; height: 24px; line-height: 24px; margin-top: 0;">middle sleeper</div>
+                                    <div class="ticket-price-num" style="width: 20%; height: 24px; line-height: 24px;"><span class="text-price"><i class="rmb">¥</i><%=(_seatInfo_item.middlePrice/10).toFixed(1)%></span></div>
+                                    <%if(_seatInfo_item.middleDiscount&&_seatInfo_item.middleDiscount!=''){%>
+                                      <div class="text-lighter" style="float: left; width: 33%; text-align: left;"><%=(100-_seatInfo_item.middleDiscount*1)%>% off</div>
+                                    <%}%>
+                                  </div>
+                                </div>
+                                <%}%>
+                                <%if(_seatInfo_item.lowerPrice&&_seatInfo_item.lowerPrice!=''){%>
+                                <div class="ticket-item-buy-item" style="margin-bottom: 0px;width:338px;">
+                                  <div class="ticket-price" style="float: none; width: 100%;">
+                                    <div class="ticket-price-seat" style="width: 47%; height: 24px; line-height: 24px; margin-top: 0;">lower sleeper</div>
+                                    <div class="ticket-price-num" style="width: 20%; height: 24px; line-height: 24px;"><span class="text-price"><i class="rmb">¥</i><%=(_seatInfo_item.lowerPrice/10).toFixed(1)%></span></div>
+                                    <%if(_seatInfo_item.lowerDiscount&&_seatInfo_item.lowerDiscount!=''){%>
+                                      <div class="text-lighter" style="float: left; width: 33%; text-align: left;"><%=(100-_seatInfo_item.lowerDiscount)%>% off</div>
+                                    <%}%>
+                                  </div>
+                                </div>
+                                <%}%>
+                              </div>
+                              <%}%>
+                            </div>
+                            <%})%>
+                        <%}%>
+                    </div>
+                </div>
+                <%} else {%>
+                <!-- 列车停运 -->
+                <div class="ticket-result-item ticket-result-item-disabled">
+                    <!-- 车次相关 -->
+                    <div class="ticket-item-info">
+                        <div class="ticket-number" style="width:120px;">
+                            <div class="ticket-number-num">
+                                <a title="点击查看停靠站信息" href="javascript:;"><%=item.trainType%></a>
+                            </div>
+                        </div>
+                        <div class="ticket-time">
+                            <div class="ticket-time-num text-primary text-lighter">-----</div>
+                            <div class="ticket-time-info"><%=item.fromStation%></div>
+                        </div>
+                        <div class="ticket-alltime">
+                            <div class="ticket-alltime-txt text-lighter">-----</div>
+                            <div class="ticket-train-type"></div>
+                        </div>
+                        <div class="ticket-time">
+                            <div class="ticket-time-num text-lighter">-----<span class="text-md ml"></span></div>
+                            <div class="ticket-time-info"><%=item.toStation%></div>
+                        </div>
+                    </div>
+                    <!-- 购买相关 -->
+                    <div class="ticket-item-buy">
+                        <div class="ticket-item-buy-item" style="width:338px;">
+                            <div class="ticket-price" style="width:238px;">
+                                <div class="ticket-price-seat text-lighter">-----</div>
+                            </div>
+                            <div class="ticket-btn">
+                                <!-- <a href="javascript:;" class="btn  btn-disabled btn-sm"><%=_._handleButtonWords(item.btnText)%></a> -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ticket-tip"><%=_._handleButtonWords(item.btnText)%></div>
+                </div>
+                <%}%>
+            <%})%>
+        <%}else{%>
+          <!-- 查询车次信息结果为空 -->
+          <div class="order-empty">
+            <div class="empty-pic"><img src="images/center/empty.png" alt=""></div>
+            <div class="empty-txt">
+              <!-- p宽度可以自行设置 -->
+              <p style="width: 750px;">
+              sorry, according to your inquiry condition, there is no train at present.
+              </p>
+            </div>
+          </div>
+        <%}%>
+      </div>
+    </div>
+  </div>
+  <%}else {%>
+  <!-- 查询车次信息结果为空 -->
+  <div class="order-empty">
+    <div class="empty-pic"><img src="images/center/empty.png" alt=""></div>
+    <div class="empty-txt">
+      <!-- p宽度可以自行设置 -->
+      <p style="width: 750px;">
+      sorry, according to your inquiry condition, there is no train at present.
+      </p>
+    </div>
+  </div>
+  <%}%>
+
+    <!-- 温馨提示 -->
+    <div class="tips-box mt-lg">
+      <h4 class="tips-tit">Tips</h4>
+      <p>The sleeper ticket prices shown on the page are all for upper berth.The actual prices vary among different berths.</p>
+    </div>
+</script>
+<script type="text/template" id="J-temp-left-ticket-stopStation">
+<%if(obj && obj.length > 0) {%>
+<ul class="stop-list">
+    <%_.each(obj, function(item, index) {%>
+        <%if(item.isEnabled){%>
+            <li class="is-active">
+        <%}else{%>
+            <li>
+        <%}%>
+        <div class="stop-item">
+          <div class="stop-station"><%=_._getStationEnNameByCode(item.station_tel, true) %></div>
+          <div class="stop-num"><span><%=item.station_no%></span></div>
+          <div class="stop-time"><%=item.arrive_time %></div>
+        </div>
+      </li>
+    <%})%>
+</ul>
+<%}%>
+</script>
+<!-- template end -->
+
+<!-- loading -->
+<!-- loading -->
+<div class="mask mask-loading">
+    <img style="display: block;position: absolute;left: 0;right: 0;top: 0;bottom: 0;margin: auto;width: 60px;" src="images/loading_en.gif">
+</div>
+
+<!-- login popup -->
+<div class="modal-login" style="display: none;">
+  <div class="modal-login-tit">
+    <a href="javascript:;" class="close"><i class="icon icon-close"></i></a>
+  </div>
+  <div class="login-box" id="J-login-box" data-popup="1">
+    <ul class="login-hd">
+      <li class="login-hd-account"><i class="icon icon-train1"></i>Login</li>
+    </ul>
+    <div class="login-bd">
+      <!-- 账号登录 -->
+      <div class="login-account">
+          <div class="login-item">
+            <label for="user" class="item-label"><i class="icon icon-user"></i></label>
+            <input type="text" class="input" id="user" placeholder="Email/Username/Mobile number">
+          </div>
+          <div class="login-item">
+            <label for="pwd" class="item-label"><i class="icon icon-pwd"></i></label>
+            <input type="password" class="input" id="pwd" placeholder="Password">
+          </div>
+
+          <div id="J-slide-passcode" class="nc-container"></div>
+          <!--No-Captcha渲染的位置，其中 class 中必须包含 nc-container-->
+
+          <div class="login-error" id="J-login-error"><i class="icon icon-error"></i><span>The password you entered is incorrect. Please check and re-enter</span></div>
+          <div class="login-item text-light">
+           <!-- <label class="pull-left"><input type="checkbox"><span class="ml">Remember me</span></label> -->
+           <a id="J-forgot-password" href="javascript:;" class="pull-right text-light">Forgot your password</a>
+          </div>
+          <div class="login-btn">
+            <a id="J-login" href="javascript:;" class="btn btn-primary form-block">LOGIN</a>
+          </div>
+          <div class="login-txt">
+            No account yet?<a id="J-register" href="javascript:;" class="text-primary text-underline">Register now</a>!
+          </div>
+      </div>
+    </div>
+    <div class="login-ft">
+      <p>1. 12306.cn website provides services from 5:00 AM to 11:30 PM (Chinese Standard Time) every day.</p>
+      <p>2. For ticket endorsement and refund on the 12306.cn website, the endorsement should be no later than 24:00 on the date shown on the ticket, the change of destination no later than 48 hours before departure, and the ticket refund should be no later than the train’s departure.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 车站地图 -->
+<!-- 车站地图 -->
+<div class="mask mask-map" style="display: none;"></div>
+<div class="modal modal-map" style="display: none; width: 1000px; margin-left: -500px;top:50%;margin-top:-270px;position: fixed;">
+	<a href="javascript:;" class="modal-close" title="Close"><i class="icon icon-close"></i></a>
+	<div class="modal-hd">
+	  <div class="modal-tit">Query Route</div>
+	</div>
+	<!-- 地图 -->
+	<div id="container" class="map-container" style="height:500px;">
+	</div>
+</div>
+
+<!-- 检索车站下拉框 -->
+<div id="search_div" style="z-index: 1000; position: absolute;">
+ <div id="form_cities">
+  <div id="top_cities">
+    操作提示
+  </div>
+  <div id="panel_cities"></div>
+  <div id="flip_cities">
+    翻页控制区
+  </div>
+ </div>
+</div>
+<!-- 选择车站下拉框 -->
+<div id="choice_div" style="z-index: 2000; position: absolute;">
+ <div id="form_cities2">
+  <div id="panel_cities2"></div>
+ </div>
+</div>
+
+<!-- 错误提示 -->
+<div id="from_tooltip" class="tooltip-error"><i class="icon icon-plaint-fill"></i>Please select the place of departure.</div>
+<div id="to_tooltip" class="tooltip-error"><i class="icon icon-plaint-fill"></i>Please select the place of arrival.</div>
+
+<script src="js/core/framework/station_name.js"></script>
+<script
+  type="text/javascript"
+  charset="utf-8"
+  src="https://g.alicdn.com/sd/ncpc/nc.js?t=2019121212"
+></script>
+<script data-main="js/dist/left-ticket/main_v20004" src="js/core/libs/require.js"></script>
+<!-- <script data-main="js/dist/left-ticket/main" src="js/core/libs/require.js"></script> -->
+<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=73acca8cb53175186367b1c9426fb351"></script>
+</body>
+</html>

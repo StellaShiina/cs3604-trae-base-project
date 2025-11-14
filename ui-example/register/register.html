@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>12306 CHINA RAILWAY</title>
+  <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <!-- <link href="css/style.css" rel="stylesheet">
+  <link href="css/loginReg.css" rel="stylesheet"> -->
+  <link href="fonts/iconfont.css" rel="stylesheet">
+
+  <!-- 日期城市控件 -->
+  <!-- <link href="css/common/calendarNew.css" rel="stylesheet">
+  <link href="css/common/table.css" rel="stylesheet">
+  <link href="css/common/station.css" rel="stylesheet"> -->
+  <link rel="stylesheet" href="css/leftTicket_v20002.css">
+  <style>
+    .tip-content {
+    width: 100%;
+    height: 395px;
+    padding: 20px;
+    overflow: hidden;
+    line-height: 30px;
+    font-size: 16px; 
+    box-sizing: border-box;
+  }
+  .tip-content-in {
+      overflow-y: auto;
+      width: 100%;
+      height: 395px;
+      padding-bottom: 20px;
+  }
+  </style>
+</head>
+
+<body id="J-register">
+  <!-- header -->
+  <div class="header" id="J-g-header">
+  <div class="header-top-bar" style='display: none;'>
+    <div class="wrapper">
+      <div class="cookies">By using this website, you are deemed to consent to our <a id="J-goUserOfCookies" style="font-style:italic; color:#3B99FC;" href="privacy.html#cookies" target="_blank">Use of cookies</a>. <span class="agree-btn">ok</span></div>
+      <a href="javascript:;" class="close"><i class="icon icon-close" title="Close"></i></a>
+    </div>
+  </div>
+  <div class="header-bd">
+    <div class="wrapper">
+      <h1 class="logo"><a href="index.html"><img src="images/logo.png" alt=""></a></h1>
+      <div class="header-right">
+        <ul class="header-menu">
+          <li class="menu-item menu-login" id="J-header-name"></li>
+          <li class="menu-item menu-login"><a id="J-signin" href="javascript:;">Login</a></li>
+          <li class="menu-item menu-login"><a id="J-register" href="javascript:;">Register</a></li>
+          <li class="menu-item menu-nav">
+            <a href="center-index.html" class="menu-nav-hd">My 12306<i class="icon icon-caret-down"></i></a>
+            <ul class="menu-nav-bd">
+              <li><a href="train-tickets.html">Order center</a></li>
+              <li><a href="personal-information.html">User information</a></li>
+              <li><a href="account-security.html">Account security</a></li>
+              <li><a href="contacts.html">My passengers</a></li>
+            </ul>
+          </li>
+          <li class="menu-item menu-nav">
+            <a href="https://www.12306.cn" class="menu-nav-hd">简体中文<i class="icon icon-down"></i></a>
+            <ul class="menu-nav-bd">
+              <li><a href="https://www.12306.cn">简体中文</a></li>
+              <li><a href="index.html">English</a></li>
+            </ul>
+          </li>
+                    <li class="menu-item menu-contact">
+            <a href="javascript:;"><i class="icon icon-contact mr"></i>Contact us</a>
+              <div class="panel-tooltips tooltips03 bottom-left">
+                <div class="tooltip-arw"></div>
+                <div class="tooltip-hd">
+                  Contact us
+                </div>
+                <div class="tooltip-bd">
+                  <ul class="contact-cont">
+                    <li class="list-item">
+                      <i class="icon icon-tel"></i>
+                      <div class="list-bd">
+                        <div class="list-title">Phone number</div>
+                        <div class="list-txt">+86 12306</div>
+                      </div>
+                    </li>
+                    <!-- <li class="list-item">
+                      <i class="icon icon-mail1"></i>
+                      <div class="list-bd">
+                        <div class="list-title">E-mail</div>
+                        <div class="list-txt">kyfw@12306.cn</div>
+                      </div>
+                    </li> -->
+                  </ul>
+                </div>
+              </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="nav-box">
+    <ul class="nav">
+      <li id="J-header-index" class="nav-item"><a href="index.html" class="nav-hd">Home</a></li>
+      <li id="J-header-ticket" class="nav-item">
+        <a href="javascript:;" class="nav-hd">Booking<i class="icon icon-down"></i></a>
+        <div class="nav-bd nav-bd-col2">
+          <div class="nav-bd-top"></div>
+          <div class="nav-bd-con">
+            <div class="nav-bd-item">
+              <ul class="nav-con">
+                <li><a id="J-location-oneWayTrip" href="javascript:;">Tickets</a></li>
+                <li><a id="J-location-refund" href="javascript:;">Refund</a></li>
+              </ul>
+            </div>
+            <div class="nav-bd-item">
+              <ul class="nav-con">
+                <li><a id="J-location-resign" href="javascript:;">Endorsement</a></li>
+                <li><a id="J-location-cs_resign" href="javascript:;">Change of destination</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </li>
+      <li id="J-header-travelGuide" class="nav-item">
+        <a href="faq.html" target="_blank" class="nav-hd">Travel guides<i class="icon icon-down"></i></a>
+        <div class="nav-bd nav-bd-col3">
+          <div class="nav-bd-top"></div>
+          <div class="nav-bd-con">
+            <div class="nav-bd-item">
+              <h3 class="nav-tit">Ticketing</h3>
+              <ul class="nav-con">
+                <li><a href="faq.html#item0q01" target="_blank" title="What is real-name ticketing?">What is real-name ticketing?</a></li>
+                <li><a href="faq.html" target="_blank" title="How many kinds of tickets are there?">How many kinds of tickets are there?</a></li>
+                <li><a href="faq.html" target="_blank" title="What is the validity period of tickets?">What is the validity period of tickets?</a></li>
+                <li><a href="faq.html" target="_blank" title="Where can I buy the ticket?">Where can I buy the ticket?</a></li>
+                <li><a href="faq.html" class="text-lighter" target="_blank">More></a></li>
+              </ul>
+            </div>
+            <div class="nav-bd-item">
+              <h3 class="nav-tit">Endorsement and refund</h3>
+              <ul class="nav-con">
+                <li><a href="faq.html?item=1" target="_blank" title="What is endorsement?">What is endorsement?</a></li>
+                <li><a href="faq.html?item=1" target="_blank" title="What are the rules of ticket endorsement?">What are the rules of ticket endorsement?</a></li>
+                <li><a href="faq.html?item=1" target="_blank" title="What are the rules of ticket ensorsement on the 12306.cn English website?">What are the rules of ticket ensorsement on the 12306.cn English website?</a></li>
+                <li><a href="faq.html?item=1" target="_blank" title="What is change of destination?">What is change of destination?</a></li>
+                <li><a href="faq.html?item=1" class="text-lighter" target="_blank">More></a></li>
+              </ul>
+            </div>
+            <div class="nav-bd-item">
+              <h3 class="nav-tit">Miscellaneous</h3>
+              <ul class="nav-con">
+                <li><a href="faq.html?item=2" target="_blank" title="Are children allowed to take the train alone?">Are children allowed to take the train alone?</a></li>
+                <li><a href="faq.html?item=2" target="_blank" title="How to buy child tickets?">How to buy child tickets?</a></li>
+                <li><a href="faq.html?item=2" target="_blank" title="Is an ID card required to buy a child ticket?">Is an ID card required to buy a child ticket?/a></li>
+                <li><a href="faq.html?item=2" target="_blank" title="Is there any discount for child tickets?">Is there any discount for child tickets?</a></li>
+                <li><a href="faq.html?item=2" class="text-lighter" target="_blank">More></a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+
+
+  <!-- 注册 -->
+  <div class="wrapper">
+    <!-- 面包屑 -->
+    <div class="breadcrumb">
+      Current location：<a href="index.html">HOME</a><span class="sep">></span><span class="active">Create an account</span>
+    </div>
+    <div class="register-box form-box-01">
+      <form id="registerForm" action="" method="post">
+        <ul class="form-new-list">
+          <li id="J-sel-countries" class="f-list-item">
+            <label for="sel-countries" class="f-label"><span class="required">*</span>Nationality：</label>
+            <div class="sel form-block">
+              <div class="sel-hd">
+                <div class="sel-inner"></div>
+                <i class="icon icon-caret-down"></i>
+              </div>
+              <div class="sel-bd">
+                <ul class="sel-list">
+                </ul>
+              </div>
+            </div>
+            <input id="country_code" type="hidden" name="country_code">
+			<div class="f-list-right">
+              <div class="f-tips">At present, only foreign passports are accepted for registration.</div>
+            </div>
+            <div class="form-error"><span>The Email you entered is not a valid format</span></div>
+          </li>
+          <li class="f-list-item">
+            <label for="name" class="f-label"><span class="required">*</span>Name：</label>
+            <input id="name" type="text" name="name" placeholder="" class="input form-block">
+            <div class="f-list-right">
+              <!-- <div class="f-tips"><a id="J-contacts-add-guidelines" href="javascript:;" class="text-primary text-underline">Guidelines</a></div> -->
+              <div class="f-tips"><a id="show-rule" href="javascript:;" class="text-primary text-underline">Check the rules for filling out passport information</a></div>
+            </div>
+          </li>
+          <li class="f-list-item">
+            <label for="id_no" class="f-label"><span class="required">*</span>Passport number：</label>
+            <input id="id_no" type="text" name="id_no" placeholder="" class="input form-block">
+            <div class="form-error"><span></span></div>
+
+          </li>
+          <li class="f-list-item">
+            <label for="passport_expiry_date" class="f-label"><span class="required">*</span>Passport expiration date：</label>
+            <div class="input-box input-date form-block">
+              <input id="txtPassportExpiryDate" type="text" name="passport_expiry_date" placeholder="" class="input form-block" readonly="readonly" required>
+              <i class="icon icon-date"></i>
+              <div class="form-error"><span></span></div>
+            </div>
+
+          </li>
+          <li class="f-list-item">
+            <label for="date_of_birth" class="f-label"><span class="required">*</span>Date of birth：</label>
+            <div class="input-box input-date form-block">
+              <input type="text" id="txtDateOfBirth" name="date_of_birth" class="input" placeholder="" readonly="readonly"
+                required>
+              <i class="icon icon-date"></i>
+            </div>
+
+          </li>
+          <li class="f-list-item">
+            <label for="gender" class="f-label"><span class="required">*</span>Gender：</label>
+            <label class="check-inline check-border"><input type="radio" value="M" name="gender">Male</label>
+            <label class="check-inline check-border"><input type="radio" value="F" name="gender">Female</label>
+          </li>
+          <li class="f-list-item">
+            <label for="user_name" class="f-label"><span class="required">*</span>Username：</label>
+            <input type="text" id="user_name" name="user_name" placeholder="" class="input form-block" value=""
+              required>
+            <div id="usernameSuccessTip" class="form-right" style="display: none;"><i
+                class="icon icon-success text-success"></i></div>
+            <div id="usernameTooltip" class="panel-tooltip bottom" style="display: none;">
+              <div class="tooltip-arw"></div>
+              <div class="tooltip-bd">6-30 letters, numbers or "_", beginning with a letter</div>
+            </div>
+          </li>
+          <li class="f-list-item">
+            <label for="password" class="f-label"><span class="required">*</span>Password：</label>
+            <input id="password" type="password" name="password" placeholder="" class="input form-block" maxlength="25">
+            <div class="form-level" style="display: none">
+              <span></span><span></span><span></span>
+            </div>
+          </li>
+          <li class="f-list-item">
+            <label for="password_repeat" class="f-label"><span class="required">*</span>Confirm Password：</label>
+            <input id="password_repeat" type="password" name="password_repeat" placeholder="" class="input form-block"
+              maxlength="25" required checkConfirmPassword>
+          </li>
+          <li class="f-list-item">
+            <label for="email" class="f-label"><span class="required">*</span>Email address：</label>
+            <input id="email" type="email" name="email" placeholder="" class="input form-block">
+            <div class="f-list-right">
+              <div class="f-tips">Related notifications will be sent to you via email.</div>
+            </div>
+          </li>
+        </ul>
+
+        <div class="clearfix"></div>
+        <div class="register-ft">
+          <input type="checkbox" name="readRules"><span class="ml">I have read and agree to abide by </span><a href="rule.html" target="_blank" class="text-primary text-underline trunRule">Terms of Service</a> and <a href="privacy.html" target="_blank" class="text-primary text-underline trunRule">Privacy Policy</a> of 12306.cn.
+        </div>
+        <div class="text-center mt-40">
+          <a id="J-next-step" href="javascript:;" class="btn btn-primary w320 text-mlg">Next step</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+<!-- footer -->
+<div class="footer footer-fixed" id="J-g-footer">
+  <div class="wrapper">
+    <div class="footer-text">
+      COPYRIGHT©2008-2025 CHINA ACADEMY OF RAILWAY SCIENCES CORPORATION LIMITED，ALL RIGHTS RESERVED
+    </div>
+    <div class="footer-text">
+      <span class="mr">
+        <img src="https://www.12306.cn/en/images/gongan.png" alt="公安" style="width:13px">
+        <a target="blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=11010802038392" style="color:#999">京公网安备 11010802038392号</a>
+        <a href="javascript:;"> | 京ICP备05020493号-4 | ICP证：京B2-20202537</a>
+      </span>
+      
+    </div>
+    <div class="footer-text"><span class="mr"><a href="privacy.html" target="_blank">Privacy Policy</a>|<a
+          href="privacy.html#cookies" target="_blank">Cookie Statement</a></span></div>
+  </div>
+</div>
+
+<!-- 返回顶部 -->
+<div class="gototop js-top">
+  <a href="javascript:;" class="js-gotop" title="backtotop"><i class="icon icon-gotop"></i></a>
+</div>
+
+
+<!-- template start -->
+<script type="text/template" id="J-temp-contacts-rules">
+  <div class="tip-content">
+    <div class="tip-content-in">
+      <img style="width: 100%;" src="images/rules/r1.jpg">
+      <img style="width: 100%;" src="images/rules/r2.jpg">
+      <img style="width: 100%;" src="images/rules/r3.jpg">
+      <img style="width: 100%;" src="images/rules/r4.jpg">
+      <img style="width: 100%;" src="images/rules/r5.jpg">
+      <img style="width: 100%;" src="images/rules/r6.jpg">
+      <img style="width: 100%;" src="images/rules/r7.jpg">
+      <img style="width: 100%;" src="images/rules/r8.jpg">
+      <img style="width: 100%;" src="images/rules/r9.jpg">
+      <img style="width: 100%;" src="images/rules/r10.jpg">
+      <img style="width: 100%;" src="images/rules/r11.jpg">
+      <img style="width: 100%;" src="images/rules/r12.jpg">
+      <img style="width: 100%;" src="images/rules/r13.jpg">
+      <img style="width: 100%;" src="images/rules/r14.jpg">
+    </div>
+  </div>
+</script>
+<!-- template end -->
+
+<!-- <script data-main="js/register/main" src="js/core/libs/require.js"></script> -->
+<script data-main="js/dist/register/main_v30001" src="js/core/libs/require.js"></script>
+</body>
+
+</html>
