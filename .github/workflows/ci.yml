@@ -40,11 +40,11 @@ jobs:
     - name: Test
       run: npm run test:unit -- --run
 
-  notify:
+  MY-CD:
     runs-on: ubuntu-latest
     needs: [backend-test, frontend-test]
     steps:
-    - name: Send notification
+    - name: Send CD notification
       run: |
         curl -X POST \
           -H "Authorization: Bearer ${{ secrets.CD_TOKEN }}" \

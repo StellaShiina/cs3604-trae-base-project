@@ -26,5 +26,9 @@ INSERT INTO trains(train_no,train_type) VALUES
 ('D301','D'),
 ('D302','D'),
 ('Z51','Z'),
-('K81','K')
+('K81','K'),
+('G301','G'),
+('G303','G'),
+('D701','D'),
+('Z151','Z')
 ON CONFLICT (train_no) DO UPDATE SET train_type=EXCLUDED.train_type;
