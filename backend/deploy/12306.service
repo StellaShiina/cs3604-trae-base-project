@@ -1,0 +1,19 @@
+[Unit]
+Description=12306 Server
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/opt/12306/12306-server
+WorkingDirectory=/opt/12306
+Restart=always
+RestartSec=3
+User=root
+
+Environment="PORT=30002"
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
