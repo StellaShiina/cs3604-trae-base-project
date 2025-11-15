@@ -1,6 +1,9 @@
 # cs3604 · 12306 英文版演示站点
 
+[![cdtool](https://img.shields.io/badge/Related_REPO-cdtool-blue)](https://github.com/StellaShiina/cdtool)
+
 一个涵盖后端（Go + PostgreSQL）与前端（Vue 3 + TypeScript）的完整示例，提供英文版 12306 常用流程：站点查询、车次搜索、余票展示、下单占位等。已配置 CI 与简易 CD，可在服务器上自动部署至预览站点。
+
 
 ## 主要功能
 - 站点字典与模糊搜索：按英文名或拼音查询站点列表（`/api/v1/stations`）。
