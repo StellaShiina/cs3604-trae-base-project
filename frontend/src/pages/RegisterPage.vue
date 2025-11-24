@@ -59,6 +59,16 @@ const error = ref('')
 async function register(){
   error.value=''
   if(password.value!==confirmPassword.value){ error.value='Passwords do not match'; return }
+  if(passportExpirationDate.value){
+    const exp = new Date(passportExpirationDate.value)
+    const today = new Date()
+    today.setHours(0,0,0,0)
+    if(exp < today){ error.value='Invalid passport information'; return }
+    if(dateOfBirth.value){
+      const dob = new Date(dateOfBirth.value)
+      if(dob > exp){ error.value='Date of birth cannot be after passport expiration date'; return }
+    }
+  }
   const body = { nationality: nationality.value, name: name.value, passportNumber: passportNumber.value, passportExpirationDate: passportExpirationDate.value, dateOfBirth: dateOfBirth.value, gender: gender.value, username: username.value, password: password.value, email: email.value, agreeTerms: agreeTerms.value }
   const API_BASE = import.meta.env.DEV ? 'http://localhost:8080' : ''
   const res = await fetch(`${API_BASE}/api/v1/auth/register`,{ method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) })

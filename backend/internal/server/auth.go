@@ -112,6 +112,18 @@ func (s *Server) register(c *gin.Context) {
     if req.DateOfBirth != "" {
         if t, err := time.Parse("2006-01-02", req.DateOfBirth); err == nil { dob = &t }
     }
+    // validations
+    if passportExp != nil {
+        today := time.Now()
+        if passportExp.Before(time.Date(today.Year(), today.Month(), today.Day(), 0, 0, 0, 0, today.Location())) {
+            c.JSON(http.StatusBadRequest, gin.H{"code":"invalid_parameters","message":"passport expired"})
+            return
+        }
+        if dob != nil && dob.After(*passportExp) {
+            c.JSON(http.StatusBadRequest, gin.H{"code":"invalid_parameters","message":"date of birth cannot be after passport expiration"})
+            return
+        }
+    }
     // insert
     var uid string
     err := s.DB.Raw(`INSERT INTO users(username,email,password_hash,name,nationality,passport_number,passport_expiration_date,date_of_birth,gender)
