@@ -3,6 +3,11 @@ package server
 import (
     "net/http"
     "time"
+    "os"
+    "log"
+    "database/sql"
+    "crypto/sha256"
+    "encoding/hex"
 
     "github.com/gin-gonic/gin"
     "golang.org/x/crypto/bcrypt"
@@ -32,6 +37,9 @@ func (s *Server) authRoutes(g *gin.RouterGroup) {
     g.POST("/auth/logout", s.logout)
     g.POST("/auth/register", s.register)
     g.GET("/session/me", s.sessionMe)
+    g.POST("/auth/forgot", s.forgot)
+    g.POST("/auth/forgot/verify", s.forgotVerify)
+    g.POST("/auth/forgot/reset", s.forgotReset)
 }
 
 func (s *Server) login(c *gin.Context) {
@@ -114,4 +122,124 @@ func (s *Server) register(c *gin.Context) {
         return
     }
     c.JSON(http.StatusCreated, gin.H{"user": gin.H{"id": uid, "username": req.Username, "email": req.Email}, "next": "login"})
+}
+
+type forgotRequest struct {
+    Identifier string `json:"identifier"`
+}
+
+type verifyRequest struct {
+    Identifier string `json:"identifier"`
+    Code       string `json:"code"`
+}
+
+type resetRequest struct {
+    ResetToken     string `json:"resetToken"`
+    NewPassword    string `json:"newPassword"`
+    ConfirmPassword string `json:"confirmPassword"`
+}
+
+func (s *Server) forgot(c *gin.Context) {
+    var req forgotRequest
+    if err := c.ShouldBindJSON(&req); err != nil || req.Identifier == "" {
+        c.JSON(http.StatusBadRequest, gin.H{"code":"invalid_parameters","message":"bad request"})
+        return
+    }
+    var u struct{ ID string }
+    s.DB.Raw("SELECT id FROM users WHERE username = ? OR email = ? LIMIT 1", req.Identifier, req.Identifier).Scan(&u)
+    if u.ID == "" {
+        c.JSON(http.StatusNotFound, gin.H{"code":"not_found","message":"Username or email does not exist"})
+        return
+    }
+    expires := time.Now().Add(10 * time.Minute)
+    maxAttempts := 5
+    code := s.CodeGenerator()
+    hash, _ := bcrypt.GenerateFromPassword([]byte(code), bcrypt.DefaultCost)
+    s.DB.Exec("INSERT INTO password_resets(user_id, code_hash, expires_at, attempts, max_attempts, created_at) VALUES (?,?,?,?,?,now())",
+        u.ID, string(hash), expires, 0, maxAttempts)
+    if os.Getenv("ENV") == "dev" {
+        log.Printf("password reset code user=%s code=%s", u.ID, code)
+    }
+    c.JSON(http.StatusAccepted, gin.H{"status":"accepted","next":"verify"})
+}
+
+func (s *Server) forgotVerify(c *gin.Context) {
+    var req verifyRequest
+    if err := c.ShouldBindJSON(&req); err != nil || req.Identifier == "" || req.Code == "" {
+        c.JSON(http.StatusBadRequest, gin.H{"code":"invalid_parameters","message":"bad request"})
+        return
+    }
+    var u struct{ ID string }
+    s.DB.Raw("SELECT id FROM users WHERE username = ? OR email = ? LIMIT 1", req.Identifier, req.Identifier).Scan(&u)
+    if u.ID == "" {
+        c.JSON(http.StatusBadRequest, gin.H{"code":"invalid_code","message":"Invalid or already used"})
+        return
+    }
+    var row struct{
+        ID string
+        CodeHash string
+        ExpiresAt time.Time
+        Attempts int
+        MaxAttempts int
+        UsedAt sql.NullTime
+        ResetTokenHash *string
+        ResetTokenExpiresAt *time.Time
+    }
+    s.DB.Raw("SELECT id, code_hash, expires_at, attempts, max_attempts, used_at, reset_token_hash, reset_token_expires_at FROM password_resets WHERE user_id = ? ORDER BY created_at DESC LIMIT 1", u.ID).Scan(&row)
+    if row.ID == "" {
+        c.JSON(http.StatusBadRequest, gin.H{"code":"invalid_code","message":"Invalid or already used"})
+        return
+    }
+    if row.Attempts >= row.MaxAttempts {
+        c.JSON(http.StatusTooManyRequests, gin.H{"code":"too_many_attempts","message":"Please request a new code"})
+        return
+    }
+    if time.Now().After(row.ExpiresAt) {
+        c.JSON(http.StatusGone, gin.H{"code":"expired","message":"Code expired"})
+        return
+    }
+    if row.UsedAt.Valid || (row.ResetTokenHash != nil && *row.ResetTokenHash != "") {
+        c.JSON(http.StatusBadRequest, gin.H{"code":"invalid_code","message":"Invalid or already used"})
+        return
+    }
+    if bcrypt.CompareHashAndPassword([]byte(row.CodeHash), []byte(req.Code)) != nil {
+        s.DB.Exec("UPDATE password_resets SET attempts = attempts + 1 WHERE id = ?", row.ID)
+        c.JSON(http.StatusBadRequest, gin.H{"code":"invalid_code","message":"Invalid or already used"})
+        return
+    }
+    token := s.TokenGenerator()
+    sum := sha256.Sum256([]byte(token))
+    tokenHash := hex.EncodeToString(sum[:])
+    rtExp := time.Now().Add(10 * time.Minute)
+    s.DB.Exec("UPDATE password_resets SET used_at = now(), reset_token_hash = ?, reset_token_expires_at = ? WHERE id = ?", tokenHash, rtExp, row.ID)
+    c.JSON(http.StatusOK, gin.H{"resetToken": token, "expiresAt": rtExp, "next": "reset"})
+}
+
+func (s *Server) forgotReset(c *gin.Context) {
+    var req resetRequest
+    if err := c.ShouldBindJSON(&req); err != nil || req.ResetToken == "" || req.NewPassword == "" || req.ConfirmPassword == "" {
+        c.JSON(http.StatusBadRequest, gin.H{"code":"invalid_parameters","message":"missing fields"})
+        return
+    }
+    if req.NewPassword != req.ConfirmPassword {
+        c.JSON(http.StatusBadRequest, gin.H{"code":"password_mismatch","message":"Passwords do not match"})
+        return
+    }
+    sum := sha256.Sum256([]byte(req.ResetToken))
+    tokenHash := hex.EncodeToString(sum[:])
+    var row struct{ ID string; UserID string; ResetTokenExpiresAt time.Time }
+    s.DB.Raw("SELECT id, user_id, reset_token_expires_at FROM password_resets WHERE reset_token_hash = ? LIMIT 1", tokenHash).Scan(&row)
+    if row.ID == "" {
+        c.JSON(http.StatusUnauthorized, gin.H{"code":"unauthorized","message":"invalid reset token"})
+        return
+    }
+    if time.Now().After(row.ResetTokenExpiresAt) {
+        c.JSON(http.StatusGone, gin.H{"code":"expired","message":"Reset token expired"})
+        return
+    }
+    hash, _ := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+    s.DB.Exec("UPDATE users SET password_hash = ? WHERE id = ?", string(hash), row.UserID)
+    s.DB.Exec("UPDATE sessions SET revoked_at = now() WHERE user_id = ?", row.UserID)
+    s.DB.Exec("DELETE FROM password_resets WHERE id = ?", row.ID)
+    c.JSON(http.StatusOK, gin.H{"next":"login"})
 }

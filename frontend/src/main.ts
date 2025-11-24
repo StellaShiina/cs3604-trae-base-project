@@ -5,6 +5,9 @@ import HomePage from './pages/HomePage.vue'
 import BookingPage from './pages/BookingPage.vue'
 import LoginPage from './pages/LoginPage.vue'
 import RegisterPage from './pages/RegisterPage.vue'
+import ForgotPasswordRequestPage from './pages/ForgotPasswordRequestPage.vue'
+import ForgotPasswordVerifyPage from './pages/ForgotPasswordVerifyPage.vue'
+import ForgotPasswordResetPage from './pages/ForgotPasswordResetPage.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -13,6 +16,9 @@ const router = createRouter({
     { path: '/booking', component: BookingPage },
     { path: '/login', component: LoginPage },
     { path: '/register', component: RegisterPage },
+    { path: '/forgot', component: ForgotPasswordRequestPage },
+    { path: '/forgot/verify', component: ForgotPasswordVerifyPage },
+    { path: '/forgot/reset', component: ForgotPasswordResetPage },
   ],
 })
 

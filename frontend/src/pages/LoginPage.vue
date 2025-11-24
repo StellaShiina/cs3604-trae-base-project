@@ -23,6 +23,7 @@
         <input v-model="identifier" class="w-full border rounded px-3 py-2 mb-2" placeholder="Email/Username/Mobile number" />
         <input v-model="password" class="w-full border rounded px-3 py-2 mb-3" type="password" placeholder="Password" />
         <button class="w-full bg-orange-500 text-white py-2 rounded" @click="login">LOGIN</button>
+        <p class="text-sm mt-2"><a href="#" @click.prevent="$router.push('/forgot')" class="text-blue-600">Forgot your password?</a></p>
         <p class="text-sm mt-2">No account yet? <a href="#" @click.prevent="$router.push('/register')" class="text-blue-600">Register now!</a></p>
         <p v-if="error" class="text-sm text-red-600 mt-2">{{error}}</p>
       </section>
