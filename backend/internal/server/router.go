@@ -3,6 +3,9 @@ package server
 import (
     "net/http"
     "os"
+    "crypto/rand"
+    "encoding/hex"
+    "fmt"
 
     "github.com/gin-contrib/cors"
     "github.com/gin-gonic/gin"
@@ -10,8 +13,10 @@ import (
 )
 
 type Server struct {
-	R  *gin.Engine
-	DB *gorm.DB
+    R  *gin.Engine
+    DB *gorm.DB
+    CodeGenerator func() string
+    TokenGenerator func() string
 }
 
 func New(db *gorm.DB) *Server {
@@ -27,7 +32,18 @@ func New(db *gorm.DB) *Server {
         ExposeHeaders:    []string{"Content-Length"},
         AllowCredentials: true,
     }))
-    s := &Server{R: r, DB: db}
+    codeGen := func() string {
+        var b [8]byte
+        _, _ = rand.Read(b[:])
+        n := (uint64(b[0])<<56 | uint64(b[1])<<48 | uint64(b[2])<<40 | uint64(b[3])<<32 | uint64(b[4])<<24 | uint64(b[5])<<16 | uint64(b[6])<<8 | uint64(b[7])) % 1000000
+        return fmt.Sprintf("%06d", n)
+    }
+    tokenGen := func() string {
+        bs := make([]byte, 16)
+        _, _ = rand.Read(bs)
+        return hex.EncodeToString(bs)
+    }
+    s := &Server{R: r, DB: db, CodeGenerator: codeGen, TokenGenerator: tokenGen}
     s.routes()
     return s
 }
