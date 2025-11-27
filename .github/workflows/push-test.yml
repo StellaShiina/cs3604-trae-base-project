@@ -1,0 +1,43 @@
+name: Run Tests on Push
+
+on:
+  push:
+    branches:
+      - db
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.20'
+
+    - name: Set up Docker Compose
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker-compose
+
+    - name: Start Database
+      run: |
+        docker-compose up -d
+        # Wait for database to be ready
+        echo "Waiting for database to initialize..."
+        sleep 10
+        until docker exec $(docker-compose ps -q db) pg_isready -U postgres; do
+          echo "Waiting for postgres..."
+          sleep 2
+        done
+
+    - name: Run Tests
+      working-directory: ./db
+      run: go test -v ./...
+
+    - name: Stop Database
+      if: always()
+      run: docker-compose down

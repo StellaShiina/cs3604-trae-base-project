@@ -1,0 +1,74 @@
+name: Run Tests on PR
+
+on:
+  pull_request:
+    branches:
+      - db
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  test-and-verify:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.20'
+
+    - name: Set up Docker Compose
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker-compose
+
+    - name: Start Database
+      run: |
+        docker-compose up -d
+        # Wait for database to be ready
+        echo "Waiting for database to initialize..."
+        sleep 10
+        until docker exec $(docker-compose ps -q db) pg_isready -U postgres; do
+          echo "Waiting for postgres..."
+          sleep 2
+        done
+
+    - name: Run Tests
+      id: run_tests
+      working-directory: ./db
+      continue-on-error: true
+      run: go test -v ./...
+
+    - name: Stop Database
+      if: always()
+      run: docker-compose down
+
+    - name: Close PR if tests failed
+      if: steps.run_tests.outcome == 'failure'
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const { owner, repo } = context.repo;
+          const prNumber = context.payload.pull_request.number;
+          
+          await github.rest.issues.createComment({
+            owner,
+            repo,
+            issue_number: prNumber,
+            body: "❌ Tests failed! Automatically closing this PR. Please fix the tests and try again."
+          });
+          
+          await github.rest.pulls.update({
+            owner,
+            repo,
+            pull_number: prNumber,
+            state: "closed"
+          });
+          
+          core.setFailed("Tests failed, PR closed automatically.");
