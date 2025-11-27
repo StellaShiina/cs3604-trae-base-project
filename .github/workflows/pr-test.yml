@@ -4,6 +4,11 @@ on:
   pull_request:
     branches:
       - db
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - 'docs/**'
+      - '.gitignore'
 
 permissions:
   pull-requests: write
@@ -20,7 +25,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: '1.20'
+        go-version: '1.22'
 
     - name: Set up Docker Compose
       run: |
@@ -33,7 +38,14 @@ jobs:
         # Wait for database to be ready
         echo "Waiting for database to initialize..."
         sleep 10
-        until docker exec $(docker-compose ps -q db) pg_isready -U postgres; do
+        # Use container name directly or get it from compose
+        CONTAINER_NAME=$(docker-compose ps -q postgres)
+        if [ -z "$CONTAINER_NAME" ]; then
+          # Fallback to service name if ps -q fails or returns empty (depending on compose version)
+          CONTAINER_NAME="railway12306-postgres"
+        fi
+        
+        until docker exec $CONTAINER_NAME pg_isready -U postgres; do
           echo "Waiting for postgres..."
           sleep 2
         done
