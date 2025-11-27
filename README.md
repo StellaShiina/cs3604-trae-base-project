@@ -1,126 +1,51 @@
-# CS3604 Database Project (12306 Replica)
+# CS3604 12306 Project - Database Module
 
-本项目是 CS3604 课程数据库项目，旨在复刻 12306 铁路购票系统的核心数据库设计与实现。基于 PostgreSQL 构建，支持高并发下的车票查询、预订、支付及订单管理等完整业务流程。
+本项目为 CS3604 12306 复刻项目的主数据库模块，基于 PostgreSQL 构建。该模块独立封装，为主项目提供完整的数据库服务支持，包括表结构、预置数据及核心业务逻辑（触发器/存储过程）。
 
-## 📋 环境要求
+## � Docker 部署（集成指南）
 
-- **Docker**: 20.10+
-- **Docker Compose**: v2.0+
-- **Go**: 1.18+ (用于运行测试)
-- **Python**: 3.8+ (用于运行概况脚本)
-- **PostgreSQL Client** (可选，用于手动连接)
+主项目接入此数据库模块时，请参考以下步骤启动服务。
 
-## 🚀 快速启动
+### 1. 启动服务
 
-本项目使用 Docker Compose 进行容器化部署，一键即可启动数据库服务。
-
-### 1. 启动数据库
-
-在项目根目录下执行：
+在本项目根目录下直接运行：
 
 ```bash
 docker compose up -d
 ```
 
-该命令将启动 PostgreSQL 容器，并自动执行 `db-init/` 目录下的 SQL 脚本进行数据库初始化（建表、视图、触发器及导入种子数据）。
+该命令将：
+- 启动 PostgreSQL 容器
+- 自动执行初始化脚本（建表、视图、触发器、种子数据导入）
 
-### 2. 验证连接
+### 2. 连接信息
 
-数据库默认配置如下（可在 `docker-compose.yml` 中查看）：
-- **Host**: `localhost`
+数据库服务启动后，后端应用可通过以下配置进行连接：
+
+- **Host**: `localhost` (容器间通信请使用 service name: `postgres` 或 `railway12306-postgres`)
 - **Port**: `5432`
 - **Database**: `railway_12306`
 - **User**: `postgres`
 - **Password**: `postgres`
 
-你可以使用 `psql` 或其他数据库客户端连接验证：
+> ⚠️ **注意**：具体的连接参数可在 `docker-compose.yml` 中查看或修改。
 
-```bash
-psql -h localhost -p 5432 -U postgres -d railway_12306
-```
+## 📚 核心文档
 
-## 🧪 测试与验证
+对于主项目开发人员，以下两份文档至关重要：
 
-项目提供了 Go 语言编写的集成测试套件和 Python 概况脚本，位于 `db/` 目录下。
+1. **[数据库需求与设计文档 (DB Requirements)](docs/db-requirements-12306-postgresql.md)**
+   - 包含完整的 ER 图设计、表结构定义、枚举类型说明。
+   - 详细描述了用户中心、订单系统（状态机）、客票库存管理等核心业务逻辑的数据库层实现。
 
-### 1. 运行 Go 集成测试
+2. **[后端对接指南 (Backend Tech Guide)](docs/backend-tech-guide-12306.md)**
+   - 提供了后端 API 与数据库交互的映射关系。
+   - 说明了如何利用数据库视图（如 `v_user_orders`）和触发器简化后端逻辑。
 
-测试涵盖了用户管理、车次查询、订单创建、支付流程、改签退票等核心场景。
+## 🛠️ 模块维护与测试
 
-进入 `db` 目录并运行测试：
+本模块包含独立的测试套件，用于验证数据库逻辑的正确性（仅供本模块维护参考，主项目集成无需关注）。
 
-```bash
-cd db
-go test -v ./...
-```
-
-或者运行特定测试文件：
-
-```bash
-go test -v db_test.go
-```
-
-### 2. 查看数据库概况
-
-提供了一个 Python 脚本 `database_info.py`，用于展示当前数据库的表结构、行数统计及关键视图数据。
-
-首先安装依赖（如有）：
-
-```bash
-cd db
-pip install -r requirements.txt  # 如果有 requirements.txt
-# 或者直接运行，通常依赖仅需 psycopg2 或类似库
-```
-
-运行脚本：
-
-```bash
-python database_info.py
-```
-
-## 🤖 CI/CD 工作流 (GitHub Actions)
-
-本项目配置了 GitHub Actions 以保障代码质量和稳定性。
-
-### 1. Run Tests on Push
-- **触发条件**: 向 `db` 分支推送代码时自动触发。
-- **执行内容**: 
-  - 启动 PostgreSQL 容器。
-  - 运行 Go 集成测试 (`go test -v ./...`)。
-- **目的**: 确保最新提交的代码通过所有测试用例。
-
-### 2. Run Tests on PR
-- **触发条件**: 向 `db` 分支提交 Pull Request 时自动触发。
-- **执行内容**:
-  - 启动 PostgreSQL 容器。
-  - 运行 Go 集成测试。
-- **自动拦截机制**: 
-  - 如果测试失败，Action 会自动在 PR 中评论错误信息，并**直接关闭该 PR**。
-  - 目的：防止未通过测试的代码合并到主分支，强制要求开发者在提交前修复所有问题。
-
-## 📂 目录结构
-
-```
-.
-├── .github/workflows/      # GitHub Actions 工作流配置
-│   ├── push-test.yml       # Push 触发测试
-│   └── pr-test.yml         # PR 触发测试与自动关闭
-├── db/                     # 测试代码与工具脚本
-│   ├── db_test.go          # Go 集成测试
-│   ├── database_info.py    # 数据库概况脚本
-│   └── ...
-├── db-init/                # 数据库初始化脚本
-│   ├── 00-init.sql         # 核心建表与触发器逻辑
-│   ├── 01-seed-data.sql    # 基础种子数据
-│   └── ...                 # 路由数据
-├── docs/                   # 技术文档
-│   ├── db-requirements...  # 详细数据库设计文档
-│   └── backend-tech...     # 后端对接指南
-├── docker-compose.yml      # 容器编排文件
-└── README.md               # 本文件
-```
-
-## 📚 文档资源
-
-- [数据库详细设计 (PostgreSQL)](docs/db-requirements-12306-postgresql.md): 包含完整的 Schema 定义、枚举、触发器及设计思路。
-- [后端开发指南](docs/backend-tech-guide-12306.md): 提供 API 与 SQL 的映射关系、核心交易流程说明及运维建议。
+- **测试代码**: 位于 `db/` 目录下，使用 Go `testing` 模块编写。
+- **概况脚本**: `db/database_info.py` 可用于快速查看数据库统计信息。
+- **CI/CD**: 配置了 GitHub Actions (`.github/workflows`)，在 push 和 PR 时自动运行集成测试，保障 Schema 变更的稳定性。
