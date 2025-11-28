@@ -1,4 +1,4 @@
-# 12306 英文版后端技术指南（PostgreSQL 与 API 调用）
+# 12306 后端技术指南（PostgreSQL 与 API 调用）
 
 ## 1. 连接与初始化
 - 数据库：PostgreSQL 14+，时区 `Asia/Shanghai`，字符集 `UTF8`
@@ -8,73 +8,111 @@
   - 首次运行会创建扩展、枚举、表、索引、触发器与视图，并插入示例数据（幂等）
 
 ## 2. 关键对象概览
-- 表：`users`、`sessions`、`stations`、`trains`、`train_services`、`service_stops`、`service_segments`、`segment_seat_inventory`、`preorders`
-- 视图：`v_train_search`（用于统一返回车次+席位）
-- 枚举：`gender_enum`、`train_type_enum`、`seat_type_enum`、`ticket_type_enum`、`preorder_status_enum`
-- 触发器：
-  - `trg_service_date_range` 限制 `service_date` 在当前日起 14 天内
-  - `trg_preorder_decrement` 预订占位创建时扣减库存
-  - `trg_preorder_release` 预订状态改为 `canceled/expired` 时释放库存
+- **基础数据**：`stations`, `trains`, `train_services`, `service_stops`, `service_segments`, `segment_seat_inventory`
+- **用户中心**：`users`, `sessions`, `passengers`
+- **交易核心**：`orders`, `tickets`, `payments`
+- **视图**：
+  - `v_train_search`：统一返回车次+席位
+  - `v_user_orders`：用户订单详情聚合视图（含车票信息）
+- **枚举**：`gender_enum`, `train_type_enum`, `seat_type_enum`, `ticket_type_enum`, `order_status_enum`, `ticket_status_enum`, `card_type_enum`
+- **关键触发器**：
+  - `trg_ticket_decrement`: 创建车票时扣减库存
+  - `trg_order_cancel_release`: 订单取消（未支付）时释放库存
+  - `trg_ticket_refund_release`: 退票时释放库存
 
 ## 3. 示例数据（执行初始化后可用）
-- 站点：
-  - `BJP` Beijing(北京)，`SHH` Shanghai(上海)
-- 车次与服务日：
-  - `D5`，服务日为 `current_date`
-- 区间与时刻：
-  - 北京(`07:21`) → 上海(`09:27`)，历时约 `2h06m`
-- 席位库存：
-  - `second` 总 500、剩 120、`31800` 分；`first` 总 100、剩 20、`62600` 分；`softSleeper` 总 60、剩 10、`94700` 分
+- 站点：`BJP` Beijing(北京)，`SHH` Shanghai(上海)
+- 车次：`D5`，服务日为 `current_date`
+- 库存：`second` 总 500、剩 120；`first` 总 100、剩 20；`softSleeper` 总 60、剩 10
 
 ## 4. 查询与调用方案
-- 站点检索（供 `Home/Booking` 下拉与模糊搜索）：
+### 4.1 基础查询
+- **站点检索**（供 Home/Booking 下拉与模糊搜索）：
   - 按 code：`SELECT * FROM stations WHERE code = $1;`
   - 模糊匹配：`SELECT * FROM stations WHERE lower(name_en) ILIKE '%'||lower($1)||'%' OR lower(pinyin) ILIKE '%'||lower($1)||'%' LIMIT 20;`
-- 统一车次与余票查询（供 `/trains/search`）：
+- **统一车次与余票查询**（供 `/trains/search`）：
   - 视图：`v_train_search`
   - 查询示例：
-    - `SELECT * FROM v_train_search WHERE from_station_id=$1 AND to_station_id=$2 AND date=$3 AND depart_time BETWEEN $4 AND $5 ORDER BY depart_time LIMIT $6 OFFSET $7;`
-  - 仅高铁：在应用层过滤 `train_type IN ('G','D','C')` 或在 SQL 中增加条件
-- 车次详情（可选）：
-  - 停站：`SELECT * FROM service_stops WHERE train_service_id=$1 ORDER BY stop_seq;`
-  - 区间：`SELECT * FROM service_segments WHERE train_service_id=$1 AND from_station_id=$2 AND to_station_id=$3;`
-- 预订占位（`Book` 按钮）：
-  - 创建：
-    - `INSERT INTO preorders(user_id,train_service_id,from_station_id,to_station_id,segment_id,seat_type,hold_quantity,expires_at) VALUES ($1,$2,$3,$4,$5,$6,$7, now()+interval '15 minutes') RETURNING id;`
-    - 成功后触发器扣减 `segment_seat_inventory.left_seats`
-  - 取消/过期：
-    - `UPDATE preorders SET status='canceled' WHERE id=$1 AND user_id=$2;`（触发器释放库存）
-  - 查询用户活跃占位：
-    - `SELECT * FROM preorders WHERE user_id=$1 AND status='active' AND expires_at>now();`
-- 会话与登录：
-  - 按标识符查找：`SELECT * FROM users WHERE username=$1 OR email=$1 OR mobile=$1;`
-  - 创建会话：`INSERT INTO sessions(user_id,expires_at,user_agent,ip) VALUES ($1, now()+interval '7 days',$2,$3) RETURNING sid;`
+    ```sql
+    SELECT * FROM v_train_search 
+    WHERE from_station_id=$1 AND to_station_id=$2 
+    AND date=$3 
+    AND depart_time BETWEEN $4 AND $5 
+    ORDER BY depart_time 
+    LIMIT $6 OFFSET $7;
+    ```
+
+### 4.2 用户与乘车人
+- **乘车人管理**：
+  - 列表：`SELECT * FROM passengers WHERE user_id=$1;`
+  - 新增：`INSERT INTO passengers(user_id, name, card_type, card_no, passenger_type) VALUES (...)`
+  - 删除：`DELETE FROM passengers WHERE id=$1 AND user_id=$2;`
+
+### 4.3 核心交易流程
+#### 1. 提交订单（下单占座）
+- **API**: `POST /api/v1/orders`
+- **逻辑**：
+  1. 开启事务。
+  2. 插入 `orders` 表，状态默认为 `pending_payment`，过期时间设为 15-30 分钟后。
+  3. 遍历乘车人列表，逐条插入 `tickets` 表。
+     - **注意**：`tickets` 插入会触发 `trg_ticket_decrement`。若库存不足，DB 抛出异常，应用层捕获后回滚事务并返回 `409 Conflict (Not enough seats)`。
+  4. 提交事务，返回 `order_id`。
+
+#### 2. 支付订单
+- **API**: `POST /api/v1/orders/{id}/pay` (或回调)
+- **逻辑**：
+  1. 校验订单状态是否为 `pending_payment` 且未过期。
+  2. 模拟/调用支付网关。
+  3. 成功后：
+     - 更新 `orders` SET `status='paid'`, `paid_at=now()`
+     - 插入 `payments` 记录流水。
+     - 返回成功。
+
+#### 3. 取消订单（未支付）
+- **API**: `POST /api/v1/orders/{id}/cancel`
+- **逻辑**：
+  - 执行 `UPDATE orders SET status='canceled' WHERE id=$1 AND user_id=$2 AND status='pending_payment'`。
+  - DB 触发器 `trg_order_cancel_release` 自动释放库存。
+
+#### 4. 退票（已支付）
+- **API**: `POST /api/v1/tickets/{id}/refund`
+- **逻辑**：
+  - 校验车票归属及状态（必须为 `active` 且订单已支付）。
+  - 计算退票费率（应用层逻辑）。
+  - 执行 `UPDATE tickets SET status='refunded' WHERE id=$1`。
+  - DB 触发器 `trg_ticket_refund_release` 自动释放库存。
+  - 记录退款流水（可选，视 `payments` 表扩展情况）。
+
+#### 5. 订单查询
+- **API**: `GET /api/v1/orders`
+- **逻辑**：
+  - 查询 `v_user_orders` 视图。
+  - 支持按状态筛选：`WHERE user_id=$1 AND order_status=$2`。
 
 ## 5. API 对应关系（后端参考）
-- `POST /api/v1/auth/login` → 查 `users`，校验密码后插入 `sessions` 并设置 Cookie
-- `POST /api/v1/auth/logout` → 删除或标记 `sessions.revoked_at`
-- `GET /api/v1/session/me` → 依据 Cookie/Token 查 `sessions` 关联 `users`
-- `POST /api/v1/auth/register` → 插入 `users`，唯一性冲突返回 409
-- `GET /api/v1/stations` → 站点模糊或精确查询，返回 `id`、中/英文名与 `code`
-- `GET /api/v1/dictionaries` → 后端常量或从枚举生成
-- `GET /api/v1/trains/search` → 读 `v_train_search`，应用层分页与过滤
-- `POST /api/v1/preorders` → 插入 `preorders`，触发器扣减库存；取消/过期更新状态释放库存
+| 方法 | 路径 | 描述 | DB 操作 |
+| --- | --- | --- | --- |
+| POST | `/auth/login` | 登录 | 查 `users`，插 `sessions` |
+| GET | `/passengers` | 获取乘车人 | Select `passengers` |
+| POST | `/passengers` | 添加乘车人 | Insert `passengers` |
+| GET | `/trains/search` | 车次查询 | Select `v_train_search` |
+| POST | `/orders` | 提交订单 | Tx: Insert `orders` + `tickets` |
+| GET | `/orders` | 订单列表 | Select `v_user_orders` |
+| GET | `/orders/:id` | 订单详情 | Select `v_user_orders` |
+| POST | `/orders/:id/cancel` | 取消订单 | Update `orders` |
+| POST | `/orders/:id/pay` | 支付订单 | Update `orders`, Insert `payments` |
+| POST | `/tickets/:id/refund` | 退票 | Update `tickets` |
 
-## 6. 典型参数组装
-- 从 `Home` 跳 `Booking`：将 `fromStationId`、`toStationId`、`date` 作为查询串传入，后端直接套用视图查询
-- 时间区间：`departTimeStart/departTimeEnd` 以 `TIME` 输入，SQL 用 `BETWEEN`
-- 列车类型过滤：转换为 `ARRAY['G','D','C']` 并在 SQL 中 `train_type = ANY($arr)`
+## 6. 约束与错误处理
+- **余票不足**：捕获 `not enough seats` 异常，返回前端友好提示。
+- **重复购票**：`passengers` 表有 `(user_id, card_no)` 唯一约束；业务层可校验同一车次同一身份证号是否已购票（需查 `tickets` 关联 `orders`）。
+- **超时取消**：建议编写后台定时任务（Cron Job），每分钟扫描 `orders` 表：
+  ```sql
+  UPDATE orders SET status='canceled' 
+  WHERE status='pending_payment' AND expires_at < now();
+  ```
+  该操作会自动触发库存释放。
 
-## 7. 约束与错误处理
-- 日期范围：插入或更新 `train_services` 超出 14 天触发异常；API 层需提前校验并返回 400
-- 余票不足：插入 `preorders` 时若库存不足，触发器抛错；API 层返回 409 并提示 `not enough seats`
-- 并发：库存扣减与释放由数据库原子更新保障；应用层重试策略以事务或幂等键实现
-
-## 8. 运维与权限
-- 角色：`app_ro`（只读）、`app_rw`（读写）、`app_admin`（管理）
-- 备份：优先逻辑备份 `pg_dump -Fc`；视图与触发器包含在脚本中可重建
-
-## 9. 校验清单
-- 视图返回字段是否与前端期望字段名一致（`trainNo/trainType/seats[]` 映射）
-- 种子数据是否存在：`BJP/SHH`、`D5`、当天服务、区间与三类席别
-- 触发器是否启用：插入占位与更新状态分别影响库存
+## 7. 运维与权限
+- 生产环境建议分离 `app_rw`（读写）与 `app_ro`（只读/报表）账号。
+- 定期对 `orders` 和 `tickets` 表进行分区（按月/年），以应对数据量增长。

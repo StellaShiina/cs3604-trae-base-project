@@ -1,0 +1,121 @@
+- type: Database
+  id: DB-CreateUser
+  description: 在 users 表中创建一个新的用户记录。
+  dependencies:
+    - none
+  acceptanceCriteria:
+    - 成功执行后，users 表中会增加一条新记录。
+    - 密码必须经过哈希处理。
+    - 如果 username, email 或 mobile 已存在，操作应失败并抛出唯一性约束错误。
+  changeLog:
+    - date: "2025-11-28"
+      description: "初始创建，基于后端需求文档。"
+
+- type: Database
+  id: DB-FindUserByCredential
+  description: 根据 username, email 或 mobile 查找用户记录。
+  dependencies:
+    - none
+  acceptanceCriteria:
+    - 返回匹配的用户记录（包含密码哈希以供校验）。
+    - 若未找到，返回空。
+  changeLog:
+    - date: "2025-11-28"
+      description: "初始创建。"
+
+- type: Database
+  id: DB-CreatePassenger
+  description: 在 passengers 表中添加新的乘车人。
+  dependencies:
+    - none
+  acceptanceCriteria:
+    - 成功插入后返回新记录 ID。
+    - 同一用户下的相同证件号 (user_id, card_no) 应触发唯一性冲突。
+  changeLog:
+    - date: "2025-11-28"
+      description: "初始创建。"
+
+- type: Database
+  id: DB-FindPassengersByUser
+  description: 查找指定用户的所有乘车人。
+  dependencies:
+    - none
+  acceptanceCriteria:
+    - 返回该 user_id 下的所有 passengers 记录。
+  changeLog:
+    - date: "2025-11-28"
+      description: "初始创建。"
+
+- type: Database
+  id: DB-SearchTrains
+  description: 查询 v_train_search 视图以获取车次和库存信息。
+  dependencies:
+    - none
+  acceptanceCriteria:
+    - 支持按出发地、目的地、日期筛选。
+    - 返回包含车次、时刻、席别库存 (left_seats) 的聚合数据。
+  changeLog:
+    - date: "2025-11-28"
+      description: "初始创建。"
+
+- type: Database
+  id: DB-CreateOrderTransaction
+  description: 在事务中创建订单和车票，触发库存扣减。
+  dependencies:
+    - none
+  acceptanceCriteria:
+    - 插入 orders 表 (status='pending_payment')。
+    - 插入 tickets 表。
+    - 必须触发 trg_ticket_decrement。
+    - 如果库存不足 (Trigger 抛出异常)，事务回滚。
+  changeLog:
+    - date: "2025-11-28"
+      description: "初始创建。"
+
+- type: Database
+  id: DB-FindOrdersByUser
+  description: 查询 v_user_orders 视图获取用户订单历史。
+  dependencies:
+    - none
+  acceptanceCriteria:
+    - 返回包含车票详情的订单列表。
+    - 支持按 status 筛选。
+  changeLog:
+    - date: "2025-11-28"
+      description: "初始创建。"
+
+- type: Database
+  id: DB-PayOrder
+  description: 更新订单状态为 paid 并记录支付流水。
+  dependencies:
+    - none
+  acceptanceCriteria:
+    - orders.status 更新为 'paid'。
+    - payments 表插入一条记录。
+  changeLog:
+    - date: "2025-11-28"
+      description: "初始创建。"
+
+- type: Database
+  id: DB-CancelOrder
+  description: 取消未支付订单，释放库存。
+  dependencies:
+    - none
+  acceptanceCriteria:
+    - orders.status 更新为 'canceled'。
+    - 必须触发 trg_order_cancel_release 以恢复库存。
+  changeLog:
+    - date: "2025-11-28"
+      description: "初始创建。"
+
+- type: Database
+  id: DB-RefundTicket
+  description: 退订已支付的车票，释放库存。
+  dependencies:
+    - none
+  acceptanceCriteria:
+    - tickets.status 更新为 'refunded'。
+    - 必须触发 trg_ticket_refund_release 以恢复库存。
+  changeLog:
+    - date: "2025-11-28"
+      description: "初始创建。"

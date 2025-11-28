@@ -1,0 +1,236 @@
+- type: Backend
+  id: API-POST-Register
+  route: POST /api/v1/auth/register
+  description: 用户注册接口。
+  input:
+    type: JSON
+    body:
+      username: string
+      password: string
+      email: string
+      mobile: string
+      name: string
+      id_type: string
+      id_no: string
+  output:
+    success:
+      statusCode: 201
+      body: { userId: "uuid" }
+    error:
+      - statusCode: 400
+        body: { error: "Validation failed" }
+      - statusCode: 409
+        body: { error: "User already exists" }
+  dependencies:
+    - DB-CreateUser
+  acceptanceCriteria:
+    - 接收用户注册信息，校验通过后创建用户。
+    - 密码在后端进行哈希处理。
+  changeLog:
+    - date: "2025-11-28"
+      description: "初始创建。"
+
+- type: Backend
+  id: API-POST-Login
+  route: POST /api/v1/auth/login
+  description: 用户登录接口，建立会话。
+  input:
+    type: JSON
+    body:
+      identifier: string
+      password: string
+  output:
+    success:
+      statusCode: 200
+      body: { user: object } # Sets sid cookie
+    error:
+      - statusCode: 401
+        body: { error: "Invalid credentials" }
+  dependencies:
+    - DB-FindUserByCredential
+  acceptanceCriteria:
+    - 验证用户名/手机号/邮箱和密码。
+    - 成功时设置 HTTP-Only Cookie (sid)。
+  changeLog:
+    - date: "2025-11-28"
+      description: "初始创建。"
+
+- type: Backend
+  id: API-GET-Passengers
+  route: GET /api/v1/passengers
+  description: 获取当前登录用户的乘车人列表。
+  input:
+    type: None
+  output:
+    success:
+      statusCode: 200
+      body: [ { id, name, card_type, card_no, type } ]
+    error:
+      - statusCode: 401
+        body: { error: "Unauthorized" }
+  dependencies:
+    - DB-FindPassengersByUser
+  acceptanceCriteria:
+    - 仅返回属于当前会话用户的乘车人。
+  changeLog:
+    - date: "2025-11-28"
+      description: "初始创建。"
+
+- type: Backend
+  id: API-POST-Passengers
+  route: POST /api/v1/passengers
+  description: 添加新的乘车人。
+  input:
+    type: JSON
+    body:
+      name: string
+      card_type: string
+      card_no: string
+      type: string
+  output:
+    success:
+      statusCode: 201
+      body: { id: "uuid" }
+    error:
+      - statusCode: 400
+        body: { error: "Limit reached (15)" }
+      - statusCode: 409
+        body: { error: "Passenger already exists" }
+  dependencies:
+    - DB-CreatePassenger
+    - DB-FindPassengersByUser # Check limit
+  acceptanceCriteria:
+    - 检查乘车人数量上限 (15)。
+    - 检查重复添加。
+  changeLog:
+    - date: "2025-11-28"
+      description: "初始创建。"
+
+- type: Backend
+  id: API-GET-TrainSearch
+  route: GET /api/v1/trains/search
+  description: 查询车次及余票信息。
+  input:
+    type: Query
+    params:
+      fromStationId: uuid
+      toStationId: uuid
+      date: string (YYYY-MM-DD)
+  output:
+    success:
+      statusCode: 200
+      body: [ { trainNo, seats: [ { type, left, bookable } ] } ]
+  dependencies:
+    - DB-SearchTrains
+  acceptanceCriteria:
+    - 返回符合条件的车次列表。
+    - 包含各席别的实时库存。
+  changeLog:
+    - date: "2025-11-28"
+      description: "初始创建。"
+
+- type: Backend
+  id: API-POST-Orders
+  route: POST /api/v1/orders
+  description: 提交订单（占座）。
+  input:
+    type: JSON
+    body:
+      trainNo: string
+      seatType: string
+      passengers: [ { id, name, card_no } ]
+  output:
+    success:
+      statusCode: 201
+      body: { orderId: "uuid" }
+    error:
+      - statusCode: 409
+        body: { error: "Not enough seats" }
+  dependencies:
+    - DB-CreateOrderTransaction
+  acceptanceCriteria:
+    - 执行核心交易，扣减库存。
+    - 若 DB 抛出库存不足异常，返回 409。
+  changeLog:
+    - date: "2025-11-28"
+      description: "初始创建。"
+
+- type: Backend
+  id: API-GET-Orders
+  route: GET /api/v1/orders
+  description: 获取我的订单列表。
+  input:
+    type: Query
+    params:
+      status: string (optional)
+  output:
+    success:
+      statusCode: 200
+      body: [ { orderId, status, tickets: [] } ]
+  dependencies:
+    - DB-FindOrdersByUser
+  acceptanceCriteria:
+    - 返回当前用户的订单。
+  changeLog:
+    - date: "2025-11-28"
+      description: "初始创建。"
+
+- type: Backend
+  id: API-POST-PayOrder
+  route: POST /api/v1/orders/{id}/pay
+  description: 支付订单。
+  input:
+    type: JSON
+    body: { paymentMethod: string }
+  output:
+    success:
+      statusCode: 200
+      body: { status: "paid" }
+    error:
+      - statusCode: 400
+        body: { error: "Order expired or invalid status" }
+  dependencies:
+    - DB-PayOrder
+  acceptanceCriteria:
+    - 仅能支付 pending_payment 且未过期的订单。
+  changeLog:
+    - date: "2025-11-28"
+      description: "初始创建。"
+
+- type: Backend
+  id: API-POST-CancelOrder
+  route: POST /api/v1/orders/{id}/cancel
+  description: 取消未支付订单。
+  input:
+    type: None
+  output:
+    success:
+      statusCode: 200
+      body: { status: "canceled" }
+  dependencies:
+    - DB-CancelOrder
+  acceptanceCriteria:
+    - 仅能取消 pending_payment 的订单。
+    - 触发库存释放。
+  changeLog:
+    - date: "2025-11-28"
+      description: "初始创建。"
+
+- type: Backend
+  id: API-POST-RefundTicket
+  route: POST /api/v1/tickets/{id}/refund
+  description: 退订已支付的单张车票。
+  input:
+    type: None
+  output:
+    success:
+      statusCode: 200
+      body: { status: "refunded" }
+  dependencies:
+    - DB-RefundTicket
+  acceptanceCriteria:
+    - 仅能退订 active 状态的车票。
+    - 触发库存释放。
+  changeLog:
+    - date: "2025-11-28"
+      description: "初始创建。"
