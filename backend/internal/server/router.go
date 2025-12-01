@@ -39,6 +39,7 @@ func (s *Server) routes() {
 	v1.GET("/stations", s.searchStations)
 	s.trainsRoutes(v1)
 	s.preorderRoutes(v1)
+	s.diningRoutes(v1)
 
     // daily job endpoint (optional manual trigger)
     s.R.POST("/internal/jobs/rolling14", func(c *gin.Context){
