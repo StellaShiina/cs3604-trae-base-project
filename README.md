@@ -22,7 +22,7 @@
 - 容器/编排：Docker Compose
 
 ## 亮点（CI/CD）
-- GitHub Actions（CI）：
+- GitHub  Actions（CI）：
   - 后端工作流：启动数据库、执行 Go 单元测试（`/root/cs3604/.github/workflows/ci.yml:10-26`）。
   - 前端工作流：安装依赖并运行单元测试（`/root/cs3604/.github/workflows/ci.yml:27-41`）。
 - 简易 CD：
