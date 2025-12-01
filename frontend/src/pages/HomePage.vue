@@ -7,6 +7,14 @@
           <nav class="hidden md:flex items-center gap-6 text-sm">
             <a class="text-blue-700" href="#" @click.prevent="$router.push('/')">Home</a>
             <a class="text-gray-700" href="#" @click.prevent="$router.push('/booking')">Booking</a>
+            <div class="relative group">
+              <a class="text-gray-700 cursor-pointer py-3 block">Business Services</a>
+              <div class="absolute left-0 top-full pt-2 hidden group-hover:block z-50">
+                <div class="bg-white shadow-lg rounded border py-2 w-40">
+                  <a href="#" @click.prevent="$router.push('/dining/search')" class="block px-4 py-2 text-gray-700 hover:bg-blue-50">Dining & Specialty</a>
+                </div>
+              </div>
+            </div>
             <a class="text-gray-700" href="#">Travel guides</a>
           </nav>
         </div>
