@@ -46,7 +46,6 @@ CREATE TABLE IF NOT EXISTS users (
   name TEXT,
   id_type card_type_enum,
   id_no TEXT UNIQUE,
-  gender gender_enum,
   status TEXT DEFAULT 'active',
   last_login_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),

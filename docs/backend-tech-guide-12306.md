@@ -14,7 +14,7 @@
 - **视图**：
   - `v_train_search`：统一返回车次+席位
   - `v_user_orders`：用户订单详情聚合视图（含车票信息）
-- **枚举**：`gender_enum`, `train_type_enum`, `seat_type_enum`, `ticket_type_enum`, `order_status_enum`, `ticket_status_enum`, `card_type_enum`
+- **枚举**：`train_type_enum`, `seat_type_enum`, `ticket_type_enum`, `order_status_enum`, `ticket_status_enum`, `card_type_enum`
 - **关键触发器**：
   - `trg_ticket_decrement`: 创建车票时扣减库存
   - `trg_order_cancel_release`: 订单取消（未支付）时释放库存

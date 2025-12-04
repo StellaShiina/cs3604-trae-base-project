@@ -4,14 +4,13 @@
 - 目标：支撑 `Home`, `Booking`, `Login`, `Register`, `UserCenter` (Order/Passenger) 等全流程业务。
 - 引擎与设置：PostgreSQL 14+；启用扩展 `citext`, `pg_trgm`；时区 `Asia/Shanghai`；字符集 `UTF8`。
 - 命名约定：表名小写下划线，主键 `id`，时间 `created_at`, `updated_at`，金额单位 `price_cents`，货币 `currency` 采用 `CNY`。
-- 统一类型：采用枚举类型表示列车类型、席别、性别、订单状态、票种等。
+- 统一类型：采用枚举类型表示列车类型、席别、订单状态、票种等。
 
 ## 2. 枚举与扩展
 ```sql
 CREATE EXTENSION IF NOT EXISTS citext;
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
-CREATE TYPE gender_enum AS ENUM ('male','female');
 CREATE TYPE train_type_enum AS ENUM ('G','D','C','Z','T','K');
 CREATE TYPE seat_type_enum AS ENUM ('business','first','second','softSleeper','hardSleeper','hardSeat');
 CREATE TYPE ticket_type_enum AS ENUM ('adult','child','student');
@@ -33,8 +32,10 @@ CREATE TABLE users (
   mobile CITEXT UNIQUE,
   password_hash TEXT NOT NULL,
   name TEXT,
-  gender gender_enum,
+  id_type card_type_enum,
+  id_no TEXT UNIQUE,
   status TEXT DEFAULT 'active',
+  last_login_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
