@@ -1,10 +1,11 @@
 package routes
 
 import (
-	"12306-backend/db"
-	"net/http"
+    "12306-backend/db"
+    "encoding/json"
+    "net/http"
 
-	"github.com/gin-gonic/gin"
+    "github.com/gin-gonic/gin"
 )
 
 type TrainSearchResult struct {
@@ -31,55 +32,42 @@ func SearchTrains(c *gin.Context) {
 		return
 	}
 
-	// Logic: Query v_train_search view
-	// Since we don't have the View model defined in GORM, we can use raw SQL or define a struct
-	// Assuming the view returns columns: train_no, start_time, end_time, second_class_left, first_class_left...
-	
-	// For this development phase, we'll execute a raw query or return a mock if DB not ready.
-	// But let's write the intended code.
-	
-	var results []struct {
-		TrainNo         string
-		StartTime       string
-		EndTime         string
-		SecondClassLeft int
-		FirstClassLeft  int
-	}
+    var rows []struct {
+        TrainNo    string
+        DepartTime string
+        ArriveTime string
+        Seats      string
+    }
 
-	// This is a simplified query assuming a view exists
-	// In reality, it might be more complex join
-	err := db.GetDB().Raw(`
-		SELECT train_no, start_time, end_time, second_class_left, first_class_left 
-		FROM v_train_search 
-		WHERE from_station_id = ? AND to_station_id = ? AND date = ?
-	`, fromStation, toStation, date).Scan(&results).Error
+    err := db.GetDB().Raw(`
+        SELECT train_no, depart_time, arrive_time, seats 
+        FROM v_train_search 
+        WHERE from_station_id = ? AND to_station_id = ? AND date = ?
+    `, fromStation, toStation, date).Scan(&rows).Error
 
-	if err != nil {
-		// If table doesn't exist (likely in this env), we return empty list or error
-		// For robustness in this demo environment, let's just return empty list if error
-		c.JSON(http.StatusOK, []TrainSearchResult{})
-		return
-	}
+    if err != nil {
+        c.JSON(http.StatusOK, []TrainSearchResult{})
+        return
+    }
 
-	// Map to response format
-	var response []TrainSearchResult
-	for _, r := range results {
-		response = append(response, TrainSearchResult{
-			TrainNo:   r.TrainNo,
-			From:      fromStation, // Simplified
-			To:        toStation,   // Simplified
-			StartTime: r.StartTime,
-			EndTime:   r.EndTime,
-			Seats: []struct {
-				Type     string `json:"type"`
-				Left     int    `json:"left"`
-				Bookable bool   `json:"bookable"`
-			}{
-				{"second", r.SecondClassLeft, r.SecondClassLeft > 0},
-				{"first", r.FirstClassLeft, r.FirstClassLeft > 0},
-			},
-		})
-	}
+    var response []TrainSearchResult
+    for _, r := range rows {
+        var seatItems []struct {
+            Type     string `json:"type"`
+            Left     int    `json:"left"`
+            Bookable bool   `json:"bookable"`
+        }
+        _ = json.Unmarshal([]byte(r.Seats), &seatItems)
 
-	c.JSON(http.StatusOK, response)
+        response = append(response, TrainSearchResult{
+            TrainNo:   r.TrainNo,
+            From:      fromStation,
+            To:        toStation,
+            StartTime: r.DepartTime,
+            EndTime:   r.ArriveTime,
+            Seats:     seatItems,
+        })
+    }
+
+    c.JSON(http.StatusOK, response)
 }

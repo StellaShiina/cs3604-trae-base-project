@@ -11,6 +11,7 @@ import (
 	"12306-backend/models"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -19,8 +20,35 @@ import (
 func setupTestRouter() *gin.Engine {
 	db.InitTest()
 	// Migrate schemas
-	_ = db.GetDB().AutoMigrate(&models.User{}, &models.Passenger{}, &models.Train{}, &models.Order{}, &models.Ticket{})
+	_ = db.GetDB().AutoMigrate(&models.User{}, &models.Passenger{}, &models.Train{}, &models.Order{}, &models.Ticket{}, &models.Station{}, &models.TrainService{}, &models.ServiceSegment{})
 	
+	// Seed data for Order creation test
+	bjpID := uuid.New()
+	shhID := uuid.New()
+	if err := db.GetDB().Create(&models.Station{ID: bjpID, Code: "BJP", NameEn: "Beijing"}).Error; err != nil {
+		panic("Failed to seed BJP: " + err.Error())
+	}
+	if err := db.GetDB().Create(&models.Station{ID: shhID, Code: "SHH", NameEn: "Shanghai"}).Error; err != nil {
+		panic("Failed to seed SHH: " + err.Error())
+	}
+
+	// Seed TrainService for current date
+	// In SQLite, date function returns YYYY-MM-DD. We need to match that.
+	// However, Gorm writes time.Time as timestamp.
+	// Let's try to use Exec with raw SQL to match the query expectation or rely on Gorm.
+	// The query uses 'service_date = current_date'.
+	db.GetDB().Exec("INSERT INTO train_services (train_no, service_date) VALUES ('G101', date('now'))")
+	
+	// Get the inserted ID
+	var tsID int64
+	db.GetDB().Raw("SELECT id FROM train_services WHERE train_no = 'G101'").Scan(&tsID)
+
+	db.GetDB().Create(&models.ServiceSegment{
+		TrainServiceID: tsID,
+		FromStationID:  bjpID,
+		ToStationID:    shhID,
+	})
+
 	// Create mock view/table for search
 	db.GetDB().Exec(`CREATE TABLE IF NOT EXISTS v_train_search (
 		train_no TEXT,
@@ -88,11 +116,13 @@ func TestLogin(t *testing.T) {
 
 	// Pre-register user
 	hash, _ := bcrypt.GenerateFromPassword([]byte("password123"), bcrypt.DefaultCost)
+	email := "test@example.com"
+	mobile := "13800000000"
 	user := models.User{
 		Username:     "testuser",
 		PasswordHash: string(hash),
-		Email:        "test@example.com",
-		Mobile:       "13800000000",
+		Email:        &email,
+		Mobile:       &mobile,
 	}
 	db.GetDB().Create(&user)
 

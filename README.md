@@ -1,8 +1,8 @@
-# cs3604 · 12306 英文版演示站点
+# cs3604 · 12306 演示站点
 
 [![cdtool](https://img.shields.io/badge/Related_REPO-cdtool-blue)](https://github.com/StellaShiina/cdtool)
 
-一个涵盖后端（Go + PostgreSQL）与前端（Vue 3 + TypeScript）的完整示例，提供英文版 12306 常用流程：站点查询、车次搜索、余票展示、下单占位等。已配置 CI 与简易 CD，可在服务器上自动部署至预览站点。
+一个涵盖后端（Go + PostgreSQL）与前端（Vue 3 + TypeScript）的完整示例，提供 12306 常用流程：站点查询、车次搜索、余票展示、下单占位等。已配置 CI 与简易 CD，可在服务器上自动部署至预览站点。
 
 
 ## 主要功能
@@ -31,8 +31,17 @@
 
 ## 本地开发
 - 前端：`cd frontend && npm install && npm run dev`
-- 后端：`cd backend && go run ./cmd/server`
+- 后端：`cd backend && go run main.go`
 - 数据库：`docker compose up -d`（服务与数据库）
+
+## 实现状态 (Current Progress)
+- **后端 (Backend)**:
+  - ✅ **用户认证 (Auth)**: 注册、登录 (Bcrypt + Session Cookie)。
+  - ✅ **乘客管理 (Passengers)**: 增删改查，支持 15 人上限与重复校验。
+  - ✅ **车次查询 (Trains)**: 基于视图 `v_train_search` 的查询接口。
+  - ✅ **订单处理 (Orders)**: 事务性订单创建，集成库存扣减触发器逻辑 (Mock)。
+  - ✅ **测试覆盖**: 核心业务逻辑单元测试通过 (SQLite 内存数据库)。
+  - ✅ **CORS**: 已配置跨域支持，允许前端本地调试。
 
 ## 测试
 - 前端单测：`npm run test:unit -- --run`
