@@ -26,7 +26,8 @@
       | 字段 | 值 |
       | username | "jdoe" |
       | password | "SecurePass123" |
-      | email | "jdoe@example.com" |
+      <!-- email项为可选，若提供则必须是有效邮箱格式 -->
+      | email | "jdoe@example.com" | 
       | mobile | "13800138000" |
       | name | "张三" |
       | id_type | "id_card" |

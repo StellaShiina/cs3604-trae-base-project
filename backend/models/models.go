@@ -14,7 +14,8 @@ type User struct {
     Mobile       *string   `gorm:"unique" json:"mobile"`
     PasswordHash string    `gorm:"not null" json:"-"`
     Name         string    `json:"name"`
-    Gender       *string   `json:"gender"`
+    IDType       string    `json:"id_type"`
+    IDNo         string    `json:"id_no"`
     Status       string    `gorm:"default:'active'" json:"status"`
     CreatedAt    time.Time `json:"created_at"`
     UpdatedAt    time.Time `json:"updated_at"`
