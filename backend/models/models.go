@@ -8,16 +8,18 @@ import (
 )
 
 type User struct {
-	ID           uuid.UUID `gorm:"primary_key"`
-	Username     string    `gorm:"unique;not null"`
-	Email        string    `gorm:"unique"`
-	Mobile       string    `gorm:"unique"`
-	PasswordHash string    `gorm:"not null"`
-	Name         string
-	Gender       string
-	Status       string `gorm:"default:'active'"`
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
+	ID           uuid.UUID `gorm:"primary_key" json:"id"`
+	Username     string    `gorm:"unique;not null" json:"username"`
+	Email        string    `gorm:"unique" json:"email"`
+	Mobile       string    `gorm:"unique" json:"mobile"`
+	PasswordHash string    `gorm:"not null" json:"-"`
+	Name         string    `json:"name"`
+	IDType       string    `json:"id_type"`
+	IDNo         string    `json:"id_no"`
+	Gender       string    `json:"gender"`
+	Status       string    `gorm:"default:'active'" json:"status"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }
 
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
@@ -48,6 +50,13 @@ func (p *Passenger) BeforeCreate(tx *gorm.DB) (err error) {
 type Train struct {
 	TrainNo   string `gorm:"primary_key"`
 	TrainType string `gorm:"not null"`
+}
+
+type Station struct {
+	ID     uuid.UUID `gorm:"primary_key" json:"id"`
+	Code   string    `gorm:"unique;not null" json:"code"`
+	NameEn string    `gorm:"not null" json:"name_en"`
+	NameZh string    `json:"name_zh"`
 }
 
 type Order struct {

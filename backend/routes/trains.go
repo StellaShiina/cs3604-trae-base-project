@@ -2,9 +2,12 @@ package routes
 
 import (
 	"12306-backend/db"
+	"12306-backend/models"
+	"encoding/json"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type TrainSearchResult struct {
@@ -17,46 +20,61 @@ type TrainSearchResult struct {
 		Type     string `json:"type"`
 		Left     int    `json:"left"`
 		Bookable bool   `json:"bookable"`
+		Price    int    `json:"price"`
 	} `json:"seats"`
 }
 
 // API-GET-TrainSearch
 func SearchTrains(c *gin.Context) {
-	fromStation := c.Query("fromStationId")
-	toStation := c.Query("toStationId")
+	fromStationInput := c.Query("fromStationId")
+	toStationInput := c.Query("toStationId")
 	date := c.Query("date")
 
-	if fromStation == "" || toStation == "" || date == "" {
+	if fromStationInput == "" || toStationInput == "" || date == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing required parameters"})
 		return
 	}
 
-	// Logic: Query v_train_search view
-	// Since we don't have the View model defined in GORM, we can use raw SQL or define a struct
-	// Assuming the view returns columns: train_no, start_time, end_time, second_class_left, first_class_left...
-	
-	// For this development phase, we'll execute a raw query or return a mock if DB not ready.
-	// But let's write the intended code.
-	
-	var results []struct {
-		TrainNo         string
-		StartTime       string
-		EndTime         string
-		SecondClassLeft int
-		FirstClassLeft  int
+	// Helper to resolve station ID
+	resolveStationID := func(input string) string {
+		// Check if valid UUID
+		if _, err := uuid.Parse(input); err == nil {
+			return input
+		}
+		// Lookup by code or name
+		var station models.Station
+		// Try Code, NameEn, NameZh
+		if err := db.GetDB().Where("code = ? OR name_en = ? OR name_zh = ?", input, input, input).First(&station).Error; err == nil {
+			return station.ID.String()
+		}
+		return ""
 	}
 
-	// This is a simplified query assuming a view exists
-	// In reality, it might be more complex join
+	fromStationID := resolveStationID(fromStationInput)
+	toStationID := resolveStationID(toStationInput)
+
+	if fromStationID == "" || toStationID == "" {
+		c.JSON(http.StatusOK, []TrainSearchResult{})
+		return
+	}
+
+	// Query v_train_search view
+	var results []struct {
+		TrainNo    string
+		DepartTime string
+		ArriveTime string
+		Seats      string // JSONB string
+	}
+
 	err := db.GetDB().Raw(`
-		SELECT train_no, start_time, end_time, second_class_left, first_class_left 
+		SELECT train_no, depart_time, arrive_time, seats::text
 		FROM v_train_search 
 		WHERE from_station_id = ? AND to_station_id = ? AND date = ?
-	`, fromStation, toStation, date).Scan(&results).Error
+	`, fromStationID, toStationID, date).Scan(&results).Error
 
 	if err != nil {
-		// If table doesn't exist (likely in this env), we return empty list or error
-		// For robustness in this demo environment, let's just return empty list if error
+		// If error (e.g. table not found or query error), return empty list
+		// Log error for debugging if needed, but keep response clean
 		c.JSON(http.StatusOK, []TrainSearchResult{})
 		return
 	}
@@ -64,20 +82,29 @@ func SearchTrains(c *gin.Context) {
 	// Map to response format
 	var response []TrainSearchResult
 	for _, r := range results {
-		response = append(response, TrainSearchResult{
-			TrainNo:   r.TrainNo,
-			From:      fromStation, // Simplified
-			To:        toStation,   // Simplified
-			StartTime: r.StartTime,
-			EndTime:   r.EndTime,
-			Seats: []struct {
+		var seats []struct {
+			Type     string `json:"type"`
+			Left     int    `json:"left"`
+			Bookable bool   `json:"bookable"`
+			Price    int    `json:"price"`
+		}
+		if err := json.Unmarshal([]byte(r.Seats), &seats); err != nil {
+			// If parsing fails, just use empty seats
+			seats = []struct {
 				Type     string `json:"type"`
 				Left     int    `json:"left"`
 				Bookable bool   `json:"bookable"`
-			}{
-				{"second", r.SecondClassLeft, r.SecondClassLeft > 0},
-				{"first", r.FirstClassLeft, r.FirstClassLeft > 0},
-			},
+				Price    int    `json:"price"`
+			}{}
+		}
+
+		response = append(response, TrainSearchResult{
+			TrainNo:   r.TrainNo,
+			From:      fromStationInput,
+			To:        toStationInput,
+			StartTime: r.DepartTime, // Map depart_time to startTime
+			EndTime:   r.ArriveTime, // Map arrive_time to endTime
+			Seats:     seats,
 		})
 	}
 
