@@ -1,11 +1,13 @@
 package routes
 
 import (
-    "12306-backend/db"
-    "encoding/json"
-    "net/http"
+	"12306-backend/db"
+	"12306-backend/models"
+	"encoding/json"
+	"net/http"
 
-    "github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type TrainSearchResult struct {
@@ -18,56 +20,93 @@ type TrainSearchResult struct {
 		Type     string `json:"type"`
 		Left     int    `json:"left"`
 		Bookable bool   `json:"bookable"`
+		Price    int    `json:"price"`
 	} `json:"seats"`
 }
 
 // API-GET-TrainSearch
 func SearchTrains(c *gin.Context) {
-	fromStation := c.Query("fromStationId")
-	toStation := c.Query("toStationId")
+	fromStationInput := c.Query("fromStationId")
+	toStationInput := c.Query("toStationId")
 	date := c.Query("date")
 
-	if fromStation == "" || toStation == "" || date == "" {
+	if fromStationInput == "" || toStationInput == "" || date == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing required parameters"})
 		return
 	}
 
-    var rows []struct {
-        TrainNo    string
-        DepartTime string
-        ArriveTime string
-        Seats      string
-    }
+	// Helper to resolve station ID
+	resolveStationID := func(input string) string {
+		// Check if valid UUID
+		if _, err := uuid.Parse(input); err == nil {
+			return input
+		}
+		// Lookup by code or name
+		var station models.Station
+		// Try Code, NameEn, NameZh
+		if err := db.GetDB().Where("code = ? OR name_en = ? OR name_zh = ?", input, input, input).First(&station).Error; err == nil {
+			return station.ID.String()
+		}
+		return ""
+	}
 
-    err := db.GetDB().Raw(`
-        SELECT train_no, depart_time, arrive_time, seats 
-        FROM v_train_search 
-        WHERE from_station_id = ? AND to_station_id = ? AND date = ?
-    `, fromStation, toStation, date).Scan(&rows).Error
+	fromStationID := resolveStationID(fromStationInput)
+	toStationID := resolveStationID(toStationInput)
 
-    if err != nil {
-        c.JSON(http.StatusOK, []TrainSearchResult{})
-        return
-    }
+	if fromStationID == "" || toStationID == "" {
+		c.JSON(http.StatusOK, []TrainSearchResult{})
+		return
+	}
 
-    var response []TrainSearchResult
-    for _, r := range rows {
-        var seatItems []struct {
-            Type     string `json:"type"`
-            Left     int    `json:"left"`
-            Bookable bool   `json:"bookable"`
-        }
-        _ = json.Unmarshal([]byte(r.Seats), &seatItems)
+	// Query v_train_search view
+	var results []struct {
+		TrainNo    string
+		DepartTime string
+		ArriveTime string
+		Seats      string // JSONB string
+	}
 
-        response = append(response, TrainSearchResult{
-            TrainNo:   r.TrainNo,
-            From:      fromStation,
-            To:        toStation,
-            StartTime: r.DepartTime,
-            EndTime:   r.ArriveTime,
-            Seats:     seatItems,
-        })
-    }
+	err := db.GetDB().Raw(`
+		SELECT train_no, depart_time, arrive_time, seats::text
+		FROM v_train_search 
+		WHERE from_station_id = ? AND to_station_id = ? AND date = ?
+	`, fromStationID, toStationID, date).Scan(&results).Error
+
+	if err != nil {
+		// If error (e.g. table not found or query error), return empty list
+		// Log error for debugging if needed, but keep response clean
+		c.JSON(http.StatusOK, []TrainSearchResult{})
+		return
+	}
+
+	// Map to response format
+	var response []TrainSearchResult
+	for _, r := range results {
+		var seats []struct {
+			Type     string `json:"type"`
+			Left     int    `json:"left"`
+			Bookable bool   `json:"bookable"`
+			Price    int    `json:"price"`
+		}
+		if err := json.Unmarshal([]byte(r.Seats), &seats); err != nil {
+			// If parsing fails, just use empty seats
+			seats = []struct {
+				Type     string `json:"type"`
+				Left     int    `json:"left"`
+				Bookable bool   `json:"bookable"`
+				Price    int    `json:"price"`
+			}{}
+		}
+
+		response = append(response, TrainSearchResult{
+			TrainNo:   r.TrainNo,
+			From:      fromStationInput,
+			To:        toStationInput,
+			StartTime: r.DepartTime, // Map depart_time to startTime
+			EndTime:   r.ArriveTime, // Map arrive_time to endTime
+			Seats:     seats,
+		})
+	}
 
     c.JSON(http.StatusOK, response)
 }

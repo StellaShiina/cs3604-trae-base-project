@@ -33,6 +33,8 @@ func SetupRouter() *gin.Engine {
 		{
 			auth.POST("/register", Register)
 			auth.POST("/login", Login)
+			auth.POST("/send-sms", SendSMS)
+			auth.POST("/verify-sms", VerifySMS)
 		}
 
 		passengers := v1.Group("/passengers")

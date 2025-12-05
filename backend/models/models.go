@@ -51,6 +51,13 @@ type Train struct {
 	TrainType string `gorm:"not null"`
 }
 
+type Station struct {
+	ID     uuid.UUID `gorm:"primary_key" json:"id"`
+	Code   string    `gorm:"unique;not null" json:"code"`
+	NameEn string    `gorm:"not null" json:"name_en"`
+	NameZh string    `json:"name_zh"`
+}
+
 type Order struct {
 	ID              uuid.UUID `gorm:"primary_key"`
 	UserID          uuid.UUID `gorm:"not null"`
