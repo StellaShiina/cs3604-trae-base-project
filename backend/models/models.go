@@ -97,12 +97,6 @@ type Ticket struct {
 }
 
 // New models for missing tables
-type Station struct {
-	ID     uuid.UUID `gorm:"primary_key"`
-	Code   string    `gorm:"unique;not null"`
-	NameEn string    `gorm:"not null"`
-	NameZh string
-}
 
 func (s *Station) BeforeCreate(tx *gorm.DB) (err error) {
 	if s.ID == uuid.Nil {
