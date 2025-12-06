@@ -30,9 +30,47 @@
   - 预览站点：`https://12306.vozn.dpdns.org`。
 
 ## 本地开发
-- 前端：`cd frontend && npm install && npm run dev`
-- 后端：`cd backend && go run ./cmd/server`
-- 数据库：`docker compose up -d`（服务与数据库）
+
+### Prerequisites (前置条件)
+在开始本地开发前，确保已安装以下工具：
+- **Docker Desktop** (Windows/Mac) 或 **Docker Engine** (Linux) - 用于运行 PostgreSQL 数据库
+- **Go 1.23+** - 用于运行后端
+- **Node.js 18+** - 用于运行前端
+
+### 启动顺序 (重要!)
+
+**必须按以下顺序启动**，否则会遇到连接错误：
+
+1. **启动数据库** (第一步)
+   ```bash
+   # 确保 Docker Desktop 已启动 (Windows/Mac) 或 Docker daemon 正在运行 (Linux)
+   docker compose up -d
+   
+   # 验证数据库是否正在运行
+   docker ps
+   # 应该看到 railway12306-postgres 容器在运行
+   ```
+
+2. **启动后端** (第二步)
+   ```bash
+   cd backend
+   go run ./cmd/server
+   # 服务器将在 http://127.0.0.1:8080 启动
+   ```
+
+3. **启动前端** (第三步)
+   ```bash
+   cd frontend
+   npm install  # 首次运行需要
+   npm run dev
+   # 前端将在 http://localhost:5173 启动
+   ```
+
+### 常见问题
+
+- **数据库连接失败**：确保 Docker 正在运行且 `docker compose up -d` 已执行
+- **端口占用**：如果端口 8080 或 5173 已被占用，需要先停止占用的进程
+- 更多问题请参考 `TROUBLESHOOTING.md`
 
 ## 测试
 - 前端单测：`npm run test:unit -- --run`
