@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"strings"
 
 	"cs3604/backend/internal/config"
 	"cs3604/backend/internal/db"
@@ -30,9 +31,18 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
-	gin.SetMode(gin.ReleaseMode)
 	log.Printf("Server starting on 127.0.0.1:%s", port)
 	if err := srv.R.Run("127.0.0.1:" + port); err != nil {
-		log.Fatalf("Failed to start server: %v\n\nNote: If you see 'bind: address already in use', another process is using port %s.\nOn Windows: netstat -ano | findstr :%s\nOn Mac/Linux: lsof -i :%s\nThen kill the process using: taskkill /PID <PID> /F (Windows) or kill <PID> (Mac/Linux)", err, port, port, port)
+		if strings.Contains(err.Error(), "address already in use") || strings.Contains(err.Error(), "bind") {
+			log.Printf("Failed to start server: %v", err)
+			log.Printf("Port %s is already in use by another process.", port)
+			log.Printf("To find the process:")
+			log.Printf("  Windows: netstat -ano | findstr :%s", port)
+			log.Printf("  Mac/Linux: lsof -i :%s", port)
+			log.Printf("To kill the process:")
+			log.Printf("  Windows: taskkill /PID <PID> /F")
+			log.Fatalf("  Mac/Linux: kill <PID>")
+		}
+		log.Fatalf("Failed to start server: %v", err)
 	}
 }
