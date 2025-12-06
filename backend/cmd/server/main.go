@@ -41,7 +41,8 @@ func main() {
 			log.Printf("  Mac/Linux: lsof -i :%s", port)
 			log.Printf("To kill the process:")
 			log.Printf("  Windows: taskkill /PID <PID> /F")
-			log.Fatalf("  Mac/Linux: kill <PID>")
+			log.Printf("  Mac/Linux: kill <PID>")
+			os.Exit(1)
 		}
 		log.Fatalf("Failed to start server: %v", err)
 	}

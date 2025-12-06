@@ -29,7 +29,7 @@ func Open(dsn string) (*gorm.DB, error) {
     if err != nil {
         // Enhance error message with troubleshooting guidance
         if strings.Contains(err.Error(), "connection refused") || strings.Contains(err.Error(), "dial tcp") {
-            return nil, fmt.Errorf("database connection failed: %w%s", err, dbConnectionTroubleshooting)
+            return nil, fmt.Errorf("database connection failed%s: %w", dbConnectionTroubleshooting, err)
         }
         return nil, fmt.Errorf("failed to connect to database: %w", err)
     }
