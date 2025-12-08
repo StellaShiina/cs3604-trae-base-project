@@ -105,6 +105,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch } from 'vue'
 
+const API_BASE = import.meta.env.DEV ? 'http://localhost:8080' : ''
 const addr = reactive({ province:'', city:'', district:'', town:'', nearby:'', detail:'', recipient:'', mobile:'', default:false })
 const addrError = ref('')
 const regionData = reactive({
@@ -127,28 +128,46 @@ watch(()=>addr.province,()=>{ addr.city=''; addr.district=''; addr.town=''; addr
 watch(()=>addr.city,()=>{ addr.district=''; addr.town=''; addr.nearby='' })
 watch(()=>addr.district,()=>{ addr.town=''; addr.nearby='' })
 watch(()=>addr.town,()=>{ addr.nearby='' })
-const ADDR_KEY = 'common_addresses'
 const addresses = ref<any[]>([])
-function loadAddresses(){
-  try { const raw = localStorage.getItem(ADDR_KEY); addresses.value = raw ? JSON.parse(raw) : [] } catch { addresses.value = [] }
+async function loadAddresses(){
+  const res = await fetch(`${API_BASE}/api/v1/addresses`, { credentials: 'include' })
+  if(res.status === 401){ addrError.value = 'Login required'; return }
+  const j = await res.json().catch(()=>({ items: [] }))
+  const list = Array.isArray(j.items) ? j.items : []
+  addresses.value = list.map((x:any)=>({
+    id: x.id,
+    province: x.province || '',
+    city: x.city || '',
+    district: x.district || '',
+    town: x.town || '',
+    nearby: x.nearby || '',
+    detail: x.detail,
+    recipient: x.recipient,
+    mobile: x.mobile,
+    default: !!x.default,
+  }))
 }
-function saveLocal(){ localStorage.setItem(ADDR_KEY, JSON.stringify(addresses.value.slice(0,20))) }
 function resetAddr(){ addr.province=''; addr.city=''; addr.district=''; addr.town=''; addr.nearby=''; addr.detail=''; addr.recipient=''; addr.mobile=''; addr.default=false; addrError.value='' }
-function saveAddr(){
+async function saveAddr(){
   addrError.value=''
-  if(!addr.province || !addr.city || !addr.district || !addr.detail || !addr.recipient || !addr.mobile){ addrError.value='Please complete the required fields'; return }
+  if(!addr.detail || !addr.recipient || !addr.mobile){ addrError.value='Please complete the required fields'; return }
   if(!/^\+?\d[\d\-\s]{5,20}$/.test(addr.mobile)){ addrError.value='Invalid mobile number'; return }
-  const item = { id: Date.now(), ...addr }
-  addresses.value.unshift(item)
-  if(addr.default){ addresses.value = addresses.value.map(x=>({ ...x, default: x.id===item.id })) }
-  saveLocal()
+  const res = await fetch(`${API_BASE}/api/v1/addresses`,{ method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify(addr) })
+  if(res.status===401){ addrError.value='Login required'; return }
+  if(res.status!==201){ const j = await res.json().catch(()=>({message:'Error'})); addrError.value=j.message||'Save failed'; return }
+  await loadAddresses()
   resetAddr()
 }
-function setDefault(id:number){ addresses.value = addresses.value.map(x=>({ ...x, default: x.id===id })); saveLocal() }
-function removeAddr(id:number){ addresses.value = addresses.value.filter(x=>x.id!==id); saveLocal() }
+async function setDefault(id:string){
+  const res = await fetch(`${API_BASE}/api/v1/addresses/${id}/default`,{ method:'PATCH', credentials:'include' })
+  if(res.status===200){ await loadAddresses() }
+}
+async function removeAddr(id:string){
+  const res = await fetch(`${API_BASE}/api/v1/addresses/${id}`,{ method:'DELETE', credentials:'include' })
+  if(res.status===204){ addresses.value = addresses.value.filter(x=>x.id!==id) }
+}
 loadAddresses()
 </script>
 <style scoped>
 .nav{display:none}
 </style>
-
