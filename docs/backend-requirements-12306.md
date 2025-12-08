@@ -37,18 +37,65 @@
     And 密码应当被哈希处理
     And API 应返回 HTTP 201 Created
 
-  Scenario: 使用有效凭据登录
-    Given 存在注册用户 "jdoe"，密码为 "SecurePass123"
-    When 使用用户名 "jdoe" 和密码 "SecurePass123" 调用 "登录" API
-    Then 系统应验证密码哈希
-    And 在 `sessions` 表中创建新的会话记录
-    And 在 HTTP Cookie 中返回会话 ID (`sid`)
-    And 返回 HTTP 200 OK 及用户资料
+  Scenario: 注册时用户名重复检测
+    Given 数据库中已存在用户名为 "jdoe" 的用户
+    When 用户尝试使用用户名 "jdoe" 注册
+    Then 系统应返回 HTTP 409 Conflict
+    And 错误消息应明确显示 "该用户名已经占用，请重新选择用户名！"
 
-  Scenario: 使用无效凭据登录
+  Scenario: 登录时的身份校验与短信验证 (二步验证)
+    # 第一步：用户输入账号密码触发验证
+    When 用户输入 "jdoe" 和密码 "Pass123" (无论正确与否)
+    Then 前端唤起 "证件号后4位" 和 "验证码" 输入弹窗
+
+    # 第二步：请求发送验证码
+    # 场景 2.1: 正常流程
+    Given 存在用户 "jdoe"，证件号尾号 "5678"
+    When 调用 "发送登录验证码" API，参数为：
+      | username | "jdoe" |
+      | id_card_last_4 | "5678" |
+    Then 系统校验通过
+    And 向用户手机发送短信验证码
+    And 返回 HTTP 200 OK
+
+    # 场景 2.2: 用户信息不匹配 (防枚举)
+    # 包括：用户不存在、证件号尾号错误
+    When 调用 "发送登录验证码" API，参数为：
+      | username | "nonexistent" 或 "jdoe" |
+      | id_card_last_4 | "0000" |
+    Then 系统应拒绝发送短信
+    But 为了防止用户枚举，API 仍应返回模糊的错误提示 "请输入正确的用户信息" (或统一错误码)
+    And 实际上不发送任何短信
+
+    # 第三步：提交登录
+    # 场景 3.1: 登录成功
+    When 调用 "登录" API，参数为：
+      | username | "jdoe" |
+      | password | "Pass123" |
+      | sms_code | "123456" (正确) |
+    Then 系统验证全部通过
+    And 返回 Session ID 和用户信息
+
+    # 场景 3.2: 密码错误
+    When 调用 "登录" API，参数为：
+      | username | "jdoe" |
+      | password | "WrongPass" |
+      | sms_code | "123456" (正确) |
+    Then 系统返回 HTTP 401 Unauthorized
+    And 错误消息为 "用户名或密码错误"
+
+
+  Scenario: 使用无效凭据或验证码登录
     When 使用用户名 "jdoe" 和错误密码调用 "登录" API
     Then 系统应返回 HTTP 401 Unauthorized
     And 不应创建任何会话
+
+  Scenario: 未登录访问受保护资源 (后端鉴权)
+    Given 用户未登录 (无有效会话 ID)
+    When 调用 "获取用户资料" 或 "获取订单列表" API
+    Then 系统应返回 HTTP 401 Unauthorized
+    # 前端收到 401 后会自动跳转到登录页，此逻辑由前端处理，但后端必须保证拒绝服务
+
 
 ### Feature: 乘车人管理
   作为注册用户
@@ -109,6 +156,14 @@
     Given 存在车站 "北京" (BJP) 和 "上海" (SHH)
     When 使用关键字 "Bei" 调用 "车站搜索" API
     Then 结果应包含 "北京"
+
+  Scenario: 城市聚合查询 (多车站匹配)
+    Given 城市 "北京" (BJP) 包含车站 "北京南" (VNP) 和 "北京西" (BXP)
+    And 车次 "G1" 从 "北京南" (VNP) 出发
+    When 调用 "查询车次" API，参数为：
+      | fromStation | "BJP" | (北京)
+    Then 响应结果应包含车次 "G1"
+    And 响应中应注明实际出发站为 "北京南"
 
 ### Feature: 车票预订 (核心交易)
   作为已登录用户
@@ -229,3 +284,13 @@
     *   `docs/backend-tech-guide-12306.md` (技术实现)
     *   `docs/db-requirements-12306-postgresql.md` (模式与触发器)
     *   `docs/frontend-api-guide-12306.md` (API 契约)
+
+### 4.5 边缘情况与复杂场景补充
+*   **同城多站 (City Aggregation)**: 明确了 City 到 Station 的映射需求。搜索城市（如 "北京"）应返回该城市下属所有车站（"北京南"、"北京西" 等）的车次。
+*   **库存显示**: 
+    *   **充裕**: 显示 "有票"。
+    *   **紧张**: 当余票 < 20 张时，显示具体数字（如 "剩余 3 张"）。
+    *   **无票**: 显示 "无票" 或 "候补"。
+*   **购票限制**: 
+    *   **实名制校验**: 同一身份证号在同一乘车日期、同一车次只能购买一张票。
+    *   **行程冲突**: 系统应检查用户是否存在时间重叠的行程，避免购买无法乘坐的车票。

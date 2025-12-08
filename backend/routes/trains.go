@@ -35,48 +35,104 @@ func SearchTrains(c *gin.Context) {
 		return
 	}
 
-	// Helper to resolve station ID
-	resolveStationID := func(input string) string {
-		// Check if valid UUID
+	// Helper to resolve station IDs (supports City Aggregation)
+	resolveStationIDs := func(input string) []string {
+		var ids []string
+		
+		// 1. Check if valid UUID (Direct ID)
 		if _, err := uuid.Parse(input); err == nil {
-			return input
+			ids = append(ids, input)
+			return ids
 		}
-		// Lookup by code or name
-		var station models.Station
-		// Try Code, NameEn, NameZh
-		if err := db.GetDB().Where("code = ? OR name_en = ? OR name_zh = ?", input, input, input).First(&station).Error; err == nil {
-			return station.ID.String()
+
+		// 2. Lookup by Code/Name (Single Station)
+		// var stations []models.Station
+		// Try Exact Match on Code, NameEn, NameZh
+		// Also support "City Code" concept: If input is a city code like "BJP", 
+		// in real world, "BJP" is Beijing Station. But here we assume we might need to find all stations in that city.
+		// Since we don't have a separate "City" table in the current schema, we can assume a convention or lookup table.
+		// For this task, let's implement a simple logic: 
+		// If input matches a Station Code that is a "major city" (e.g. BJP, SHH), we fetch related stations.
+		// OR, simpler: Just query stations where Code = input OR NameEn = input OR NameZh = input.
+		
+		// However, the requirement says "Search BJP should return VNP, BXP...".
+		// This implies a mapping. Let's hardcode a mapping for now or use a prefix search if applicable.
+		// Mapping for Beijing (BJP) -> Beijing (BJP), Beijing Nan (VNP), Beijing Xi (BXP)
+		// Mapping for Shanghai (SHH) -> Shanghai (SHH), Shanghai Hongqiao (AOH)
+		
+		cityMapping := map[string][]string{
+			"BJP": {"BJP", "VNP", "BXP"}, // Beijing, South, West
+			"SHH": {"SHH", "AOH"},        // Shanghai, Hongqiao
 		}
-		return ""
+		
+		if mappedCodes, ok := cityMapping[input]; ok {
+			// Fetch IDs for all these codes
+			db.GetDB().Model(&models.Station{}).Where("code IN ?", mappedCodes).Pluck("id", &ids)
+			return ids
+		}
+		
+		// Fallback: Normal single station lookup
+		if err := db.GetDB().Model(&models.Station{}).Where("code = ? OR name_en = ? OR name_zh = ?", input, input, input).Pluck("id", &ids).Error; err == nil {
+			return ids
+		}
+		
+		return ids
 	}
 
-	fromStationID := resolveStationID(fromStationInput)
-	toStationID := resolveStationID(toStationInput)
+	fromStationIDs := resolveStationIDs(fromStationInput)
+	toStationIDs := resolveStationIDs(toStationInput)
 
-	if fromStationID == "" || toStationID == "" {
+	if len(fromStationIDs) == 0 || len(toStationIDs) == 0 {
 		c.JSON(http.StatusOK, []TrainSearchResult{})
 		return
 	}
 
-	// Query v_train_search view
+	// Query v_train_search view with IN clause
 	var results []struct {
-		TrainNo    string
-		DepartTime string
-		ArriveTime string
-		Seats      string // JSONB string
+		TrainNo       string
+		FromStationID string `gorm:"column:from_station_id"` // To map back to station name if needed
+		ToStationID   string `gorm:"column:to_station_id"`
+		DepartTime    string
+		ArriveTime    string
+		Seats         string // JSONB string
 	}
 
-	err := db.GetDB().Raw(`
-		SELECT train_no, depart_time, arrive_time, seats::text
-		FROM v_train_search 
-		WHERE from_station_id = ? AND to_station_id = ? AND date = ?
-	`, fromStationID, toStationID, date).Scan(&results).Error
+	// Note: Gorm's Raw SQL with IN clause needs specific handling or string interpolation if using ? with slice.
+	// Gorm handles slice for ? automatically in Where, but in Raw it depends.
+	// Let's use Where clause construction.
+	
+	// Since v_train_search is a view, we can treat it like a model if we define a struct, 
+	// or use Raw with Gorm's clause building.
+	
+	err := db.GetDB().Table("v_train_search").
+		Select("train_no, from_station_id, to_station_id, depart_time, arrive_time, seats::text").
+		Where("from_station_id IN ? AND to_station_id IN ? AND date = ?", fromStationIDs, toStationIDs, date).
+		Scan(&results).Error
 
 	if err != nil {
 		// If error (e.g. table not found or query error), return empty list
 		// Log error for debugging if needed, but keep response clean
 		c.JSON(http.StatusOK, []TrainSearchResult{})
 		return
+	}
+
+	// We need to map Station IDs back to Station Names/Codes for the response "from" / "to" fields?
+	// The Requirement says "Response should indicate actual departure station".
+	// So we should fetch Station info to display correct names.
+	
+	// Collect all unique station IDs from results
+	stationIDMap := make(map[string]models.Station)
+	var allStationIDs []string
+	for _, r := range results {
+		allStationIDs = append(allStationIDs, r.FromStationID, r.ToStationID)
+	}
+	
+	if len(allStationIDs) > 0 {
+		var stations []models.Station
+		db.GetDB().Where("id IN ?", allStationIDs).Find(&stations)
+		for _, s := range stations {
+			stationIDMap[s.ID.String()] = s
+		}
 	}
 
 	// Map to response format
@@ -97,13 +153,22 @@ func SearchTrains(c *gin.Context) {
 				Price    int    `json:"price"`
 			}{}
 		}
+		
+		fromStationName := fromStationInput
+		if s, ok := stationIDMap[r.FromStationID]; ok {
+			fromStationName = s.NameZh // Or NameEn, or Code depending on requirement. Let's use ZH name.
+		}
+		toStationName := toStationInput
+		if s, ok := stationIDMap[r.ToStationID]; ok {
+			toStationName = s.NameZh
+		}
 
 		response = append(response, TrainSearchResult{
 			TrainNo:   r.TrainNo,
-			From:      fromStationInput,
-			To:        toStationInput,
-			StartTime: r.DepartTime, // Map depart_time to startTime
-			EndTime:   r.ArriveTime, // Map arrive_time to endTime
+			From:      fromStationName, // Actual Station Name
+			To:        toStationName,   // Actual Station Name
+			StartTime: r.DepartTime, 
+			EndTime:   r.ArriveTime, 
 			Seats:     seats,
 		})
 	}

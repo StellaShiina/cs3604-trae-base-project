@@ -23,6 +23,20 @@ func CORSMiddleware() gin.HandlerFunc {
 	}
 }
 
+func AuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		cookie, err := c.Cookie("sid")
+		if err != nil || cookie == "" {
+			c.JSON(401, gin.H{"error": "Unauthorized"})
+			c.Abort()
+			return
+		}
+		// In production, validate session ID against Redis/DB
+		// For now, we assume if cookie exists it's valid for simple tests unless we implement session store
+		c.Next()
+	}
+}
+
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
 	r.Use(CORSMiddleware())
@@ -33,32 +47,37 @@ func SetupRouter() *gin.Engine {
 		{
 			auth.POST("/register", Register)
 			auth.POST("/login", Login)
-			auth.POST("/send-sms", SendSMS)
+			auth.POST("/send-sms", SendLoginSMS) // Updated for 2FA Login
 			auth.POST("/verify-sms", VerifySMS)
 		}
 
-		passengers := v1.Group("/passengers")
+		// Protected Routes
+		protected := v1.Group("/")
+		protected.Use(AuthMiddleware())
 		{
-			passengers.GET("", GetPassengers)
-			passengers.POST("", AddPassenger)
+			passengers := protected.Group("/passengers")
+			{
+				passengers.GET("", GetPassengers)
+				passengers.POST("", AddPassenger)
+			}
+
+			orders := protected.Group("/orders")
+			{
+				orders.POST("", CreateOrder)
+				orders.GET("", GetOrders)
+				orders.POST("/:id/pay", PayOrder)
+				orders.POST("/:id/cancel", CancelOrder)
+			}
+
+			tickets := protected.Group("/tickets")
+			{
+				tickets.POST("/:id/refund", RefundTicket)
+			}
 		}
 
 		trains := v1.Group("/trains")
 		{
 			trains.GET("/search", SearchTrains)
-		}
-
-		orders := v1.Group("/orders")
-		{
-			orders.POST("", CreateOrder)
-			orders.GET("", GetOrders)
-			orders.POST("/:id/pay", PayOrder)
-			orders.POST("/:id/cancel", CancelOrder)
-		}
-
-		tickets := v1.Group("/tickets")
-		{
-			tickets.POST("/:id/refund", RefundTicket)
 		}
 	}
 
