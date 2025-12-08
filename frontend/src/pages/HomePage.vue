@@ -74,6 +74,13 @@
         <div class="text-blue-600">More&gt;</div>
       </div>
     </section>
+
+    <section class="max-w-6xl mx-auto mt-8">
+      <div class="bg-white rounded shadow p-4 flex items-center justify-between">
+        <div class="text-sm text-gray-700">Need to manage recipient addresses?</div>
+        <button class="px-4 py-2 rounded border text-blue-700" @click="$router.push('/addresses')">Create Common Address</button>
+      </div>
+    </section>
   </div>
 </template>
 <script setup lang="ts">

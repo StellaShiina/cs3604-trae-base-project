@@ -139,6 +139,25 @@ CREATE TABLE IF NOT EXISTS preorders (
 
 CREATE INDEX IF NOT EXISTS idx_preorders_active ON preorders(status, expires_at);
 
+-- User addresses (for Common Address page)
+CREATE TABLE IF NOT EXISTS user_addresses (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  province TEXT,
+  city TEXT,
+  district TEXT,
+  town TEXT,
+  nearby TEXT,
+  detail TEXT NOT NULL,
+  recipient TEXT NOT NULL,
+  mobile TEXT NOT NULL,
+  is_default BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_user_addresses_user ON user_addresses(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_addresses_default ON user_addresses(user_id, is_default);
+
 -- Triggers: 14-day range enforcement for service_date
 CREATE OR REPLACE FUNCTION enforce_service_date_range() RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN

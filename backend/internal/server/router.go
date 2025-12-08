@@ -1,12 +1,12 @@
 package server
 
 import (
-    "net/http"
-    "os"
+	"net/http"
+	"os"
 
-    "github.com/gin-contrib/cors"
-    "github.com/gin-gonic/gin"
-    "gorm.io/gorm"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type Server struct {
@@ -15,21 +15,23 @@ type Server struct {
 }
 
 func New(db *gorm.DB) *Server {
-    r := gin.Default()
-    origin := os.Getenv("DEV_FRONTEND_ORIGIN")
-    if origin == "" {
-        origin = "http://localhost:5173"
-    }
-    r.Use(cors.New(cors.Config{
-        AllowOrigins:     []string{origin},
-        AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-        AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
-        ExposeHeaders:    []string{"Content-Length"},
-        AllowCredentials: true,
-    }))
-    s := &Server{R: r, DB: db}
-    s.routes()
-    return s
+	r := gin.Default()
+	origin := os.Getenv("DEV_FRONTEND_ORIGIN")
+	if origin == "" {
+		origin = "http://localhost:5173"
+	}
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{origin},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
+	s := &Server{R: r, DB: db}
+	// ensure optional schema parts
+	s.ensureAddressSchema()
+	s.routes()
+	return s
 }
 
 func (s *Server) routes() {
@@ -39,12 +41,13 @@ func (s *Server) routes() {
 	v1.GET("/stations", s.searchStations)
 	s.trainsRoutes(v1)
 	s.preorderRoutes(v1)
+	s.addressRoutes(v1)
 
-    // daily job endpoint (optional manual trigger)
-    s.R.POST("/internal/jobs/rolling14", func(c *gin.Context){
-        s.DB.Exec("SELECT ensure_rolling_14_days()")
-        c.JSON(http.StatusOK, gin.H{"ok": true})
-    })
+	// daily job endpoint (optional manual trigger)
+	s.R.POST("/internal/jobs/rolling14", func(c *gin.Context) {
+		s.DB.Exec("SELECT ensure_rolling_14_days()")
+		c.JSON(http.StatusOK, gin.H{"ok": true})
+	})
 }
 
 func (s *Server) getDictionaries(c *gin.Context) {
