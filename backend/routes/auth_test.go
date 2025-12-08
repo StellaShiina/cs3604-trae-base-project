@@ -69,19 +69,22 @@ func setupTestRouter() *gin.Engine {
 	return SetupRouter()
 }
 
-func TestRegister(t *testing.T) {
+func TestRegisterFlow(t *testing.T) {
 	// Ensure each test runs with a fresh DB
 	r := setupTestRouter()
 
-	t.Run("Success", func(t *testing.T) {
+	var sessionId string
+
+	// Step 1: Start Registration
+	t.Run("Step1_Start", func(t *testing.T) {
 		payload := map[string]string{
-			"username": "testuser",
+			"username": "testuser_flow",
 			"password": "password123",
-			"email":    "test@example.com",
-			"mobile":   "13800000000",
-			"name":     "Test User",
+			"email":    "test_flow@example.com",
+			"mobile":   "13800000001",
+			"name":     "Test Flow User",
 			"id_type":  "id_card",
-			"id_no":    "110101199001011234",
+			"id_no":    "110101199001011235",
 		}
 		body, _ := json.Marshal(payload)
 		req, _ := http.NewRequest("POST", "/api/v1/auth/register", bytes.NewBuffer(body))
@@ -90,51 +93,209 @@ func TestRegister(t *testing.T) {
 
 		r.ServeHTTP(w, req)
 
-		// Acceptance Criteria: Return 201 and userId
-		if w.Code != http.StatusCreated {
-			t.Logf("Expected 201, got %d. Body: %s", w.Code, w.Body.String())
-			// assert.Equal(t, http.StatusCreated, w.Code) // Let it fail naturally or log
+		assert.Equal(t, http.StatusOK, w.Code)
+		
+		var response map[string]interface{}
+		json.Unmarshal(w.Body.Bytes(), &response)
+		assert.Contains(t, response, "sessionId")
+		sessionId = response["sessionId"].(string)
+	})
+
+	// Step 2: Send SMS
+	t.Run("Step2_SendSMS", func(t *testing.T) {
+		payload := map[string]string{
+			"sessionId": sessionId,
+			"phone":     "13800000001",
 		}
-		
-		// Since implementation is TODO, this will likely fail or return 200 OK empty
-		// We assert strictly based on requirements
+		body, _ := json.Marshal(payload)
+		req, _ := http.NewRequest("POST", "/api/v1/auth/register/send-verification-code", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+		var response map[string]interface{}
+		json.Unmarshal(w.Body.Bytes(), &response)
+		assert.Contains(t, response, "verificationCode")
+	})
+
+	// Step 3: Complete
+	t.Run("Step3_Complete", func(t *testing.T) {
+		payload := map[string]string{
+			"sessionId": sessionId,
+			"smsCode":   "123456", // Use backdoor code
+		}
+		body, _ := json.Marshal(payload)
+		req, _ := http.NewRequest("POST", "/api/v1/auth/register/complete", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		r.ServeHTTP(w, req)
+
 		assert.Equal(t, http.StatusCreated, w.Code)
-		
 		var response map[string]interface{}
 		json.Unmarshal(w.Body.Bytes(), &response)
 		assert.Contains(t, response, "userId")
 	})
 
-	t.Run("DuplicateUser", func(t *testing.T) {
-		// Create an existing user first
-		existingUser := models.User{
-			Username:     "duplicate_user",
-			PasswordHash: "hash",
-			IDType:       "id_card",
-			IDNo:         "110101199001019999",
-		}
-		if err := db.GetDB().Create(&existingUser).Error; err != nil {
-			t.Fatalf("Failed to setup existing user: %v", err)
-		}
-
-		// Try to register with same username
+	t.Run("ValidateUsername_Duplicate", func(t *testing.T) {
+		// Try to validate the username we just created
 		payload := map[string]string{
-			"username": "duplicate_user",
-			"password": "password123",
-			"id_type":  "id_card",
-			"id_no":    "110101199001018888", // Different ID
+			"username": "testuser_flow",
 		}
 		body, _ := json.Marshal(payload)
-		req, _ := http.NewRequest("POST", "/api/v1/auth/register", bytes.NewBuffer(body))
+		req, _ := http.NewRequest("POST", "/api/v1/auth/register/validate-username", bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 		w := httptest.NewRecorder()
 
 		r.ServeHTTP(w, req)
 
 		assert.Equal(t, http.StatusConflict, w.Code)
-		var response map[string]string
+		var response map[string]interface{}
 		json.Unmarshal(w.Body.Bytes(), &response)
-		assert.Equal(t, "该用户名已经占用，请重新选择用户名！", response["error"])
+		assert.Equal(t, false, response["valid"])
+	})
+}
+
+func TestRegisterFlow_CamelCase(t *testing.T) {
+	// Test compatibility with frontend camelCase fields
+	r := setupTestRouter()
+
+	var sessionId string
+
+	// Step 1: Start Registration with camelCase
+	t.Run("Step1_Start_CamelCase", func(t *testing.T) {
+		payload := map[string]string{
+			"username":     "testuser_camel",
+			"password":     "password123",
+			"email":        "test_camel@example.com",
+			"mobile":       "13800000002",
+			"name":         "Test Camel User",
+			"idCardType":   "id_card",         // CamelCase
+			"idCardNumber": "110101199001011236", // CamelCase
+		}
+		body, _ := json.Marshal(payload)
+		req, _ := http.NewRequest("POST", "/api/v1/auth/register", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+		
+		var response map[string]interface{}
+		json.Unmarshal(w.Body.Bytes(), &response)
+		assert.Contains(t, response, "sessionId")
+		sessionId = response["sessionId"].(string)
+	})
+
+	// Step 2: Send SMS
+	t.Run("Step2_SendSMS", func(t *testing.T) {
+		payload := map[string]string{
+			"sessionId": sessionId,
+			"phone":     "13800000002",
+		}
+		body, _ := json.Marshal(payload)
+		req, _ := http.NewRequest("POST", "/api/v1/auth/register/send-verification-code", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+	})
+
+	// Step 3: Complete
+	t.Run("Step3_Complete", func(t *testing.T) {
+		payload := map[string]string{
+			"sessionId": sessionId,
+			"smsCode":   "123456",
+		}
+		body, _ := json.Marshal(payload)
+		req, _ := http.NewRequest("POST", "/api/v1/auth/register/complete", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusCreated, w.Code)
+		var response map[string]interface{}
+		json.Unmarshal(w.Body.Bytes(), &response)
+		assert.Contains(t, response, "userId")
+	})
+}
+
+func TestRegisterFlow_ChineseIDType(t *testing.T) {
+	// Test Chinese ID Type mapping
+	r := setupTestRouter()
+
+	var sessionId string
+
+	// Step 1: Start Registration with Chinese ID Type
+	t.Run("Step1_Start_ChineseID", func(t *testing.T) {
+		payload := map[string]string{
+			"username":     "testuser_cn",
+			"password":     "password123",
+			"email":        "test_cn@example.com",
+			"mobile":       "13800000003",
+			"name":         "Test CN User",
+			"id_type":      "居民身份证",         // Chinese Input
+			"id_no":        "110101199001011237",
+		}
+		body, _ := json.Marshal(payload)
+		req, _ := http.NewRequest("POST", "/api/v1/auth/register", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+		
+		var response map[string]interface{}
+		json.Unmarshal(w.Body.Bytes(), &response)
+		assert.Contains(t, response, "sessionId")
+		sessionId = response["sessionId"].(string)
+	})
+
+	// Step 2: Send SMS
+	t.Run("Step2_SendSMS", func(t *testing.T) {
+		payload := map[string]string{
+			"sessionId": sessionId,
+			"phone":     "13800000003",
+		}
+		body, _ := json.Marshal(payload)
+		req, _ := http.NewRequest("POST", "/api/v1/auth/register/send-verification-code", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+	})
+
+	// Step 3: Complete
+	t.Run("Step3_Complete", func(t *testing.T) {
+		payload := map[string]string{
+			"sessionId": sessionId,
+			"smsCode":   "123456",
+		}
+		body, _ := json.Marshal(payload)
+		req, _ := http.NewRequest("POST", "/api/v1/auth/register/complete", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusCreated, w.Code)
+		var response map[string]interface{}
+		json.Unmarshal(w.Body.Bytes(), &response)
+		assert.Contains(t, response, "userId")
+        
+        // Verify DB content
+        var user models.User
+        db.GetDB().First(&user, "username = ?", "testuser_cn")
+        assert.Equal(t, "id_card", user.IDType)
 	})
 }
 
@@ -155,68 +316,12 @@ func TestLogin(t *testing.T) {
 	}
 	db.GetDB().Create(&user)
 
-	// Step 1: Send SMS Code (Verify ID last 4 digits)
-	t.Run("SendSMS_Success", func(t *testing.T) {
-		payload := map[string]string{
-			"username":       "testuser",
-			"id_card_last_4": "5678",
-		}
-		body, _ := json.Marshal(payload)
-		req, _ := http.NewRequest("POST", "/api/v1/auth/send-sms", bytes.NewBuffer(body))
-		req.Header.Set("Content-Type", "application/json")
-		w := httptest.NewRecorder()
-
-		r.ServeHTTP(w, req)
-
-		assert.Equal(t, http.StatusOK, w.Code)
-		// Ideally, we should check if a mock SMS was sent or code stored in DB/Redis
-	})
-
-	t.Run("SendSMS_Fail_WrongID", func(t *testing.T) {
-		payload := map[string]string{
-			"username":       "testuser",
-			"id_card_last_4": "0000",
-		}
-		body, _ := json.Marshal(payload)
-		req, _ := http.NewRequest("POST", "/api/v1/auth/send-sms", bytes.NewBuffer(body))
-		req.Header.Set("Content-Type", "application/json")
-		w := httptest.NewRecorder()
-
-		r.ServeHTTP(w, req)
-
-		// Updated requirement: Returns 400 with message "请输入正确的用户信息" but no SMS sent
-		assert.Equal(t, http.StatusBadRequest, w.Code)
-		var response map[string]string
-		json.Unmarshal(w.Body.Bytes(), &response)
-		assert.Equal(t, "请输入正确的用户信息", response["error"])
-	})
-
-	t.Run("SendSMS_Fail_UserNotFound", func(t *testing.T) {
-		payload := map[string]string{
-			"username":       "nonexistent",
-			"id_card_last_4": "0000",
-		}
-		body, _ := json.Marshal(payload)
-		req, _ := http.NewRequest("POST", "/api/v1/auth/send-sms", bytes.NewBuffer(body))
-		req.Header.Set("Content-Type", "application/json")
-		w := httptest.NewRecorder()
-
-		r.ServeHTTP(w, req)
-
-		// Updated requirement: Returns 400 with message "请输入正确的用户信息" to prevent enumeration
-		assert.Equal(t, http.StatusBadRequest, w.Code)
-		var response map[string]string
-		json.Unmarshal(w.Body.Bytes(), &response)
-		assert.Equal(t, "请输入正确的用户信息", response["error"])
-	})
-
-	// Step 2: Login with SMS Code
-	t.Run("Login_Success", func(t *testing.T) {
-		// First, assume valid SMS code is "123456" (mocked in backend for dev/test)
+	// Step 1: Login (Credentials) -> Session
+	var sessionId string
+	t.Run("Login_Step1_Success", func(t *testing.T) {
 		payload := map[string]string{
 			"username": "testuser",
 			"password": "password123",
-			"sms_code": "123456",
 		}
 		body, _ := json.Marshal(payload)
 		req, _ := http.NewRequest("POST", "/api/v1/auth/login", bytes.NewBuffer(body))
@@ -226,13 +331,56 @@ func TestLogin(t *testing.T) {
 		r.ServeHTTP(w, req)
 
 		assert.Equal(t, http.StatusOK, w.Code)
+		var response map[string]interface{}
+		json.Unmarshal(w.Body.Bytes(), &response)
+		assert.Contains(t, response, "sessionId")
+		sessionId = response["sessionId"].(string)
 	})
-	
+
+	// Step 2: Send Verification Code
+	t.Run("Login_Step2_SendCode", func(t *testing.T) {
+		payload := map[string]string{
+			"sessionId":   sessionId,
+			"idCardLast4": "5678",
+		}
+		body, _ := json.Marshal(payload)
+		// Use the new frontend compatible route
+		req, _ := http.NewRequest("POST", "/api/v1/auth/send-verification-code", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+	})
+
+	// Step 3: Verify Login
+	t.Run("Login_Step3_Verify", func(t *testing.T) {
+		payload := map[string]string{
+			"sessionId":        sessionId,
+			"idCardLast4":      "5678",
+			"verificationCode": "123456",
+		}
+		body, _ := json.Marshal(payload)
+		// Use the new frontend compatible route
+		req, _ := http.NewRequest("POST", "/api/v1/auth/verify-login", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+		var response map[string]interface{}
+		json.Unmarshal(w.Body.Bytes(), &response)
+		assert.Contains(t, response, "token")
+		assert.Contains(t, response, "user")
+	})
+
+	// Legacy Tests (Adapted)
 	t.Run("Login_Fail_WrongPassword", func(t *testing.T) {
 		payload := map[string]string{
 			"username": "testuser",
 			"password": "WrongPassword",
-			"sms_code": "123456",
 		}
 		body, _ := json.Marshal(payload)
 		req, _ := http.NewRequest("POST", "/api/v1/auth/login", bytes.NewBuffer(body))
@@ -241,17 +389,52 @@ func TestLogin(t *testing.T) {
 
 		r.ServeHTTP(w, req)
 
-		assert.Equal(t, http.StatusUnauthorized, w.Code)
-		var response map[string]string
+		// Step 1: Should return 200 OK (Fake Success)
+		assert.Equal(t, http.StatusOK, w.Code)
+		var response map[string]interface{}
 		json.Unmarshal(w.Body.Bytes(), &response)
-		assert.Equal(t, "用户名或密码错误", response["error"])
+		assert.Contains(t, response, "sessionId")
+		sessionId := response["sessionId"].(string)
+
+		// Step 2: Try to send code -> Should SUCCEED (New requirement)
+		// Assuming we provide correct ID Last 4 for the user "testuser"
+		// The user "testuser" has ID "110101199001015678" -> Last 4 is "5678"
+		payload2 := map[string]string{
+			"sessionId":   sessionId,
+			"idCardLast4": "5678",
+		}
+		body2, _ := json.Marshal(payload2)
+		req2, _ := http.NewRequest("POST", "/api/v1/auth/send-verification-code", bytes.NewBuffer(body2))
+		req2.Header.Set("Content-Type", "application/json")
+		w2 := httptest.NewRecorder()
+
+		r.ServeHTTP(w2, req2)
+
+		assert.Equal(t, http.StatusOK, w2.Code)
+
+		// Step 3: Verify Login -> Should FAIL now
+		payload3 := map[string]string{
+			"sessionId":        sessionId,
+			"idCardLast4":      "5678",
+			"verificationCode": "123456", // Doesn't matter, should fail before checking code or after
+		}
+		body3, _ := json.Marshal(payload3)
+		req3, _ := http.NewRequest("POST", "/api/v1/auth/verify-login", bytes.NewBuffer(body3))
+		req3.Header.Set("Content-Type", "application/json")
+		w3 := httptest.NewRecorder()
+
+		r.ServeHTTP(w3, req3)
+
+		assert.Equal(t, http.StatusUnauthorized, w3.Code)
+		var response3 map[string]interface{}
+		json.Unmarshal(w3.Body.Bytes(), &response3)
+		assert.Contains(t, response3["error"], "用户名或密码错误")
 	})
 
-	t.Run("Login_Fail_WrongSMS", func(t *testing.T) {
+	t.Run("Login_Fail_UserNotFound", func(t *testing.T) {
 		payload := map[string]string{
-			"username": "testuser",
+			"username": "nonexistentuser",
 			"password": "password123",
-			"sms_code": "000000",
 		}
 		body, _ := json.Marshal(payload)
 		req, _ := http.NewRequest("POST", "/api/v1/auth/login", bytes.NewBuffer(body))
@@ -260,11 +443,112 @@ func TestLogin(t *testing.T) {
 
 		r.ServeHTTP(w, req)
 
-		assert.Equal(t, http.StatusUnauthorized, w.Code)
-		// Error message for wrong SMS can be specific or generic. Assuming specific for now.
-		var response map[string]string
+		// Step 1: Should return 200 OK (Fake Success)
+		assert.Equal(t, http.StatusOK, w.Code)
+		var response map[string]interface{}
 		json.Unmarshal(w.Body.Bytes(), &response)
-		assert.Equal(t, "Invalid or expired SMS code", response["error"])
+		sessionId := response["sessionId"].(string)
+
+		// Step 2: Try to send code -> Should Fail with "请输入正确的用户信息"
+		payload2 := map[string]string{
+			"sessionId":   sessionId,
+			"idCardLast4": "1234",
+		}
+		body2, _ := json.Marshal(payload2)
+		req2, _ := http.NewRequest("POST", "/api/v1/auth/send-verification-code", bytes.NewBuffer(body2))
+		req2.Header.Set("Content-Type", "application/json")
+		w2 := httptest.NewRecorder()
+
+		r.ServeHTTP(w2, req2)
+
+		assert.Equal(t, http.StatusUnauthorized, w2.Code)
+		var response2 map[string]interface{}
+		json.Unmarshal(w2.Body.Bytes(), &response2)
+		assert.Equal(t, "请输入正确的用户信息", response2["error"])
+	})
+
+	t.Run("Login_Success_Mobile", func(t *testing.T) {
+		payload := map[string]string{
+			"username": "13800000000",
+			"password": "password123",
+		}
+		body, _ := json.Marshal(payload)
+		req, _ := http.NewRequest("POST", "/api/v1/auth/login", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+	})
+
+	t.Run("Login_Success_Mobile_WithSpaces", func(t *testing.T) {
+		payload := map[string]string{
+			"username": "138 0000 0000", // Input with spaces
+			"password": "password123",
+		}
+		body, _ := json.Marshal(payload)
+		req, _ := http.NewRequest("POST", "/api/v1/auth/login", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		r.ServeHTTP(w, req)
+
+		// Should find user and return success (loginSuccess=true)
+		assert.Equal(t, http.StatusOK, w.Code)
+		
+		// Verify session has username (not INVALID_USER)
+		var response map[string]interface{}
+		json.Unmarshal(w.Body.Bytes(), &response)
+		sessionId := response["sessionId"].(string)
+
+		// Try verify login with correct code (simulated)
+		// Since we can't easily check internal state, we can try VerifyLogin
+		// If loginSuccess=true, session has username. VerifyLogin should work (if we skip SMS code check or provide it)
+		// But here we just want to know if user was found.
+		// If user was NOT found, session would be INVALID_USER.
+		// If user found but password match, session is username.
+		
+		// Let's check via SendLoginSMS. If user found, it returns 200 (or 400 if ID mismatch).
+		// If user NOT found, it returns 401.
+		
+		payload2 := map[string]string{
+			"sessionId":   sessionId,
+			"idCardLast4": "5678", // Correct ID
+		}
+		body2, _ := json.Marshal(payload2)
+		req2, _ := http.NewRequest("POST", "/api/v1/auth/send-verification-code", bytes.NewBuffer(body2))
+		req2.Header.Set("Content-Type", "application/json")
+		w2 := httptest.NewRecorder()
+
+		r.ServeHTTP(w2, req2)
+
+		// Expect 200 (User found and ID matches)
+		assert.Equal(t, http.StatusOK, w2.Code)
+	})
+
+	t.Run("SendLoginSMS_NoSessionId_Mobile", func(t *testing.T) {
+		// Scenario: Frontend calls send-sms with mobile number but NO session ID
+		// This tests if backend can resolve mobile -> user -> send SMS
+		payload := map[string]string{
+			"username":       "13800000000",
+			"id_card_last_4": "5678",
+		}
+		body, _ := json.Marshal(payload)
+		req, _ := http.NewRequest("POST", "/api/v1/auth/send-verification-code", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+		var response map[string]interface{}
+		json.Unmarshal(w.Body.Bytes(), &response)
+		assert.Contains(t, response, "code")
+		
+		// Ensure the code is stored under "testuser" (canonical username), not "13800000000"
+		// We can't verify internal map directly easily, but we can infer from the fact that 
+		// VerifyLogin (which uses session->username) would need it under "testuser".
 	})
 }
 

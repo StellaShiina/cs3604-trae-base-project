@@ -43,12 +43,36 @@ func SetupRouter() *gin.Engine {
 
 	v1 := r.Group("/api/v1")
 	{
+		// Registration Flow (Matches frontend /register prefix)
+		// Frontend requests: /api/v1/auth/register/validate-username
+		// The frontend prefixes everything with /auth because of my previous suggestion, OR
+		// Looking at the log: POST "/api/v1/auth/register/validate-username" 404
+		// This means the frontend IS sending /auth/register/...
+		// But I configured backend to listen on /api/v1/register/...
+		// So I need to move it back to /auth group or adjust the group path.
+		
 		auth := v1.Group("/auth")
 		{
-			auth.POST("/register", Register)
+			// Login Flow
 			auth.POST("/login", Login)
-			auth.POST("/send-sms", SendLoginSMS) // Updated for 2FA Login
-			auth.POST("/verify-sms", VerifySMS)
+			auth.POST("/send-verification-code", SendLoginSMS) // Frontend compatibility
+			auth.POST("/verify-login", VerifyLogin)            // Frontend compatibility
+			auth.POST("/send-sms", SendLoginSMS)               // Legacy/Backup
+			auth.POST("/verify-sms", VerifySMS)                // Legacy/Backup
+
+			// Registration Flow
+			register := auth.Group("/register")
+			{
+				register.POST("", StartRegistration) // Step 1
+				register.POST("/validate-username", ValidateUsername)
+				register.POST("/validate-phone", ValidatePhone)
+				register.POST("/validate-email", ValidateEmail)
+				register.POST("/validate-password", ValidatePassword)
+				register.POST("/validate-name", ValidateName)
+				register.POST("/validate-idcard", ValidateIDCard)
+				register.POST("/send-verification-code", SendRegisterSMS) // Step 2
+				register.POST("/complete", CompleteRegistration)          // Step 3
+			}
 		}
 
 		// Protected Routes

@@ -19,12 +19,34 @@
   - 401 未登录；200 返回 `{ user }`
 - 前端约定：登录成功后刷新导航状态；若通过 `Book` 跳转到登录，登录成功需返回原来源页。
 
-## 3. 注册
-- `POST /api/v1/auth/register`
-  - Request：与 UI 字段一致（`nationality/name/passportNumber/...`）
-  - 成功：201 返回 `{ user, next: "login" }`
-  - 失败：400 字段错误聚合；409 重复（`Already taken`）
-- 前端约定：字段逐项展示错误；密码复杂度本地预校验。
+## 3. 注册 (分步流程)
+- **即时校验** (Input Blur)
+  - `POST /api/v1/auth/register/validate-username`: `{ username }` -> `{ valid: bool, message? }`
+  - `POST /api/v1/auth/register/validate-phone`: `{ phone }` -> `{ valid: bool }`
+  - `POST /api/v1/auth/register/validate-email`: `{ email }` -> `{ valid: bool }`
+  - 失败返回 409 Conflict
+
+- **Step 1: 启动注册**
+  - `POST /api/v1/auth/register`
+  - Request：全量注册信息 `{ username, password, email, mobile, ... }`
+  - 成功：200 `{ sessionId: "uuid" }` (数据暂存，未创建用户)
+  - 失败：400 校验失败；409 用户已存在
+
+- **Step 2: 发送验证码**
+  - `POST /api/v1/auth/register/send-verification-code`
+  - Request: `{ sessionId, phone }`
+  - 成功：200 `{ message: "Verification code sent" }`
+
+- **Step 3: 完成注册**
+  - `POST /api/v1/auth/register/complete`
+  - Request: `{ sessionId, smsCode }`
+  - 成功：201 `{ userId, next: "login" }` (创建用户)
+  - 失败：400 验证码错误或会话过期
+
+- 前端约定：
+  - 用户输入时调用即时校验接口。
+  - Step 1 返回的 `sessionId` 需在后续步骤透传。
+
 
 ## 4. 站点与字典
 - 站点 `GET /api/v1/stations`

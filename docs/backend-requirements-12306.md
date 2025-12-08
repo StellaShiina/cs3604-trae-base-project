@@ -21,27 +21,54 @@
   Background:
     Given 数据库已初始化用户表
 
-  Scenario: 用户注册
+  Scenario: 注册过程中的即时校验 (用户名/手机/邮箱)
+    # 用户在输入框失去焦点时触发即时校验
+    Given 数据库中已存在用户名为 "jdoe" 的用户
+    When 用户在注册表单中输入用户名 "jdoe" 并失去焦点
+    And 前端调用 "校验用户名" API
+    Then API 应返回 HTTP 409 Conflict
+    And 返回结果应包含 `valid: false`
+    And 错误消息应明确显示 "该用户名已经占用，请重新选择用户名！"
+
+    # 校验成功的情况
+    When 用户输入用户名 "new_user"
+    And 前端调用 "校验用户名" API
+    Then API 应返回 HTTP 200 OK
+    And 返回结果应包含 `valid: true`
+
+  Scenario: 注册第一步：提交基本信息与会话创建
     Given 用户提供有效的注册详细信息：
       | 字段 | 值 |
-      | username | "jdoe" |
+      | username | "jdoe_new" |
       | password | "SecurePass123" |
-      <!-- email项为可选，若提供则必须是有效邮箱格式 -->
-      | email | "jdoe@example.com" | 
+      | email | "jdoe@example.com" |
       | mobile | "13800138000" |
       | name | "张三" |
       | id_type | "id_card" |
       | id_no | "110101199001011234" |
-    When 调用 "注册" API
-    Then 应在 `users` 表中创建新用户记录
+    When 调用 "启动注册" API (/api/v1/auth/register)
+    Then API 应返回 HTTP 200 OK
+    And 返回一个唯一的 `sessionId`
+    And 用户信息应被暂存 (如 Redis)，但尚未写入数据库
+    And 不应创建数据库用户记录
+
+  Scenario: 注册第二步：发送验证码
+    Given 这是一个有效的注册会话，`sessionId` 为 "sess-123"
+    And 用户手机号为 "13800138000"
+    When 调用 "发送注册验证码" API
+    Then 系统应生成一个 6 位数字验证码
+    And 向 "13800138000" 发送短信
+    And API 应返回 HTTP 200 OK
+
+  Scenario: 注册第三步：完成注册
+    Given 这是一个有效的注册会话 "sess-123"
+    And 系统生成的验证码为 "123456"
+    When 用户提交 `sessionId` 和验证码 "123456" 到 "完成注册" API
+    Then 系统验证通过
+    And 应在 `users` 表中创建新用户记录
     And 密码应当被哈希处理
     And API 应返回 HTTP 201 Created
-
-  Scenario: 注册时用户名重复检测
-    Given 数据库中已存在用户名为 "jdoe" 的用户
-    When 用户尝试使用用户名 "jdoe" 注册
-    Then 系统应返回 HTTP 409 Conflict
-    And 错误消息应明确显示 "该用户名已经占用，请重新选择用户名！"
+    And 返回新创建的用户 ID
 
   Scenario: 登录时的身份校验与短信验证 (二步验证)
     # 第一步：用户输入账号密码触发验证

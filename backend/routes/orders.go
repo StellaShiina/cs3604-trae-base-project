@@ -53,7 +53,7 @@ func CreateOrder(c *gin.Context) {
 	var trainServiceID int64
     var trainService models.TrainService
     // Use raw SQL for date because Gorm date mapping with SQLite/Postgres might differ slightly in format
-    if err := db.GetDB().Where("train_no = ? AND service_date = current_date", req.TrainNo).First(&trainService).Error; err != nil {
+    if err := tx.Where("train_no = ? AND service_date = current_date", req.TrainNo).First(&trainService).Error; err != nil {
         tx.Rollback()
         c.JSON(http.StatusBadRequest, gin.H{"error": "Train service not found"})
         return
@@ -64,7 +64,7 @@ func CreateOrder(c *gin.Context) {
     var serviceSegment models.ServiceSegment
     // Find the segment associated with this train service. 
 	// Assuming 1 segment per train for now as per current DB state and API spec limitations.
-    if err := db.GetDB().Where("train_service_id = ?", trainServiceID).First(&serviceSegment).Error; err != nil {
+    if err := tx.Where("train_service_id = ?", trainServiceID).First(&serviceSegment).Error; err != nil {
         tx.Rollback()
         c.JSON(http.StatusBadRequest, gin.H{"error": "Segment not found"})
         return
@@ -121,7 +121,7 @@ func CreateOrder(c *gin.Context) {
             
             // Fetch passenger to get card type
             var passenger models.Passenger
-            if err := db.GetDB().First(&passenger, "id = ?", pid).Error; err == nil {
+            if err := tx.First(&passenger, "id = ?", pid).Error; err == nil {
                 ticket.PassengerCardType = passenger.CardType
             } else {
                  // If passenger not found in DB, maybe fallback or error. 

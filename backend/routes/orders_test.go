@@ -26,11 +26,12 @@ func TestCreateOrder(t *testing.T) {
 	})
 
 	t.Run("Success", func(t *testing.T) {
+		pID := uuid.New().String()
 		payload := map[string]interface{}{
 			"trainNo":  "G101",
 			"seatType": "second",
 			"passengers": []map[string]string{
-				{"id": "uuid1", "name": "P1", "card_no": "123"},
+				{"id": pID, "name": "P1", "card_no": "123"},
 			},
 		}
 		body, _ := json.Marshal(payload)
