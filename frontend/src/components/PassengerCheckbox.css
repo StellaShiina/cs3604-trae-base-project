@@ -1,0 +1,60 @@
+/* 乘客勾选框样式 */
+.passenger-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  margin: 5px 15px 5px 25px;
+  border: none;
+  cursor: pointer;
+  background-color: transparent;
+}
+
+.passenger-checkbox:hover {
+  opacity: 0.8;
+}
+
+.passenger-checkbox.checked {
+  opacity: 1;
+}
+
+.passenger-checkbox-input {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  margin: 0;
+  border: 1px solid #999999;
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: #ffffff;
+  position: relative;
+  border-radius: 2px;
+}
+
+.passenger-checkbox-input:checked {
+  background-color: #5aabf5;
+  border-color: #5aabf5;
+}
+
+.passenger-checkbox-input:checked::after {
+  content: '✓';
+  position: absolute;
+  top: -2px;
+  left: 1px;
+  font-size: 12px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.passenger-checkbox-label {
+  font-size: 14px;
+  color: #333333;
+  cursor: pointer;
+  user-select: none;
+}
+
+.passenger-id-type {
+  font-size: 12px;
+  color: #666666;
+  margin-left: 4px;
+}

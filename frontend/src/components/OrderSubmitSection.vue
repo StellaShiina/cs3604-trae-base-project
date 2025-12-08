@@ -1,0 +1,128 @@
+<template>
+  <div class="order-submit-section">
+    <div class="submit-notice">
+      <p class="notice-text">
+        提交订单表示已阅读并同意
+        <a href="#" @click.prevent>《国铁集团铁路旅客运输规程》</a>
+        <a href="#" @click.prevent>《服务条款》</a>
+      </p>
+    </div>
+    
+    <div class="submit-buttons">
+      <button
+        class="order-back-button"
+        @click="$emit('back')"
+        :disabled="isSubmitting"
+      >
+        上一步
+      </button>
+      <button
+        class="order-submit-button"
+        @click="$emit('submit')"
+        :disabled="isSubmitting"
+      >
+        {{ isSubmitting ? '提交中...' : '提交订单' }}
+      </button>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+defineProps<{
+  isSubmitting: boolean;
+}>();
+
+defineEmits<{
+  (e: 'submit'): void;
+  (e: 'back'): void;
+}>();
+</script>
+
+<style>
+/* 订单提交区域样式 */
+.order-submit-section {
+  background-color: transparent;
+  border-radius: 0;
+  padding: 0;
+  margin: 20px auto;
+  max-width: 1100px;
+}
+
+.submit-notice {
+  margin-bottom: 15px;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  text-align: left;
+}
+
+.notice-text {
+  font-size: 12px;
+  color: #000000 !important;
+  margin: 0;
+}
+
+.notice-text a {
+  color: #0066cc;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.notice-text a:hover {
+  color: #0052a3;
+}
+
+.submit-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+}
+
+.order-back-button,
+.order-submit-button {
+  padding: 0px 10px;
+  border: none;
+  border-radius: 3px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 180px;
+  height: 40px;
+}
+
+.order-back-button {
+  background-color: #ffffff;
+  color: #333333;
+  border: 1px solid #c0c0c0;
+}
+
+.order-back-button:hover:not(:disabled) {
+  background-color: #f5f5f5;
+  border-color: #999999;
+}
+
+.order-back-button:active:not(:disabled) {
+  background-color: #e8e8e8;
+}
+
+.order-submit-button {
+  background: #fd8100;
+  color: #ffffff;
+}
+
+.order-submit-button:hover:not(:disabled) {
+  background: #ff921d;
+}
+
+.order-submit-button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(255, 119, 34, 0.3);
+}
+
+.order-back-button:disabled,
+.order-submit-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+</style>

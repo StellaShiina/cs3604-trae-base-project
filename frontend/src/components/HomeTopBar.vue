@@ -1,0 +1,450 @@
+<template>
+  <div class="home-top-bar">
+    <div class="home-top-bar-container">
+      <!-- Logo区域 -->
+      <div class="home-logo-section" @click="handleLogoClick">
+        <img 
+          src="/images/logo.png" 
+          alt="中国铁路12306" 
+          className="home-logo-image"
+        />
+        <div class="home-logo-text">
+          <div class="home-logo-chinese">中国铁路12306</div>
+          <div class="home-logo-english">12306 CHINA RAILWAY</div>
+        </div>
+      </div>
+
+      <!-- 搜索框 -->
+      <div class="home-search-box">
+        <input
+          type="text"
+          class="home-search-input"
+          placeholder="搜索车票、餐饮、常旅客、相关规章"
+          v-model="searchText"
+          @keypress.enter="handleSearch"
+        />
+        <button class="home-search-button" @click="handleSearch">
+          <img src="/images/search.svg" alt="搜索" class="home-search-icon" />
+        </button>
+      </div>
+
+      <!-- 右侧链接区域 -->
+      <div class="home-top-links">
+        <a href="#" class="home-top-link">无障碍</a>
+        <a href="#" class="home-top-link">敬老版</a>
+        <a href="#" class="home-top-link">English</a>
+        <a href="#" class="home-top-link" @click.prevent="handleMy12306Click">我的12306</a>
+        
+        <template v-if="isLoggedIn">
+          <span class="home-welcome-text">您好，</span>
+          <span class="home-username">{{ username }}</span>
+          <span class="home-divider">|</span>
+          <button class="home-logout-button" @click="handleLogout">退出</button>
+        </template>
+        <template v-else>
+          <button class="home-top-auth-link login" @click="handleLogin">登录</button>
+          <button class="home-top-auth-link register" @click="handleRegister">注册</button>
+        </template>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const props = defineProps<{
+  isLoggedIn?: boolean
+  username?: string
+}>()
+
+const emit = defineEmits<{
+  (e: 'logout'): void
+  (e: 'my12306Click'): void
+}>()
+
+const router = useRouter()
+const searchText = ref('')
+
+const handleLogoClick = () => {
+  router.push('/')
+}
+
+const handleLogin = () => {
+  router.push('/login')
+}
+
+const handleRegister = () => {
+  router.push('/register')
+}
+
+const handleSearch = () => {
+  if (searchText.value.trim()) {
+    console.log('搜索:', searchText.value)
+  }
+}
+
+const handleLogout = () => {
+  emit('logout')
+}
+
+const handleMy12306Click = () => {
+  emit('my12306Click')
+}
+</script>
+
+<style>
+/* 主页顶部栏样式 */
+.home-top-bar {
+  width: 100%;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  position: relative;
+  z-index: 101;
+}
+
+.home-top-bar-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 12px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Logo区域 */
+.home-logo-section {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.home-logo-image {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+.home-logo-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.home-logo-chinese {
+  font-size: 22px;
+  font-weight: bold;
+  color: #333333;
+  letter-spacing: 1.3px;
+  line-height: 1.2;
+}
+
+.home-logo-english {
+  font-size: 15px;
+  color: #999999;
+  letter-spacing: 0.1px;
+  line-height: 1.2;
+}
+
+/* 搜索框 */
+.home-search-box {
+  flex: 1;
+  max-width: 480px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  margin: 0 auto;
+}
+
+.home-search-input {
+  width: 100%;
+  height: 36px;
+  padding: 0 50px 0 16px;
+  border: 1px solid #d0d0d0;
+  border-radius: 0px;
+  font-size: 13px;
+  color: #333333;
+  outline: none;
+  transition: all 0.3s;
+}
+
+.home-search-input::placeholder {
+  color: #999999;
+  font-size: 13px;
+}
+
+.home-search-input:focus {
+  border-color: #3B99FC;
+  box-shadow: 0 0 0 2px rgba(59, 153, 252, 0.1);
+}
+
+.home-search-button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 42px;
+  height: 36px;
+  background: #3B99FC;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  border-radius: 0;
+}
+
+.home-search-button:hover {
+  background: #0082fc;
+}
+
+.home-search-button:active {
+  background: #2a88eb;
+}
+
+.home-search-icon {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  background-color: #3B99FC;
+}
+
+/* 右侧链接区域 */
+.home-top-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.home-top-link {
+  color: #3B99FC;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.3s;
+  white-space: nowrap;
+  padding: 0 10px;
+  position: relative;
+}
+
+.home-top-link::after {
+  content: '';
+  position: absolute;
+  right: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 12px;
+  background-color: #3B99FC;
+}
+
+.home-top-link:last-of-type::after {
+  display: block;
+}
+
+.home-top-link:hover {
+  color: #2a88eb;
+  text-decoration: underline;
+}
+
+.home-top-auth-link {
+  background: none;
+  border: none;
+  color: #999999;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0 10px;
+  transition: color 0.3s;
+  white-space: nowrap;
+  position: relative;
+}
+
+.home-top-auth-link::after {
+  display: none;
+}
+
+.home-top-auth-link:hover {
+  color: #666666;
+  text-decoration: underline;
+}
+
+.home-welcome-text {
+  font-size: 14px;
+  color: #666666;
+  margin-left: 8px;
+  margin-right: 0;
+}
+
+.home-username {
+  font-size: 14px;
+  color: #2196f3;
+  font-weight: 500;
+  margin: 0 4px 0 0;
+}
+
+.home-divider {
+  font-size: 14px;
+  color: #333333;
+  margin: 0 4px;
+}
+
+.home-logout-button {
+  background: none;
+  border: none;
+  color: #3B99FC;
+  text-decoration: none;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.home-logout-button:hover {
+  color: #2a88eb;
+  text-decoration: underline;
+}
+
+.home-logout-button:active {
+  color: #1976d2;
+}
+
+.home-top-divider {
+  color: #3B99FC;
+  font-size: 14px;
+  user-select: none;
+  margin: 0 4px;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+  .home-top-bar-container {
+    padding: 12px 30px;
+    gap: 20px;
+  }
+
+  .home-search-box {
+    max-width: 380px;
+  }
+
+  .home-top-links {
+    gap: 8px;
+  }
+
+  .home-top-link,
+  .home-top-auth-link {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .home-top-bar-container {
+    padding: 10px 20px;
+    gap: 15px;
+  }
+
+  .home-logo-image {
+    width: 40px;
+    height: 40px;
+  }
+
+  .home-logo-chinese {
+    font-size: 16px;
+  }
+
+  .home-logo-english {
+    font-size: 10px;
+  }
+
+  .home-search-box {
+    max-width: 300px;
+  }
+
+  .home-search-input {
+    height: 32px;
+    font-size: 12px;
+  }
+
+  .home-search-input::placeholder {
+    font-size: 12px;
+  }
+
+  .home-search-button {
+    width: 38px;
+    height: 32px;
+  }
+
+  .home-top-links {
+    gap: 6px;
+  }
+
+  .home-top-link,
+  .home-top-auth-link {
+    font-size: 12px;
+  }
+
+  .home-top-divider {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-top-bar-container {
+    flex-wrap: wrap;
+    padding: 10px 15px;
+  }
+
+  .home-search-box {
+    order: 3;
+    flex: 1 0 100%;
+    max-width: 100%;
+    margin-top: 8px;
+  }
+
+  .home-top-links {
+    margin-left: auto;
+  }
+
+  /* 隐藏部分链接以节省空间 */
+  .home-top-link:nth-child(1),
+  .home-top-link:nth-child(2) {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-top-bar-container {
+    padding: 8px 10px;
+  }
+
+  .home-logo-image {
+    width: 36px;
+    height: 36px;
+  }
+
+  .home-logo-chinese {
+    font-size: 14px;
+  }
+
+  .home-logo-english {
+    font-size: 9px;
+  }
+
+  .home-search-input {
+    font-size: 11px;
+  }
+
+  .home-search-input::placeholder {
+    font-size: 11px;
+  }
+
+  .home-top-link,
+  .home-top-auth-link {
+    font-size: 11px;
+  }
+}
+</style>

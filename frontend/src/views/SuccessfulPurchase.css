@@ -1,0 +1,48 @@
+.successful-purchase-page {
+  min-height: 100vh;
+  background-color: white;
+}
+
+.successful-purchase-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.loading,
+.error-message {
+  text-align: center;
+  padding: 40px;
+  font-size: 16px;
+  color: #666;
+}
+
+.error-message {
+  color: #cc0000;
+}
+
+/* 支付成功页面专用二维码区域样式，避免与底部导航栏样式冲突 */
+.success-qr-codes-section {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 20px !important;
+  margin-left: 20px !important;
+}
+
+.success-qr-code-item {
+  text-align: center !important;
+}
+
+.success-qr-code-item img {
+  width: 150px !important;
+  height: 150px !important;
+  border: 1px solid #e0e0e0 !important;
+  margin-bottom: 10px !important;
+}
+
+.success-qr-code-text {
+  font-size: 12px !important;
+  color: #666 !important;
+  margin: 0 !important;
+  max-width: 150px !important;
+}

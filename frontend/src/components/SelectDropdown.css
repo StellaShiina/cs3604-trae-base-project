@@ -1,0 +1,152 @@
+/* ==================== SelectDropdown组件样式 ==================== */
+.select-dropdown {
+  position: relative !important;
+  width: 100% !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  z-index: 1 !important; /* 默认层级 */
+}
+
+/* ==================== 展开状态 ==================== */
+.select-dropdown.expanded {
+  z-index: 10000 !important;
+}
+
+/* ==================== 禁用状态 ==================== */
+.select-dropdown.disabled {
+  cursor: not-allowed !important;
+  opacity: 0.6 !important;
+}
+
+/* ==================== 选中值显示区域 ==================== */
+.select-dropdown .selected-value-display {
+  width: 100% !important;
+  height: 32px !important;
+  line-height: 32px !important;
+  padding: 0 28px 0 10px !important;
+  border: 1px solid #cccccc !important;
+  border-radius: 4px !important;
+  font-size: 13px !important;
+  background-color: #e9e9ed !important;
+  cursor: pointer !important;
+  outline: none !important;
+  transition: all 0.3s !important;
+  user-select: none !important;
+  color: #333 !important;
+  box-sizing: border-box !important;
+  text-align: center !important;
+}
+
+.select-dropdown:not(.disabled) .selected-value-display:hover {
+  border-color: #3b99fc !important;
+}
+
+.select-dropdown.expanded .selected-value-display {
+  border-color: #3b99fc !important;
+  box-shadow: 0 0 0 2px #f5f5f5 !important;
+}
+
+.select-dropdown.disabled .selected-value-display {
+  background-color: #f5f5f5 !important;
+  cursor: not-allowed !important;
+  color: #999999 !important;
+}
+
+/* ==================== 隐藏输入框 ==================== */
+.select-dropdown .selected-value-input-hidden {
+  position: absolute !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* ==================== 下拉箭头 ==================== */
+.select-dropdown .arrow {
+  position: absolute !important;
+  right: 12px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  cursor: pointer !important;
+  transition: transform 0.3s !important;
+  width: 0 !important;
+  height: 0 !important;
+  border-left: 4px solid transparent !important;
+  border-right: 4px solid transparent !important;
+  border-top: 5px solid #666 !important;
+  pointer-events: none !important;
+}
+
+.select-dropdown .arrow.rotated {
+  transform: translateY(-50%) rotate(180deg) !important;
+}
+
+/* ==================== 选项列表 ==================== */
+.select-dropdown .options-list {
+  position: absolute !important;
+  top: calc(100% + 4px) !important;
+  left: 0 !important;
+  right: 0 !important;
+  background: white !important;
+  border: 1px solid #d9d9d9 !important;
+  border-radius: 4px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  max-height: 300px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important; /* 隐藏横向滚动条 */
+  z-index: 9999 !important;  /* 提高z-index确保显示在所有元素之上 */
+  animation: slideDown 0.2s ease-out !important;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== 选项项 ==================== */
+.select-dropdown .option {
+  padding: 8px 12px !important;
+  cursor: pointer !important;
+  transition: background-color 0.2s !important;
+  font-size: 12px !important;
+  color: #333 !important;
+  white-space: nowrap !important; /* 确保选项文字不换行，所有文字在同一行 */
+  overflow: hidden !important;
+  text-overflow: ellipsis !important; /* 如果文字过长，显示省略号 */
+  text-align: left !important; /* 选项文字靠左对齐 */
+}
+
+.select-dropdown .option:hover {
+  background-color: #f5f5f5 !important;
+}
+
+.select-dropdown .option.selected {
+  background-color: #3b99fc !important;
+  color: white !important;
+  font-weight: 500 !important;
+}
+
+/* ==================== 滚动条样式 ==================== */
+.select-dropdown .options-list::-webkit-scrollbar {
+  width: 8px !important;
+}
+
+.select-dropdown .options-list::-webkit-scrollbar-track {
+  background: #f1f1f1 !important;
+  border-radius: 4px !important;
+}
+
+.select-dropdown .options-list::-webkit-scrollbar-thumb {
+  background: #888 !important;
+  border-radius: 4px !important;
+}
+
+.select-dropdown .options-list::-webkit-scrollbar-thumb:hover {
+  background: #555 !important;
+}

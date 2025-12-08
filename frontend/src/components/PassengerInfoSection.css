@@ -1,0 +1,75 @@
+/* 乘客信息区域样式 */
+.passenger-info-section {
+  background-color: #ffffff;
+  border: 1px solid #c0d7eb;
+  border-radius: 10px;
+  margin: 20px auto;
+  max-width: 1100px;
+  overflow: visible;
+}
+
+.passenger-info-header {
+  background: linear-gradient(to bottom, #3698d5 0%, #1d82bd 100%);
+  border-radius: 10px 10px 0px 0px;
+  padding: 5px 20px !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+  border-bottom: 2px solid #8fcdec;
+}
+
+.passenger-info-section .section-title {
+  font-size: 16px !important;
+  font-weight: 500;
+  color: #ffffff !important;
+  margin: 5px !important;
+  letter-spacing: 0.5px;
+  border-bottom: none !important;
+  padding-bottom: 0px !important;
+}
+
+.passenger-info-content {
+  background-color: #ffffff;
+  padding: 15px 20px 0 20px;
+  overflow: visible;
+}
+
+.passenger-list-container {
+  margin-bottom: 5px;
+  padding-bottom: 0px;
+  border-bottom: 1px dashed #bbbbbb;
+}
+
+.purchase-info-container {
+  margin-bottom: 15px;
+}
+
+.subsection-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0066cc;
+  margin: 0 0 0px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.passenger-list-container .subsection-title::before {
+  content: '👤';
+  font-size: 18px;
+  color: #0066cc;
+}
+
+/* 中国铁路保险横幅 */
+.railway-insurance-banner {
+  width: 100%;
+  margin: 0px 0;
+  border-radius: 0;
+}
+
+.railway-insurance-banner img {
+  width: 100%;
+  height: auto;
+  display: block;
+}

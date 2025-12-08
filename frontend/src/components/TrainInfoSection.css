@@ -1,0 +1,164 @@
+/* 列车信息区域样式 */
+.train-info-section {
+  background-color: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #c0d7eb;
+  margin: 20px auto;
+  max-width: 1100px;
+  overflow: hidden;
+}
+
+.train-info-header {
+  background: linear-gradient(to bottom, #3698d5 0%, #1d82bd 100%);
+  border-radius: 10px 10px 0px 0px;
+  padding: 5px 20px !important;
+  margin: 0;
+  border-bottom: 2px solid #8fcdec;
+}
+
+.train-info-section .section-title {
+  font-size: 16px !important;
+  font-weight: 500;
+  color: #ffffff !important;
+  margin: 5px !important;
+  letter-spacing: 0.5px;
+  border-bottom: none !important;
+  padding-bottom: 0px !important;
+}
+
+.train-info-content {
+  background-color: #eef1fa;
+  padding: 10px 20px;
+}
+
+/* 车次基本信息行 */
+.train-basic-info {
+  margin-bottom: 10px;
+  font-size: 20px;
+  color: #333333;
+  line-height: 20px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* 信息组（内部无间隙） */
+.train-info-group {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0;
+  white-space: nowrap;
+}
+
+.train-date {
+  font-weight: 800;
+  color: #000000;
+  font-size: 20px;
+}
+
+.train-no {
+  font-weight: 800;
+  color: #000000;
+  font-size: 20px;
+}
+
+.train-station {
+  font-weight: 800;
+  color: #000000;
+  font-size: 20px;
+}
+
+.train-bold-group {
+  font-weight: 800;
+  color: #000000;
+  font-size: 20px;
+}
+
+.train-text {
+  font-weight: 400;
+  color: #000000;
+  font-size: 16px;
+}
+
+/* 票价余票信息区域 */
+.train-fare-info {
+  margin-bottom: 10px;
+  padding: 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 50px;
+  align-items: center;
+  border-top: 1px dashed #cecece;
+  padding-top: 12px;
+}
+
+.fare-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0;
+}
+
+.seat-type-label {
+  font-size: 14px;
+  color: #333333;
+  font-weight: 400;
+}
+
+.seat-price-bracket {
+  font-size: 14px;
+  color: #333333;
+  font-weight: 400;
+}
+
+.seat-price {
+  font-size: 14px;
+  color: #ff6600;
+  font-weight: 600;
+}
+
+.seat-available {
+  font-size: 14px;
+  color: #333333;
+  font-weight: 400;
+}
+
+.seat-discount {
+  font-size: 14px;
+  color: #33a853;
+  font-weight: 500;
+}
+
+.seat-status {
+  font-size: 14px;
+  color: #999999;
+}
+
+/* 底部提示文字 */
+.train-info-notice {
+  padding-top: 5px;
+  border-top: none;
+}
+
+.notice-text {
+  font-size: 13px !important;
+  color: #0066cc !important;
+  margin: 0;
+  line-height: 20px;
+}
+
+.notice-text::before {
+  content: "*";
+  margin-right: 2px;
+}
+
+/* 链接样式 */
+.notice-text a {
+  color: #0381ff !important;
+  text-decoration: none !important;
+  cursor: pointer;
+}
+
+.notice-text a:hover {
+  color: #0052a3;
+}

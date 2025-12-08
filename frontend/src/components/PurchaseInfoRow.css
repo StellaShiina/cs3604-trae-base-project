@@ -1,0 +1,103 @@
+/* 购票信息行样式 */
+.purchase-info-row {
+  display: grid;
+  grid-template-columns: 40px 110px 200px 140px 160px 1fr 40px;
+  gap: 8px;
+  padding: 12px 12px 12px 12px;
+  border-bottom: 1px solid #e0e0e0;
+  align-items: center;
+  min-height: 45px;
+  background-color: #eef1fa;
+  position: relative; /* 添加定位上下文 */
+  z-index: 1; /* 默认层级 */
+}
+
+/* 当行内有展开的下拉框时，提升整行的z-index */
+.purchase-info-row:has(.select-dropdown.expanded) {
+  z-index: 10001;
+}
+
+.purchase-info-row:nth-child(even) {
+  background-color: #f0f7ff;
+}
+
+.purchase-info-row:hover {
+  background-color: #e8f2fd;
+}
+
+.purchase-info-row:last-child {
+  border-bottom: none;
+}
+
+.row-cell {
+  text-align: left;
+  font-size: 14px;
+  color: #333333;
+  padding: 0 2px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  /* 移除固定z-index，让下拉框展开时动态提升 */
+}
+
+.row-cell:first-child {
+  font-weight: 400;
+  color: #000000;
+  justify-content: center;
+}
+
+.row-cell .readonly-input {
+  width: 100%;
+  border: 1px solid #cccccc;
+  background-color: #ffffff;
+  text-align: left;
+  font-size: 14px;
+  color: #333333;
+  padding: 6px 10px;
+  cursor: not-allowed;
+  border-radius: 2px;
+}
+
+.row-cell .readonly-input::placeholder {
+  color: #999999;
+}
+
+.row-cell .readonly-input:focus {
+  outline: none;
+}
+
+/* 删除按钮单元格 */
+.row-cell-delete {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0;
+}
+
+.delete-button {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background-color: #ff6600;
+  color: #ffffff !important;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  line-height: 1;
+  padding: 0;
+}
+
+.delete-button:hover {
+  background-color: #ff5500;
+  transform: scale(1.1);
+}
+
+.delete-button:active {
+  transform: scale(0.95);
+}

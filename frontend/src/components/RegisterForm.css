@@ -1,0 +1,301 @@
+/* RegisterForm组件样式 - 像素级还原12306注册表单 */
+
+.register-form {
+  width: 100%;
+  max-width: 950px;
+  margin: 0 auto;
+}
+
+/* 表单行 */
+.register-form .form-row {
+  margin-bottom: 22px;
+  display: flex;
+  align-items: center;
+}
+
+/* 标签区域 */
+.register-form .form-label-wrapper {
+  width: 200px;
+  text-align: right;
+  padding-top: 0;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.register-form .form-label {
+  font-size: 14px;
+  color: #333;
+  line-height: 20px;
+  display: inline-block;
+}
+
+.register-form .required-mark {
+  color: #ff4d4f;
+  margin-right: 4px;
+  font-weight: bold;
+}
+
+/* 输入区域 */
+.register-form .form-input-container {
+  flex: 1;
+  margin-left: 20px;
+  max-width: 600px;
+}
+
+.register-form .form-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* 输入框 */
+.register-form .form-input {
+  width: 350px !important;
+  min-width: 350px !important;
+  max-width: 350px !important;
+  height: 36px !important;
+  padding: 0 12px !important;
+  border: 1px solid #b8b8b8 !important;
+  border-radius: 0px !important;
+  font-size: 14px !important;
+  color: #333 !important;
+  outline: none !important;
+  transition: all 0.3s !important;
+  box-sizing: border-box !important;
+  background: white !important;
+  flex-shrink: 0 !important;
+}
+
+/* 选择框统一宽度 */
+.register-form .form-input-container > .select-dropdown {
+  width: 350px;
+  min-width: 350px;
+  max-width: 350px;
+  flex-shrink: 0;
+}
+
+/* 注册页面下拉框显示框样式 - 方角设计 */
+.register-form .form-input-container .select-dropdown .selected-value-display {
+  height: 36px;
+  line-height: 36px;
+  border: 1px solid #b8b8b8;
+  border-radius: 0px;
+  font-size: 14px;
+  padding: 0 28px 0 12px;
+  background-color: #e9e9ed;
+}
+
+.register-form .form-input-container .select-dropdown:not(.disabled) .selected-value-display:hover {
+  border-color: #40a9ff;
+}
+
+.register-form .form-input-container .select-dropdown.expanded .selected-value-display {
+  border-color: #40a9ff;
+  box-shadow: 0 0 0 2px rgba(64, 169, 255, 0.1);
+}
+
+/* 下拉菜单选项列表 - 方角设计 */
+.register-form .form-input-container .select-dropdown .options-list {
+  border-radius: 0px;
+}
+
+.register-form .form-input::placeholder {
+  color: #999 !important;
+}
+
+.register-form .form-input:hover {
+  border-color: #40a9ff !important;
+}
+
+.register-form .form-input:focus {
+  border-color: #40a9ff !important;
+  box-shadow: 0 0 0 2px rgba(64, 169, 255, 0.1) !important;
+  outline: none !important;
+}
+
+.register-form .form-input.error {
+  border-color: #ff4d4f !important;
+}
+
+.register-form .form-input.error:focus {
+  box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.1) !important;
+}
+
+.register-form .form-input.valid {
+  border-color: #52c41a !important;
+}
+
+/* 对号标记 */
+.register-form .input-checkmark {
+  margin-left: 8px;
+  color: #52c41a;
+  font-size: 16px;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+/* 密码强度条 */
+.register-form .password-strength {
+  margin-left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.register-form .strength-bars {
+  display: flex;
+  gap: 4px;
+}
+
+.register-form .strength-bar {
+  width: 60px;
+  height: 4px;
+  background: #e0e0e0;
+  border-radius: 0px;
+}
+
+.register-form .strength-bar.weak {
+  background: #ff4d4f;
+}
+
+.register-form .strength-bar.medium {
+  background: #faad14;
+}
+
+.register-form .strength-bar.strong {
+  background: #52c41a;
+}
+
+/* 错误消息 */
+.register-form .form-error-message {
+  color: #ff4d4f;
+  font-size: 12px;
+  margin-top: 6px;
+  line-height: 1.5;
+  min-height: 18px;
+}
+
+/* 提示信息 */
+.register-form .form-hint-message {
+  color: #ff8800;
+  font-size: 12px;
+  margin-left: 12px;
+  line-height: 20px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* 手机号码区域 */
+.register-form .phone-input-wrapper {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  width: 350px;
+}
+
+.register-form .phone-country-select {
+  width: 110px;
+  flex-shrink: 0;
+}
+
+/* 手机号码区域下拉框样式 - 方角设计 */
+.register-form .phone-country-select .select-dropdown .selected-value-display {
+  height: 36px;
+  line-height: 36px;
+  border: 1px solid #b8b8b8;
+  border-radius: 0px;
+  font-size: 14px;
+  padding: 0 28px 0 12px;
+  background-color: #e9e9ed;
+}
+
+.register-form .phone-country-select .select-dropdown:not(.disabled) .selected-value-display:hover {
+  border-color: #40a9ff;
+}
+
+/* 手机号下拉菜单选项列表 - 方角设计 */
+.register-form .phone-country-select .select-dropdown .options-list {
+  border-radius: 0px;
+}
+
+.register-form .phone-input {
+  width: 230px !important;
+  min-width: 230px !important;
+  max-width: 230px !important;
+  flex-shrink: 0 !important;
+}
+
+/* 协议勾选区域 */
+.register-form .agreement-section {
+  margin: 30px 0 24px;
+  padding-left: 220px;
+}
+
+.register-form .agreement-wrapper {
+  display: flex;
+  align-items: flex-start;
+}
+
+.register-form .agreement-checkbox {
+  margin: 3px 8px 0 0;
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.register-form .agreement-text {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.6;
+}
+
+.register-form .agreement-link {
+  color: #0066cc;
+  text-decoration: none;
+  cursor: pointer; 
+}
+
+.register-form .agreement-link:hover {
+  text-decoration: underline;
+}
+
+/* 提交按钮区域 */
+.register-form .submit-section {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.register-form .submit-button {
+  width: 170px !important;
+  height: 38px !important;
+  background: #ff8001 !important;
+  border-radius: 5px !important;
+  color: white !important;
+  font-size: 16px !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  transition: all 0.3s !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  text-align: center !important;
+  padding: 0px !important;
+  border: none !important;
+}
+
+.register-form .submit-button:hover {
+  background: #ffaa55 !important;
+  border: none !important;
+  border-color: transparent !important;
+}
+
+.register-form .submit-button:active {
+  background: linear-gradient(to bottom, #ff7700 0%, #ee6600 100%) !important;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+}
+
+.register-form .submit-button:disabled {
+  background: #cccccc !important;
+  border-color: #bbbbbb !important;
+  cursor: not-allowed !important;
+}

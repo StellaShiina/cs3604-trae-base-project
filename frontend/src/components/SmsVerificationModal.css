@@ -1,0 +1,215 @@
+/* ==================== 弹窗背景遮罩 ==================== */
+.sms-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* ==================== 弹窗主体 ==================== */
+.sms-modal {
+  background: #ffffff !important;
+  border-radius: 6px !important;
+  width: 440px !important;
+  max-width: 90% !important;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1) !important;
+  animation: modalSlideIn 0.25s ease-out !important;
+  overflow: hidden !important;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== 顶部标题栏 ==================== */
+.sms-modal .sms-modal-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 16px 24px !important;
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #f0f0f0 !important;
+}
+
+.sms-modal .modal-title {
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  color: #303133 !important;
+}
+
+.sms-modal .close-button {
+  background: none !important;
+  border: none !important;
+  font-size: 24px !important;
+  font-weight: 400 !important;
+  color: #888888 !important;
+  cursor: pointer !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+
+.sms-modal .close-button:hover {
+  border-color: transparent !important;
+}
+
+.sms-modal .close-button:focus,
+.sms-modal .close-button:focus-visible {
+  outline: none !important;
+  border-color: transparent !important;
+}
+
+/* ==================== "短信验证"蓝色居中标题 ==================== */
+.sms-modal .verification-type {
+  text-align: center !important;
+  padding: 24px 0 !important;
+  margin: 0 !important;
+  font-size: 18px !important;
+  font-weight: 500 !important;
+  color: #1890ff !important;
+}
+
+/* ==================== 表单主体 ==================== */
+.sms-modal .sms-modal-form {
+  padding: 0 40px 32px 40px !important;
+}
+
+.sms-modal .form-group {
+  margin-bottom: 20px !important;
+}
+
+/* ==================== 错误提示信息 ==================== */
+.sms-modal .sms-verification-error-message {
+  /* 【修改】颜色改亮一些的红色 */
+  color: #ff4d4f !important; 
+  font-size: 15px !important;
+  text-align: left !important;
+  /* 【关键修改】强制重置所有外边距，覆盖全局的 margin-left: 90px */
+  margin: -10px 0 15px 0 !important; 
+}
+
+.sms-modal .success-message {
+  color: #52c41a !important;  /* 绿色 */
+  font-size: 15px !important;
+  text-align: left !important;
+  margin: -10px 0 15px 0 !important;
+}
+
+
+/* ==================== 输入框通用样式 ==================== */
+.sms-modal .form-input {
+  width: auto !important;
+  height: 48px !important;
+  padding: 0 15px !important;
+  border: 1px solid #dcdfe6 !important;
+  border-radius: 4px !important;
+  font-size: 14px !important;
+  color: #333333 !important;
+  transition: border-color 0.2s ease !important;
+  box-sizing: border-box !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  background: #ffffff !important;
+}
+
+.sms-modal .form-group:first-child .form-input {
+  width: 100% !important;
+}
+
+.sms-modal .form-input:focus {
+  outline: none !important;
+  border-color: #1890ff !important;
+}
+
+.sms-modal .form-input::placeholder {
+  color: #c0c4cc !important;
+}
+
+/* ==================== 验证码输入区域 ==================== */
+.sms-modal .code-input-group {
+  display: flex !important;
+  gap: 12px !important;
+  align-items: center !important;
+}
+
+.sms-modal .code-input {
+  flex: 1 !important;
+}
+
+/* ==================== "获取验证码"按钮 ==================== */
+.sms-modal .send-code-button {
+  flex-shrink: 0 !important;
+  width: 120px !important;
+  height: 48px !important;
+  padding: 0 !important;
+  border-radius: 4px !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+  text-align: center !important;
+  transition: all 0.2s ease !important;
+  background-color: #f5f7fa !important;
+  color: #c0c4cc !important;
+  border: 1px solid #e4e7ed !important;
+}
+
+.sms-modal .send-code-button:disabled {
+  cursor: not-allowed !important;
+  opacity: 0.6 !important;
+}
+
+.sms-modal .send-code-button:not(:disabled) {
+  background-color: #ffffff !important;
+  color: #606266 !important;
+  border: 1px solid #dcdfe6 !important;
+  cursor: pointer !important;
+}
+
+.sms-modal .send-code-button:not(:disabled):hover {
+  border-color: #1890ff !important;
+  color: #1890ff !important;
+}
+
+.sms-modal .send-code-button:focus,
+.sms-modal .send-code-button:focus-visible {
+  outline: none !important;
+}
+
+/* ==================== "确定"按钮 ==================== */
+.sms-modal .confirm-button {
+  width: 100% !important;
+  height: 48px !important;
+  padding: 0 !important;
+  margin-top: 12px !important;
+  background: #ff8a29 !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 4px !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.sms-modal .confirm-button:hover {
+  background: #ffa151 !important;
+  border-color: transparent !important;
+}
+
+.sms-modal .confirm-button:focus,
+.sms-modal .confirm-button:focus-visible {
+  outline: none !important;
+  border-color: transparent !important;
+}

@@ -1,0 +1,189 @@
+/* ==================== 登录框容器 ==================== */
+.login-form-container {
+  width: 400px !important;
+  background: #ffffff !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+/* ==================== 顶部选项卡 ==================== */
+.login-form-container .login-tabs {
+  display: flex !important;
+  background: #ffffff !important;
+  border-bottom: none !important;
+}
+
+.login-form-container .tab-button {
+  flex: 1 !important;
+  padding: 15px 20px !important;
+  border: none !important;
+  background: transparent !important;
+  font-size: 18px !important;
+  color: #333333 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  border-bottom: 3px solid transparent !important;
+}
+
+.login-form-container .tab-button.active {
+  background: #ffffff !important;
+  color: #1890ff !important;
+  font-weight: 600 !important;
+  border-bottom-color: transparent !important;
+}
+
+.login-form-container .tab-button:hover:not(.active) {
+  background: transparent !important;
+  color: #1890ff !important;
+}
+
+/* ==================== 表单主体 ==================== */
+.login-form-container .login-form {
+  padding: 30px !important;
+}
+
+.login-form-container .error-message {
+  background: #fff1f0 !important; 
+  border: 1px solid #ffa39e !important;
+  color: #cf1322 !important;
+  padding: 10px 15px !important;
+  border-radius: 0 !important;
+  margin-bottom: 20px !important;
+  font-size: 14px !important;
+  box-sizing: border-box !important;
+  width: 100% !important; 
+  text-align: center !important; 
+  margin: 0 0 20px 0 !important;
+}
+
+.login-form-container .form-group {
+  margin-bottom: 20px !important;
+}
+
+/* ==================== 输入框 ==================== */
+.login-form-container .form-input {
+  width: 100% !important;
+  height: 50px !important;
+  padding: 0 10px !important;
+  border: 1px solid #d9d9d9 !important;
+  border-radius: 0 !important;
+  font-size: 14px !important;
+  transition: border-color 0.3s ease !important;
+  box-sizing: border-box !important;
+  background: #ffffff !important;
+}
+
+.login-form-container .form-input:focus {
+  outline: none !important;
+  border-color: #1890ff !important;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+}
+
+.login-form-container .form-input::placeholder {
+  color: #bfbfbf !important;
+}
+
+/* (保留规则) */
+.login-form-container .sms-login-area {
+  margin-bottom: 20px !important;
+}
+.login-form-container .sms-group {
+  display: flex !important;
+  gap: 10px !important;
+}
+.login-form-container .sms-input {
+  flex: 1 !important;
+}
+.login-form-container .sms-button {
+  padding: 12px 20px !important;
+  background: #1890ff !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 0 !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  transition: background-color 0.3s ease !important;
+}
+.login-form-container .sms-button:hover {
+  background: #40a9ff !important;
+}
+.login-form-container .qr-login-area {
+  text-align: center !important;
+  padding: 20px 0 !important;
+}
+.login-form-container .qr-code-container {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 15px !important;
+}
+.login-form-container .qr-code-image {
+  width: 150px !important;
+  height: 150px !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 0 !important;
+}
+.login-form-container .qr-instructions {
+  color: #666666 !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+}
+.login-form-container .qr-instructions p {
+  margin: 5px 0 !important;
+}
+
+/* ==================== 登录按钮 ==================== */
+.login-form-container .login-button {
+  width: 100% !important;
+  padding: 12px !important;
+  background: #FF8001 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 5px !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: background-color 0.3s ease !important;
+  margin-bottom: 20px !important;
+  text-align: center !important;
+}
+
+.login-form-container .login-button:hover:not(:disabled) {
+  background: #ff8533 !important;
+}
+
+.login-form-container .login-button:disabled {
+  background: #d9d9d9 !important;
+  cursor: not-allowed !important;
+}
+
+/* ==================== 底部链接 ==================== */
+.login-form-container .form-links {
+  display: flex !important;
+  justify-content: center !important; /* 水平居中 */
+  align-items: center !important;
+  gap: 20px; /* 加大链接之间的间距 */
+}
+.login-form-container .link-button {
+  background: none !important;
+  border: none !important;
+  color: #1890ff !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  transition: color 0.3s ease !important;
+}
+.login-form-container .link-button:hover {
+  color: #40a9ff !important;
+  text-decoration: underline !important;
+}
+
+/* 【新增规则】将“忘记密码”链接变为灰色 */
+.login-form-container .forgot-password-link {
+  color: #999999 !important; /* 灰色 */
+}
+.login-form-container .forgot-password-link:hover {
+  color: #40a9ff !important; /* 鼠标悬浮时可以变蓝 */
+}

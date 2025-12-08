@@ -1,0 +1,320 @@
+/* 车次列表区域样式 */
+.train-list {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* 查询结果提示信息 */
+.train-list-info {
+  padding: 12px 16px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.train-list-summary {
+  font-size: 13px;
+  color: #333333;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.summary-route {
+  font-weight: 600;
+  color: #333333;
+}
+
+.summary-date {
+  color: #000000;
+}
+
+.summary-count {
+  color: #000000;
+  font-weight: 600;
+}
+
+.summary-transfer {
+  color: #333333;
+  font-weight: 400;
+  margin-left: 20px;
+}
+
+.transfer-highlight {
+  color: #ff7700;
+  font-weight: 500;
+}
+
+.train-list-hints {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.hint-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #333333;
+  user-select: none;
+}
+
+.hint-checkbox input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  margin: 0;
+}
+
+.hint-checkbox:hover {
+  color: #2196f3;
+}
+
+.train-list-container {
+  width: 100%;
+}
+
+/* 列表表头 */
+.train-list-header {
+  display: grid;
+  grid-template-columns: 80px 100px 80px 70px repeat(11, minmax(50px, 1fr)) 80px;
+  gap: 0;
+  padding: 0px 0px;
+  background: linear-gradient(to bottom, #3699d6 0%, #187ac1 100%);
+  border-bottom: 2px solid #3466a0;
+  font-weight: 600;
+  font-size: 13px;
+  color: white;
+  align-items: center;
+  line-height: 1.3;
+}
+
+.train-list-header-cell {
+  text-align: center;
+  white-space: normal;
+  position: relative;
+  padding: 4px 3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.5;
+  min-height: 32px;
+  gap: 2px;
+  border-right: 1px solid #2270a4;
+}
+
+.train-list-header-cell:last-child {
+  border-right: none;
+}
+
+.train-list-header-cell.align-left {
+  align-items: flex-start;
+}
+
+.train-list-header-cell.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s;
+  padding: 4px;
+  border-radius: 0px;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.header-line {
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.sortable-line {
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 2px;
+  transition: background-color 0.2s;
+}
+
+.sortable-line:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sortable-line:active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.train-list-header-cell.sortable:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.train-list-header-cell.sortable:active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* 排序图标 */
+.sort-icon {
+  display: inline-block;
+  font-size: 10px;
+  margin-left: 2px;
+  opacity: 0.7;
+}
+
+.sort-icon.neutral {
+  opacity: 0.4;
+}
+
+.sort-icon.asc {
+  opacity: 1;
+  color: #ffd700;
+}
+
+.sort-icon.desc {
+  opacity: 1;
+  color: #ffd700;
+}
+
+/* 列表主体 */
+.train-list-body {
+  background-color: #ffffff;
+  position: relative;
+}
+
+/* 空状态 */
+.train-list-empty {
+  padding: 60px 20px;
+  text-align: center;
+  color: #999999;
+}
+
+.train-list-empty-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+  opacity: 0.5;
+}
+
+.train-list-empty-text {
+  font-size: 16px;
+  color: #666666;
+  margin-bottom: 10px;
+}
+
+.train-list-empty-hint {
+  font-size: 14px;
+  color: #999999;
+}
+
+/* 加载更多 */
+.train-list-load-more {
+  padding: 20px;
+  text-align: center;
+}
+
+.train-list-load-more-btn {
+  padding: 10px 30px;
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.train-list-load-more-btn:hover {
+  background-color: #1976d2;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(33, 150, 243, 0.3);
+}
+
+.train-list-load-more-btn:active {
+  transform: translateY(0);
+}
+
+.train-list-load-more-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 响应式设计 - 平板 */
+@media (max-width: 1024px) {
+  .train-list-header {
+    grid-template-columns: 70px 160px 110px 110px 90px repeat(5, minmax(60px, 1fr)) 90px;
+    gap: 8px;
+    padding: 12px 15px;
+    font-size: 12px;
+  }
+}
+
+/* 响应式设计 - 手机 */
+@media (max-width: 768px) {
+  .train-list {
+    border-radius: 6px;
+  }
+
+  .train-list-header {
+    display: none; /* 在手机上隐藏表头，改用卡片式布局 */
+  }
+
+  .train-list-empty {
+    padding: 40px 15px;
+  }
+
+  .train-list-empty-icon {
+    font-size: 40px;
+  }
+
+  .train-list-empty-text {
+    font-size: 15px;
+  }
+
+  .train-list-empty-hint {
+    font-size: 13px;
+  }
+
+  .train-list-load-more {
+    padding: 15px;
+  }
+
+  .train-list-load-more-btn {
+    padding: 9px 25px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .train-list-empty {
+    padding: 30px 10px;
+  }
+
+  .train-list-empty-icon {
+    font-size: 36px;
+  }
+
+  .train-list-empty-text {
+    font-size: 14px;
+  }
+
+  .train-list-empty-hint {
+    font-size: 12px;
+  }
+
+  .train-list-load-more {
+    padding: 12px;
+  }
+
+  .train-list-load-more-btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+  }
+}
