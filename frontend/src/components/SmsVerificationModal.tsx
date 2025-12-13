@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
+import { API_BASE_URL } from '../config'
 import './SmsVerificationModal.css'
 
 interface SmsVerificationModalProps {
@@ -53,14 +54,14 @@ const SmsVerificationModal: React.FC<SmsVerificationModalProps> = ({
     
     try {
       // 调用发送验证码API
-      const response = await axios.post('/api/auth/send-verification-code', {
+      const response = await axios.post(`${API_BASE_URL}/auth/send-sms`, {
         sessionId,
         idCardLast4
       })
       
-      if (response.data.success) {
+      if (response.status === 200) {
         // 从后端获取真实验证码和手机号（开发环境）
-        const realCode = response.data.verificationCode
+        const realCode = response.data.verificationCode || response.data.code
         const phone = response.data.phone
         if (realCode) {
           console.log(`\n=================================`)

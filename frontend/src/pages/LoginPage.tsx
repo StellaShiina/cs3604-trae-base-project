@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { API_BASE_URL } from '../config'
 import TopNavigation from '../components/TopNavigation'
 import LoginForm from '../components/LoginForm'
 import BottomNavigation from '../components/BottomNavigation'
@@ -22,7 +23,7 @@ const LoginPage: React.FC = () => {
     
     try {
       // 调用登录API（支持identifier或username）
-      const response = await axios.post('/api/auth/login', {
+      const response = await axios.post(`${API_BASE_URL}/auth/login`, {
         identifier: data.identifier || data.username,
         password: data.password
       })
@@ -72,7 +73,7 @@ const LoginPage: React.FC = () => {
     
     try {
       // 调用验证登录API
-      const response = await axios.post('/api/auth/verify-login', {
+      const response = await axios.post(`${API_BASE_URL}/auth/verify-login`, {
         sessionId,
         idCardLast4: data.idCardLast4,
         verificationCode: data.code
