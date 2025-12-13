@@ -1,0 +1,113 @@
+/* 左侧功能菜单栏样式 */
+.side-menu {
+  width: 220px;
+  background-color: #ffffff;
+  padding: 0;
+  border-right: none;
+  min-height: calc(100vh - 200px);
+  padding-right: 20px;
+}
+
+.menu-header {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  padding: 8px 20px;
+  background-color: #ffffff;
+  border-bottom: none;
+}
+
+.menu-section {
+  margin-bottom: 0;
+  border-bottom: none;
+}
+
+.menu-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  padding: 8px 20px;
+  margin-bottom: 0;
+  user-select: none;
+  background-color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.menu-title:hover {
+  color: #3b99fc;
+}
+
+.menu-title-simple {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  padding: 12px 20px;
+  margin-bottom: 0;
+  user-select: none;
+  background-color: #ffffff;
+  cursor: default;
+}
+
+.menu-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-items {
+  background-color: #fff;
+}
+
+.menu-item {
+  font-size: 14px;
+  color: #666;
+  padding: 6px 20px 6px 40px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  background-color: #fff;
+  border-left: 3px solid transparent;
+}
+
+.menu-item:hover:not(.disabled) {
+  color: #3b99fc;
+}
+
+.menu-item.selected {
+  background-color: #3b99fc;
+  color: #fff;
+  font-weight: 400;
+  border-left: 3px solid #3b99fc;
+}
+
+.menu-item.disabled {
+  color: #999;
+  cursor: not-allowed;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .side-menu {
+    width: 180px;
+  }
+  
+  .menu-header {
+    font-size: 14px;
+    padding: 12px 15px;
+  }
+  
+  .menu-title,
+  .menu-title-simple {
+    font-size: 13px;
+    padding: 10px 15px;
+  }
+  
+  .menu-item {
+    font-size: 13px;
+    padding: 8px 15px 8px 30px;
+  }
+}
+

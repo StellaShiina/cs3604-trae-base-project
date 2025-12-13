@@ -1,0 +1,333 @@
+/* 订单信息容器 - 包含订单信息和温馨提示 */
+.payment-order-info-container {
+  max-width: 1100px !important;
+  margin: 0 auto !important;
+}
+
+/* 订单信息显示组件 - 支付页专用样式 */
+.payment-order-info-display {
+  background-color: #ffffff !important;
+  border: 1px solid #c0d7eb !important;
+  border-radius: 10px 0px!important;
+  margin: 20px auto 0 auto !important;
+  overflow: hidden !important;
+}
+
+/* 订单信息标题栏 - 复用TrainInfoSection的蓝色渐变header */
+.payment-order-info-header {
+  background: linear-gradient(to bottom, #3698d5 0%, #1d82bd 100%) !important;
+  border-radius: 10px 10px 0px 0px !important;
+  padding: 5px 20px !important;
+  margin: 0 !important;
+  border-bottom: 2px solid #8fcdec !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  color: #ffffff !important;
+  letter-spacing: 0.5px !important;
+}
+
+/* 订单信息内容区域 */
+.payment-order-info-content {
+  background-color: #ffffff !important;
+  padding: 20px 20px 0px 20px !important;
+}
+
+/* 车次信息行 - 复用TrainInfoSection的train-basic-info样式 */
+.payment-train-info-row {
+  margin-bottom: 20px !important;
+  font-size: 20px !important;
+  color: #333333 !important;
+  line-height: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+}
+
+/* 信息组（内部无间隙） */
+.payment-train-info-group {
+  display: inline-flex !important;
+  align-items: baseline !important;
+  gap: 0 !important;
+  white-space: nowrap !important;
+}
+
+.payment-train-date {
+  font-weight: 800 !important;
+  color: #000000 !important;
+  font-size: 20px !important;
+}
+
+.payment-train-no {
+  font-weight: 800 !important;
+  color: #000000 !important;
+  font-size: 20px !important;
+}
+
+.payment-train-station {
+  font-weight: 800 !important;
+  color: #0066cc !important;
+  font-size: 20px !important;
+}
+
+.payment-train-bold-group {
+  font-weight: 800 !important;
+  color: #000000 !important;
+  font-size: 20px !important;
+}
+
+.payment-train-text {
+  font-weight: 400 !important;
+  color: #000000 !important;
+  font-size: 16px !important;
+}
+
+/* 乘客表格容器 */
+.payment-passenger-table-container {
+  padding: 0 !important;
+  margin-top: 12px !important;
+  background-color: transparent !important;
+}
+
+/* 乘客表格 */
+.payment-passenger-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  font-size: 14px !important;
+  margin-bottom: 0 !important;
+}
+
+.payment-passenger-table thead {
+  background: linear-gradient(to bottom, #ffffff 0%, #d9d9d9 100%) !important;
+}
+
+.payment-passenger-table thead th {
+  padding: 10px 8px !important;
+  text-align: center !important;
+  font-weight: 500 !important;
+  color: #111 !important;
+  border-top: 1px solid #999999 !important;
+  border-bottom: 1px solid #d0d0d0 !important;
+  border-left: none !important;
+  border-right: none !important;
+  background: transparent !important;
+  font-size: 15px !important;
+}
+
+.payment-passenger-table thead th:first-child {
+  border-left: 1px solid #d0d0d0 !important;
+}
+
+.payment-passenger-table thead th:last-child {
+  border-right: 1px solid #d0d0d0 !important;
+}
+
+.payment-passenger-table tbody td {
+  padding: 12px 8px !important;
+  text-align: center !important;
+  border-top: none !important;
+  border-bottom: 1px solid #d0d0d0 !important;
+  border-left: none !important;
+  border-right: none !important;
+  color: #111 !important;
+  background-color: #eff1f9 !important;
+}
+
+.payment-passenger-table tbody td:first-child {
+  border-left: 1px solid #d0d0d0 !important;
+}
+
+.payment-passenger-table tbody td:last-child {
+  border-right: 1px solid #d0d0d0 !important;
+}
+
+.payment-passenger-table tbody tr:hover {
+  background-color: #e5e7ef !important;
+}
+
+.payment-passenger-table tbody tr:hover td {
+  background-color: #e5e7ef !important;
+}
+
+/* 表格最后一行底部边框 - 与表头顶部边框一致 */
+.payment-passenger-table tbody tr:last-child td {
+  border-bottom: 1px solid #999999 !important;
+}
+
+/* 保险区域 - Mock展示 */
+.payment-insurance-section {
+  padding: 0 !important;
+  margin-top: 20px !important;
+  background-color: transparent !important;
+  overflow: hidden !important;
+}
+
+.payment-insurance-image {
+  width: 100% !important;
+  height: auto !important;
+  display: block !important;
+}
+
+/* 总票价行 */
+.payment-total-price-row {
+  padding: 15px 0 !important;
+  margin-top: 5px !important;
+  text-align: right !important;
+  background-color: transparent !important;
+  padding-top: 12px !important;
+  padding-right: 20px !important;
+  border-bottom: 1px solid #70a9d5 !important;
+}
+
+.payment-total-label {
+  font-size: 14px !important;
+  color: #333 !important;
+  margin-right: 10px !important;
+}
+
+.payment-total-amount {
+  font-size: 20px !important;
+  font-weight: 600 !important;
+  color: #ff6600 !important;
+}
+
+/* 操作按钮区域 */
+.payment-actions {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 40px !important;
+  margin: 20px 0 !important;
+  padding: 0 !important;
+}
+
+.payment-button {
+  padding: 10px 40px !important;
+  border: none !important;
+  border-radius: 5px !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  min-width: 140px !important;
+}
+
+.payment-button:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
+
+.cancel-order-button {
+  background-color: #fff !important;
+  color: #666 !important;
+  border: 1px solid #d0d0d0 !important;
+}
+
+.cancel-order-button:hover:not(:disabled) {
+  background-color: #f5f5f5 !important;
+  border-color: #b0b0b0 !important;
+}
+
+.cancel-order-button:focus,
+.cancel-order-button:focus-visible {
+  outline: none !important;
+  border-color: #d0d0d0 !important;
+}
+
+.confirm-payment-button {
+  background-color: #ff7200 !important;
+  color: #fff !important;
+  border: 1px solid #ff7200 !important;
+}
+
+.confirm-payment-button:hover:not(:disabled) {
+  background-color: #ff8533 !important;
+  border-color: #ff8533 !important;
+}
+
+.confirm-payment-button:focus,
+.confirm-payment-button:focus-visible {
+  outline: none !important;
+  border-color: transparent !important;
+}
+
+/* 支付页专用温馨提示样式 */
+.payment-warm-tips-section {
+  background-color: #fffbe5 !important;
+  border: 1px solid #f5e6a8 !important;
+  border-radius: 0 !important;
+  padding: 10px 15px !important;
+  margin: 20px 0 0 0 !important;
+}
+
+.payment-warm-tips-section .payment-tips-title {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: #333333 !important;
+  margin: 0 0 5px 0 !important;
+}
+
+.payment-warm-tips-section .payment-tips-list {
+  margin: 0 !important;
+  padding-left: 15px !important;
+  list-style-position: outside !important;
+  list-style-type: decimal !important;
+}
+
+.payment-warm-tips-section .payment-tip-item {
+  font-size: 14px !important;
+  color: #000000 !important;
+  line-height: 22px !important;
+  margin-bottom: 2px !important;
+  padding-left: 4px !important;
+}
+
+.payment-warm-tips-section .payment-tip-item:last-child {
+  margin-bottom: 0 !important;
+}
+
+.payment-warm-tips-section .payment-tip-item a {
+  color: #0073e7 !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+}
+
+.payment-warm-tips-section .payment-tip-item a:hover {
+  color: #0052a3 !important;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .payment-passenger-table {
+    font-size: 12px !important;
+  }
+  
+  .payment-passenger-table thead th,
+  .payment-passenger-table tbody td {
+    padding: 8px 4px !important;
+  }
+  
+  .payment-train-info-row {
+    font-size: 16px !important;
+  }
+  
+  .payment-train-date,
+  .payment-train-no,
+  .payment-train-station,
+  .payment-train-bold-group {
+    font-size: 16px !important;
+  }
+  
+  .payment-train-text {
+    font-size: 14px !important;
+  }
+  
+  .payment-actions {
+    flex-direction: column !important;
+    gap: 15px !important;
+  }
+  
+  .payment-button {
+    width: 100% !important;
+  }
+}

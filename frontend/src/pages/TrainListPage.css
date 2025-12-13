@@ -1,0 +1,112 @@
+/* 车次列表页样式 */
+.train-list-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #ffffff;
+}
+
+/* 内容区域 */
+.train-list-content {
+  flex: 1;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* 加载和错误状态 */
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 16px;
+  color: #666666;
+}
+
+.train-list-error-message {
+  text-align: center;
+  padding: 10px;
+  margin: 20px 0;
+  background-color: #ffebee;
+  border: 1px solid #ef5350;
+  border-radius: 4px;
+  color: #d32f2f;
+  font-size: 14px;
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999999;
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.empty-state-text {
+  font-size: 16px;
+  color: #666666;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .train-list-content {
+    padding: 15px;
+  }
+
+  .loading {
+    padding: 30px;
+    font-size: 15px;
+  }
+
+  .error-message {
+    padding: 15px;
+    margin: 15px 0;
+    font-size: 13px;
+  }
+
+  .empty-state {
+    padding: 40px 15px;
+  }
+
+  .empty-state-icon {
+    font-size: 40px;
+  }
+
+  .empty-state-text {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .train-list-content {
+    padding: 10px;
+  }
+
+  .loading {
+    padding: 25px;
+    font-size: 14px;
+  }
+
+  .error-message {
+    padding: 12px;
+    margin: 12px 0;
+    font-size: 12px;
+  }
+
+  .empty-state {
+    padding: 30px 10px;
+  }
+
+  .empty-state-icon {
+    font-size: 36px;
+  }
+
+  .empty-state-text {
+    font-size: 14px;
+  }
+}

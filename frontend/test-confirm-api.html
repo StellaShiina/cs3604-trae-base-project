@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>测试确认订单API</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    .section {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .result {
+      margin-top: 10px;
+      padding: 10px;
+      background: #f5f5f5;
+      border-left: 4px solid #007bff;
+      white-space: pre-wrap;
+      font-family: monospace;
+    }
+    .error {
+      border-left-color: #dc3545;
+      background: #f8d7da;
+    }
+    .success {
+      border-left-color: #28a745;
+      background: #d4edda;
+    }
+  </style>
+</head>
+<body>
+  <h1>测试确认订单API</h1>
+  
+  <div class="section">
+    <h2>步骤1：登录获取Token</h2>
+    <input type="text" id="username" placeholder="用户名" value="testuser">
+    <input type="password" id="password" placeholder="密码" value="password123">
+    <button onclick="login()">登录</button>
+    <div id="login-result" class="result" style="display:none;"></div>
+  </div>
+
+  <div class="section">
+    <h2>步骤2：创建测试订单</h2>
+    <button onclick="createTestOrder()">创建测试订单</button>
+    <div id="create-result" class="result" style="display:none;"></div>
+  </div>
+
+  <div class="section">
+    <h2>步骤3：确认订单</h2>
+    <input type="text" id="orderId" placeholder="订单ID" style="width: 300px;">
+    <button onclick="confirmOrder()">确认订单</button>
+    <div id="confirm-result" class="result" style="display:none;"></div>
+  </div>
+
+  <script>
+    let authToken = localStorage.getItem('authToken');
+    
+    if (authToken) {
+      document.getElementById('login-result').style.display = 'block';
+      document.getElementById('login-result').className = 'result success';
+      document.getElementById('login-result').textContent = 'Token已存在：' + authToken;
+    }
+
+    async function login() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const resultDiv = document.getElementById('login-result');
+      
+      try {
+        const response = await fetch('http://localhost:3000/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        
+        const data = await response.json();
+        resultDiv.style.display = 'block';
+        
+        if (response.ok) {
+          authToken = data.token;
+          localStorage.setItem('authToken', authToken);
+          resultDiv.className = 'result success';
+          resultDiv.textContent = '登录成功！\nToken: ' + authToken;
+        } else {
+          resultDiv.className = 'result error';
+          resultDiv.textContent = '登录失败：' + JSON.stringify(data, null, 2);
+        }
+      } catch (error) {
+        resultDiv.style.display = 'block';
+        resultDiv.className = 'result error';
+        resultDiv.textContent = '请求失败：' + error.message;
+      }
+    }
+
+    async function createTestOrder() {
+      const resultDiv = document.getElementById('create-result');
+      
+      if (!authToken) {
+        resultDiv.style.display = 'block';
+        resultDiv.className = 'result error';
+        resultDiv.textContent = '请先登录！';
+        return;
+      }
+
+      try {
+        // 先获取订单填写页数据
+        const dataResponse = await fetch('http://localhost:3000/api/orders/new?trainNo=D6&departureStation=上海&arrivalStation=北京&departureDate=2025-11-13', {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        
+        if (!dataResponse.ok) {
+          throw new Error('获取订单数据失败');
+        }
+        
+        const orderData = await dataResponse.json();
+        
+        // 创建订单
+        const createResponse = await fetch('http://localhost:3000/api/orders/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: JSON.stringify({
+            trainNo: 'D6',
+            departureStation: '上海',
+            arrivalStation: '北京',
+            departureDate: '2025-11-13',
+            passengers: [
+              {
+                passengerId: orderData.passengers[0]?.id || 'pass-1',
+                name: orderData.passengers[0]?.name || '测试乘客',
+                seatType: '二等座',
+                ticketType: '成人票'
+              }
+            ]
+          })
+        });
+        
+        const createData = await createResponse.json();
+        resultDiv.style.display = 'block';
+        
+        if (createResponse.ok) {
+          document.getElementById('orderId').value = createData.orderId;
+          resultDiv.className = 'result success';
+          resultDiv.textContent = '订单创建成功！\n' + JSON.stringify(createData, null, 2);
+        } else {
+          resultDiv.className = 'result error';
+          resultDiv.textContent = '订单创建失败：' + JSON.stringify(createData, null, 2);
+        }
+      } catch (error) {
+        resultDiv.style.display = 'block';
+        resultDiv.className = 'result error';
+        resultDiv.textContent = '请求失败：' + error.message;
+      }
+    }
+
+    async function confirmOrder() {
+      const orderId = document.getElementById('orderId').value;
+      const resultDiv = document.getElementById('confirm-result');
+      
+      if (!authToken) {
+        resultDiv.style.display = 'block';
+        resultDiv.className = 'result error';
+        resultDiv.textContent = '请先登录！';
+        return;
+      }
+      
+      if (!orderId) {
+        resultDiv.style.display = 'block';
+        resultDiv.className = 'result error';
+        resultDiv.textContent = '请输入订单ID！';
+        return;
+      }
+
+      try {
+        console.log('调用确认订单API:', `http://localhost:3000/api/orders/${orderId}/confirm`);
+        console.log('Token:', authToken);
+        
+        const response = await fetch(`http://localhost:3000/api/orders/${orderId}/confirm`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          }
+        });
+        
+        const data = await response.json();
+        resultDiv.style.display = 'block';
+        
+        console.log('API响应:', data);
+        
+        if (response.ok) {
+          resultDiv.className = 'result success';
+          resultDiv.textContent = '订单确认成功！\n\n' + JSON.stringify(data, null, 2);
+          
+          // 显示座位信息
+          if (data.tickets && data.tickets.length > 0) {
+            let ticketInfo = '\n\n=== 车票信息 ===\n';
+            data.tickets.forEach((ticket, i) => {
+              ticketInfo += `\n乘客${i+1}: ${ticket.passengerName}`;
+              ticketInfo += `\n  席别: ${ticket.seatType}`;
+              ticketInfo += `\n  座位号: ${ticket.seatNo}`;
+              ticketInfo += `\n  票种: ${ticket.ticketType}\n`;
+            });
+            resultDiv.textContent += ticketInfo;
+          }
+        } else {
+          resultDiv.className = 'result error';
+          resultDiv.textContent = '订单确认失败：\n' + JSON.stringify(data, null, 2);
+        }
+      } catch (error) {
+        resultDiv.style.display = 'block';
+        resultDiv.className = 'result error';
+        resultDiv.textContent = '请求失败：' + error.message + '\n\n请确保后端服务器正在运行（http://localhost:3000）';
+        console.error('确认订单错误:', error);
+      }
+    }
+  </script>
+</body>
+</html>
+

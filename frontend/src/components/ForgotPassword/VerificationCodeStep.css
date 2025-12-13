@@ -1,0 +1,214 @@
+/* ==================== 密码找回验证码步骤容器 ==================== */
+.verification-code-step {
+  max-width: 900px !important;
+  margin: 0 auto !important;
+}
+
+.verification-code-step form {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* ==================== 表单行布局 ==================== */
+.verification-code-step .form-row {
+  display: flex !important;
+  align-items: center !important; /* 改为center，使标签与输入框垂直居中对齐 */
+  margin-bottom: 20px !important; /* 减少间距，从35px改为20px */
+  margin-left: 80px !important; /* 整体向右移动 */
+  position: relative !important;
+}
+
+.verification-code-step .form-label {
+  width: 120px !important;
+  text-align: right !important;
+  padding-right: 15px !important;
+  padding-top: 0px !important; /* 移除顶部padding */
+  padding-bottom: 0 !important; /* 移除底部padding */
+  font-size: 14px !important;
+  color: #333333 !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important; /* 确保标签文字不换行 */
+  display: flex !important;
+  align-items: center !important; /* 标签内容垂直居中 */
+  height: 30px !important; /* 与输入框高度一致，便于对齐 */
+}
+
+.verification-code-step .required-mark {
+  color: #ff4d4f !important;
+  margin-right: 2px !important;
+}
+
+/* ==================== 手机号显示 ==================== */
+.verification-code-step .phone-display {
+  padding: 0 !important; /* 移除padding，使用margin来控制位置 */
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  font-size: 16px !important;
+  color: #ffa151 !important;
+  font-weight: 500 !important;
+  width: 400px !important;
+  box-sizing: border-box !important;
+  margin-left: 40px !important; /* 进一步向右移动，与输入框对齐 */
+  display: flex !important;
+  align-items: center !important; /* 垂直居中 */
+  height: 30px !important; /* 与输入框高度一致 */
+}
+
+/* ==================== 输入框容器 ==================== */
+.verification-code-step .input-wrapper {
+  width: 600px !important;
+  flex-shrink: 0 !important;
+  margin-left: 40px !important; /* 进一步向右移动，使输入框更居中 */
+}
+
+/* ==================== 验证码输入区域 ==================== */
+.verification-code-step .code-input-group {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 12px !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+}
+
+/* ==================== 验证码输入框 ==================== */
+.verification-code-step .form-input {
+  width: 230px !important; /* 宽度230px */
+  height: 30px !important; /* 高度30px */
+  padding: 4px 10px !important; /* padding 4px 10px */
+  border: 1px solid #e4e7ed !important;
+  border-radius: 0px !important;
+  font-size: 14px !important;
+  transition: border-color 0.3s !important;
+  background: white !important;
+  box-sizing: border-box !important;
+  line-height: 20px !important;
+  flex-shrink: 0 !important;
+}
+
+.verification-code-step .form-input:focus {
+  outline: none !important;
+  border-color: #1890ff !important;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1) !important;
+}
+
+.verification-code-step .form-input:disabled {
+  background: #f5f5f5 !important;
+  cursor: not-allowed !important;
+}
+
+/* ==================== 发送验证码按钮 ==================== */
+.verification-code-step .send-code-button {
+  flex-shrink: 0 !important;
+  padding: 4px 10px !important;
+  background: #f5f7fa !important;
+  color: #606266 !important;
+  border: 1px solid #e4e7ed !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  transition: all 0.3s !important;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+  height: 30px !important;
+  width: 122px !important;
+  line-height: 20px !important;
+  min-width: 120px !important;
+  text-align: center !important;
+}
+
+.verification-code-step .send-code-button:hover:not(:disabled) {
+  color: #1890ff !important;
+  border-color: #1890ff !important;
+}
+
+.verification-code-step .send-code-button:disabled {
+  background: #ffffff !important;
+  color: #606266 !important;
+  border: 1px solid #dcdfe6 !important;
+  cursor: not-allowed !important;
+}
+
+/* ==================== 倒计时文字 ==================== */
+.verification-code-step .countdown-text {
+  flex-shrink: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  color: #ff8000 !important;
+  font-size: 13px !important;
+  line-height: 1.6 !important;
+  white-space: nowrap !important;
+  margin-left: 0 !important;
+}
+
+/* ==================== 错误提示 ==================== */
+.verification-code-step .error-text {
+  position: absolute !important;
+  left: 135px !important;
+  bottom: -22px !important;
+  color: #FF2626 !important;
+  font-size: 13px !important;
+}
+
+/* ==================== 按钮行 ==================== */
+.verification-code-step .button-row {
+  display: flex !important;
+  justify-content: center !important;
+  margin-top: 15px !important; /* 减少上边距，从30px改为15px */
+  margin-bottom: 10px !important; /* 减少下边距，从20px改为10px */
+}
+
+/* ==================== 提交按钮 ==================== */
+.verification-code-step .submit-button {
+  padding: 4px 10px !important;
+  background: #ff6602 !important;
+  color: white !important;
+  border: 1px solid #dedede !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  transition: background 0.3s !important;
+  min-width: 120px !important;
+  height:30px !important;
+  line-height:20px !important;
+
+}
+
+.verification-code-step .submit-button:hover:not(:disabled) {
+  background: #ffa151 !important;
+}
+
+.verification-code-step .submit-button:disabled {
+  background: #d9d9d9 !important;
+  cursor: not-allowed !important;
+}
+
+/* ==================== 帮助链接 ==================== */
+.verification-code-step .help-link {
+  text-align: center !important;
+  font-size: 14px !important;
+  color: #666 !important;
+  margin-top: 10px !important;
+}
+
+.verification-code-step .help-link a {
+  color: #1890ff !important;
+  text-decoration: none !important;
+}
+
+.verification-code-step .help-link a:hover {
+  text-decoration: underline !important;
+}
+
+/* ==================== 响应式设计 ==================== */
+@media (max-width: 900px) {
+  .verification-code-step .phone-display,
+  .verification-code-step .input-wrapper {
+    width: 100% !important;
+    max-width: 500px !important;
+  }
+  
+  .verification-code-step .countdown-text {
+    font-size: 12px !important;
+  }
+}

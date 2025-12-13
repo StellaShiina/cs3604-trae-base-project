@@ -1,0 +1,85 @@
+/* 订单列表面板样式 */
+.order-list-panel {
+  background-color: #fff;
+  margin: 10px;
+  border-radius: 0;
+  box-shadow: none;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.order-type-section {
+  padding: 0;
+  border-bottom: none;
+  background-color: #fff;
+  position: relative;
+}
+
+.order-type-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+  margin: 0;
+}
+
+/* 标签切换样式 */
+.order-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: none;
+  background-color: #fff;
+  position: relative;
+}
+
+.order-tab {
+  min-width: 135px;
+  padding: 12px 25px;
+  border: 1px solid #d0d0d0;
+  border-bottom: none;
+  background-color: #ffffff;
+  font-size: 14px;
+  font-weight: 400;
+  color: #444444;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  border-radius: 0;
+}
+
+.order-tab:hover {
+  color: #3b99fc;
+  border: 1px solid #d0d0d0;
+}
+
+.order-tab.active {
+  color: #3b99fc;
+  background-color: #fff;
+  font-weight: 500;
+  border-bottom: 1px solid #ebebeb;
+  z-index: 1;
+}
+
+/* 标签区域底部边框 */
+.order-type-section::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: #d0d0d0;
+  z-index: 0;
+}
+
+@media (max-width: 768px) {
+  .order-list-panel {
+    margin: 0;
+  }
+  
+  .order-tab {
+    min-width: 100px;
+    font-size: 13px;
+    padding: 12px 20px;
+  }
+}
+

@@ -1,0 +1,39 @@
+/* 个人信息展示面板样式 */
+.personal-info-panel {
+  flex: 1;
+  padding: 10px 20px;
+  background-color: #ffffff;
+  min-height: calc(100vh - 200px);
+  display: flex;
+  flex-direction: column;
+}
+
+/* 统一的大容器包裹器 */
+.personal-info-panel > * {
+  background-color: #fff;
+}
+
+.personal-info-panel > *:first-child {
+  border-top: 1px solid #e8e8e8;
+  border-left: 1px solid #e8e8e8;
+  border-right: 1px solid #e8e8e8;
+}
+
+.personal-info-panel > *:not(:first-child):not(:last-child) {
+  border-left: 1px solid #e8e8e8;
+  border-right: 1px solid #e8e8e8;
+}
+
+.personal-info-panel > *:last-child {
+  border-left: 1px solid #e8e8e8;
+  border-right: 1px solid #e8e8e8;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .personal-info-panel {
+    padding: 15px;
+  }
+}
+

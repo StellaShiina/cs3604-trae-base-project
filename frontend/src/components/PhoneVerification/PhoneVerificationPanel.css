@@ -1,0 +1,232 @@
+/* 手机核验面板样式 - 像素级复刻 */
+.phone-verification-panel {
+  background-color: #fff !important;
+  padding: 0 !important;
+  margin: 25px 30px !important;
+  border: 1px solid #e8e8e8 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+.phone-verification-panel .verification-section {
+  margin-bottom: 0 !important;
+  padding: 20px 30px !important;
+  border-bottom: none !important;
+}
+
+.phone-verification-panel .section-title {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: #333 !important;
+  margin: 0 0 15px 0 !important;
+  padding: 0 !important;
+  border-bottom: none !important;
+}
+
+.phone-verification-panel .form-content {
+  padding: 15px 0 0 0 !important;
+}
+
+.phone-verification-panel .form-row {
+  display: flex !important;
+  align-items: flex-start !important;
+  margin-bottom: 25px !important;
+}
+
+.phone-verification-panel .form-row:last-child {
+  margin-bottom: 5px !important;
+}
+
+.phone-verification-panel .form-row-with-divider {
+  padding-bottom: 25px !important;
+  margin-bottom: 25px !important;
+  border-bottom: 1px dashed #e8e8e8 !important;
+}
+
+.phone-verification-panel .form-label {
+  min-width: 150px !important;
+  width: 300px !important;
+  color: #666 !important;
+  font-size: 14px !important;
+  padding-top: 8px !important;
+  text-align: right !important;
+  padding-right: 15px !important;
+  flex-shrink: 0 !important;
+}
+
+.phone-verification-panel .required {
+  color: #ff0000 !important;
+  margin-right: 3px !important;
+  font-weight: normal !important;
+}
+
+.phone-verification-panel .form-value {
+  font-size: 14px !important;
+  color: #333 !important;
+  padding-top: 8px !important;
+  flex: 1 !important;
+}
+
+.phone-verification-panel .verified-link {
+  color: #3b99fc !important;
+  margin-left: 15px !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  font-weight: 500;
+}
+
+.phone-verification-panel .form-input-wrapper {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.phone-verification-panel .form-input-group {
+  display: flex !important;
+  gap: 8px !important;
+  align-items: center !important;
+}
+
+.phone-verification-panel .country-code {
+  padding: 6px 8px !important;
+  border: 1px solid #d0d0d0 !important;
+  border-radius: 0 !important;
+  font-size: 14px !important;
+  width: 80px !important;
+  cursor: pointer !important;
+  background-color: #ffffff !important;
+  outline: none !important;
+  height: 34px !important;
+  text-align: center !important;
+}
+
+.phone-verification-panel .form-input {
+  padding: 6px 10px !important;
+  border: 1px solid #d0d0d0 !important;
+  border-radius: 0 !important;
+  font-size: 14px !important;
+  outline: none !important;
+  transition: border-color 0.2s ease !important;
+  height: 34px !important;
+  box-sizing: border-box !important;
+}
+
+.phone-verification-panel .phone-input {
+  flex: 1 !important;
+  max-width: 300px !important;
+}
+
+.phone-verification-panel .password-input {
+  width: 300px !important;
+}
+
+.phone-verification-panel .form-input:focus {
+  border-color: #40a9ff !important;
+}
+
+.phone-verification-panel .password-hint {
+  color: #999 !important;
+  font-size: 13px !important;
+  margin-left: 320px !important;
+  margin-top: -28px !important;
+  display: inline-block !important;
+  line-height: 34px !important;
+}
+
+.phone-verification-panel .phone-panel-error-message {
+  color: #ff0000 !important;
+  font-size: 12px !important;
+  margin-top: 5px !important;
+  margin-left: 0 !important;
+}
+
+.phone-verification-panel .button-group {
+  display: flex !important;
+  justify-content: center !important;
+  gap: 30px !important;
+  margin: 0 !important;
+  padding: 0px 30px 20px 30px !important;
+  border-top: none !important;
+}
+
+.phone-verification-panel .cancel-button,
+.phone-verification-panel .confirm-button {
+  padding: 8px 35px !important;
+  border: none !important;
+  border-radius: 4px !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  font-weight: normal !important;
+}
+
+.phone-verification-panel .cancel-button {
+  background-color: #fff !important;
+  color: #333 !important;
+  border: 1px solid #d0d0d0 !important;
+}
+
+.phone-verification-panel .cancel-button:hover {
+  background-color: #f5f5f5 !important;
+  border-color: #b0b0b0 !important;
+}
+
+.phone-verification-panel .confirm-button {
+  background-color: #ff7300 !important;
+  color: #fff !important;
+  border: 1px solid #ff7300 !important;
+}
+
+.phone-verification-panel .confirm-button:hover {
+  background-color: #ff8533 !important;
+  border-color: #ff8533 !important;
+}
+
+@media (max-width: 768px) {
+  .phone-verification-panel {
+    padding: 0 !important;
+    margin: 15px !important;
+  }
+  
+  .phone-verification-panel .verification-section {
+    padding: 15px !important;
+  }
+  
+  .phone-verification-panel .form-row {
+    flex-direction: column !important;
+    margin-bottom: 15px !important;
+  }
+  
+  .phone-verification-panel .form-label {
+    min-width: auto !important;
+    width: auto !important;
+    padding-top: 0 !important;
+    margin-bottom: 8px !important;
+    text-align: left !important;
+    padding-right: 0 !important;
+  }
+  
+  .phone-verification-panel .phone-input,
+  .phone-verification-panel .password-input {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+  
+  .phone-verification-panel .password-hint {
+    margin-left: 0 !important;
+    margin-top: 5px !important;
+    line-height: 1.5 !important;
+  }
+  
+  .phone-verification-panel .button-group {
+    flex-direction: column !important;
+    gap: 15px !important;
+    padding: 15px !important;
+  }
+  
+  .phone-verification-panel .cancel-button,
+  .phone-verification-panel .confirm-button {
+    width: 100% !important;
+  }
+}

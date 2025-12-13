@@ -1,0 +1,211 @@
+/* ==================== 底部导航栏样式 ==================== */
+.bottom-navigation {
+  background-color: #f5f5f5;
+  border-top: none;
+  padding: 40px 0;
+  margin-top: auto;
+}
+
+.bottom-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 40px;
+}
+
+/* ==================== 友情链接区域 ==================== */
+.friendship-links-section {
+  flex: 0 0 40%;
+}
+
+.bottom-navigation .section-title {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #333333 !important;
+  margin-bottom: 20px !important;
+  margin-top: 0 !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+.friendship-links-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px 10px;
+}
+
+.friendship-link-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  border-radius: 0;
+  padding: 0px 0px;
+  min-height: 30px;
+}
+
+.friendship-link-item img {
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  max-width: 200px;
+  max-height: 30px;
+}
+
+/* ==================== 二维码区域 ==================== */
+.bottom-navigation .qr-codes-section {
+  flex: 0 0 55%;
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+}
+
+.bottom-navigation .qr-codes-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.bottom-navigation .qr-code-row {
+  display: flex;
+  gap: 35px;
+  justify-content: flex-start;
+}
+
+.bottom-navigation .qr-code-row:first-child {
+  margin-bottom: 0;
+}
+
+.bottom-navigation .qr-label {
+  font-size: 13px;
+  color: #333333 !important;
+  text-align: center;
+  white-space: nowrap;
+  width: 80px;
+}
+
+/* 为底部导航的二维码项添加更具体的选择器，避免与其他页面冲突 */
+.bottom-navigation .qr-code-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bottom-navigation .qr-code-item img {
+  width: 80px;
+  height: 80px;
+  border: none;
+  padding: 0;
+  background-color: #ffffff;
+  border-radius: 0;
+}
+
+/* ==================== 最右侧提示语 ==================== */
+.bottom-navigation .qr-code-footer {
+  flex: 0 0 200px;
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  /* 【修改2】移除圆角，变为方框 */
+  border-radius: 0;
+  /* 【修改1】增加上外边距，使提示框下移。您可以调整这个数值来控制下移的距离 */
+  margin-top: 20px;
+}
+
+.bottom-navigation .qr-code-footer p {
+  font-size: 12px;
+  color: #333333 !important;
+  line-height: 1.8;
+  margin: 0;
+}
+
+/* ==================== 响应式设计 (保留并微调) ==================== */
+@media (max-width: 968px) {
+  .bottom-content {
+    flex-direction: column;
+    gap: 40px;
+    align-items: center;
+  }
+
+  .friendship-links-section, .bottom-navigation .qr-codes-section {
+    width: 100%;
+    flex-basis: auto !important; /* 在垂直布局时重置宽度占比 */
+  }
+  
+  .friendship-links-section {
+    max-width: 500px;
+  }
+
+  .bottom-navigation .qr-codes-section {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .bottom-navigation .qr-code-footer {
+      margin-top: 0; /* 在垂直布局时重置下移 */
+  }
+}
+
+@media (max-width: 768px) {
+  .bottom-navigation {
+    padding: 20px 0;
+  }
+
+  .bottom-content {
+    padding: 0 20px;
+  }
+
+  .bottom-navigation .section-title {
+    font-size: 15px;
+  }
+
+  .friendship-links-grid {
+    gap: 12px 15px;
+  }
+
+  .bottom-navigation .qr-code-row {
+    gap: 20px;
+    justify-content: center;
+  }
+
+  .bottom-navigation .qr-codes-wrapper {
+    align-items: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .bottom-navigation {
+    padding: 15px 0;
+  }
+
+  .bottom-content {
+    padding: 0 15px;
+  }
+
+  .bottom-navigation .section-title {
+    font-size: 14px;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+
+  .friendship-links-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .bottom-navigation .qr-code-row {
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  
+  .bottom-navigation .qr-code-footer {
+    padding: 15px;
+    flex-basis: auto !important; /* 在手机端取消固定宽度 */
+  }
+}

@@ -1,0 +1,206 @@
+.date-picker {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.date-input {
+  width: 100%;
+  padding: 6px 32px 6px 10px;
+  border: 1px solid #d0d5e8;
+  border-radius: 3px;
+  font-size: 13px;
+  color: #333333;
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  height: 30px;
+  box-sizing: border-box;
+}
+
+.date-input::placeholder {
+  color: #bbb;
+  font-size: 12px;
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: #5ba3e0;
+  box-shadow: 0 0 0 2px rgba(91, 163, 224, 0.1);
+}
+
+.date-input.disabled {
+  background-color: #f5f5f5;
+  color: #bbb;
+  cursor: not-allowed;
+  border-color: #e0e0e0;
+}
+
+.date-input.disabled::placeholder {
+  color: #ccc;
+}
+
+/* 日历图标 */
+.calendar-icon {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  pointer-events: none;
+}
+
+.date-input.disabled + .calendar-icon {
+  color: #ccc;
+}
+
+.calendar-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: white;
+  border: 1px solid #d0d5e8;
+  border-radius: 4px;
+  padding: 12px;
+  z-index: 1000;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  min-width: 280px;
+}
+
+/* 日历头部 */
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 0 4px;
+}
+
+.calendar-month-year {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.calendar-nav-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #666;
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+  transition: color 0.2s, background-color 0.2s;
+  border-radius: 4px;
+}
+
+.calendar-nav-btn:hover {
+  color: #5ba3e0;
+  background-color: #f5f5f5;
+}
+
+/* 星期标题 */
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.calendar-weekday {
+  text-align: center;
+  font-size: 12px;
+  color: #666;
+  padding: 8px 0;
+  font-weight: 500;
+}
+
+/* 日期网格 */
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  cursor: default;
+  user-select: none;
+}
+
+/* 其他月份的日期 */
+.calendar-day.other-month {
+  color: #bbb;
+}
+
+/* 可选择的日期 */
+.calendar-day.selectable {
+  cursor: pointer;
+  color: #333;
+}
+
+.calendar-day.selectable:hover {
+  background-color: #e6f2ff;
+  color: #5ba3e0;
+}
+
+/* 不可选择的日期（14天外） */
+.calendar-day.disabled {
+  color: #d0d0d0;
+  cursor: not-allowed;
+}
+
+/* 今天 */
+.calendar-day.today {
+  border: 1px solid #5ba3e0;
+}
+
+/* 已选中的日期 */
+.calendar-day.selected {
+  background-color: #5ba3e0;
+  color: white;
+  font-weight: 600;
+}
+
+.calendar-day.selected:hover {
+  background-color: #4a92d0;
+}
+
+/* 日历底部 */
+.calendar-footer {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: center;
+}
+
+.calendar-today-btn {
+  background: none;
+  border: 1px solid #5ba3e0;
+  color: #5ba3e0;
+  font-size: 13px;
+  padding: 6px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.calendar-today-btn:hover {
+  background-color: #5ba3e0;
+  color: white;
+}
+
+.calendar-placeholder {
+  text-align: center;
+  color: #999;
+  padding: 20px;
+}
+

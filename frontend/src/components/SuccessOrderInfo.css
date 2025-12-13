@@ -1,0 +1,351 @@
+/* 购票成功页专用订单信息样式 */
+.success-order-info-container {
+  max-width: 1100px !important;
+  margin: 20px auto !important;
+}
+
+.success-order-info-display {
+  background-color: #ffffff !important;
+  border: 1px solid #c0d7eb !important;
+  border-radius: 10px 10px 0 0 !important;
+  margin: 0 auto !important;
+  overflow: hidden !important;
+}
+
+/* 订单信息标题栏 - 复用蓝色渐变header */
+.success-order-info-header {
+  background: linear-gradient(to bottom, #3698d5 0%, #1d82bd 100%) !important;
+  border-radius: 10px 10px 0px 0px !important;
+  padding: 5px 20px !important;
+  margin: 0 !important;
+  border-bottom: 2px solid #8fcdec !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  color: #ffffff !important;
+  letter-spacing: 0.5px !important;
+}
+
+/* 订单信息内容区域 */
+.success-order-info-content {
+  background-color: #ffffff !important;
+  padding: 20px 20px 0px 20px !important;
+}
+
+/* 车次信息行 */
+.success-train-info-row {
+  margin-bottom: 20px !important;
+  font-size: 20px !important;
+  color: #333333 !important;
+  line-height: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+}
+
+/* 信息组（内部无间隙） */
+.success-train-info-group {
+  display: inline-flex !important;
+  align-items: baseline !important;
+  gap: 0 !important;
+  white-space: nowrap !important;
+}
+
+.success-train-date {
+  font-weight: 800 !important;
+  color: #000000 !important;
+  font-size: 20px !important;
+}
+
+.success-train-no {
+  font-weight: 800 !important;
+  color: #000000 !important;
+  font-size: 20px !important;
+}
+
+.success-train-station {
+  font-weight: 1000 !important;
+  color: #ff0000 !important;
+  font-size: 26px !important;
+}
+
+.success-train-bold-group {
+  font-weight: 800 !important;
+  color: #000000 !important;
+  font-size: 20px !important;
+}
+
+.success-train-text {
+  font-weight: 400 !important;
+  color: #000000 !important;
+  font-size: 16px !important;
+}
+
+/* 乘客表格容器 */
+.success-passenger-table-container {
+  padding: 0 !important;
+  margin-top: 12px !important;
+  background-color: transparent !important;
+}
+
+/* 乘客表格 */
+.success-passenger-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  font-size: 14px !important;
+  margin-bottom: 0 !important;
+}
+
+.success-passenger-table thead {
+  background: linear-gradient(to bottom, #ffffff 0%, #d9d9d9 100%) !important;
+}
+
+.success-passenger-table thead th {
+  padding: 10px 8px !important;
+  text-align: center !important;
+  font-weight: 700 !important;
+  color: #333 !important;
+  border-top: 1px solid #999999 !important;
+  border-bottom: 1px solid #d0d0d0 !important;
+  border-left: none !important;
+  border-right: none !important;
+  background: transparent !important;
+  font-size: 15px !important;
+}
+
+.success-passenger-table thead th:first-child {
+  border-left: 1px solid #d0d0d0 !important;
+}
+
+.success-passenger-table thead th:last-child {
+  border-right: 1px solid #d0d0d0 !important;
+}
+
+.success-passenger-table tbody td {
+  padding: 12px 8px !important;
+  text-align: center !important;
+  border-top: none !important;
+  border-bottom: 1px solid #d0d0d0 !important;
+  border-left: none !important;
+  border-right: none !important;
+  color: #333 !important;
+  background-color: #eff1f9 !important;
+}
+
+.success-passenger-table tbody td:first-child {
+  border-left: 1px solid #d0d0d0 !important;
+}
+
+.success-passenger-table tbody td:last-child {
+  border-right: 1px solid #d0d0d0 !important;
+}
+
+.success-passenger-table tbody tr:hover {
+  background-color: #e5e7ef !important;
+}
+
+.success-passenger-table tbody tr:hover td {
+  background-color: #e5e7ef !important;
+}
+
+/* 表格最后一行底部边框 - 与表头顶部边框一致 */
+.success-passenger-table tbody tr:last-child td {
+  border-bottom: 1px solid #999999 !important;
+}
+
+/* 订单状态 */
+.status-paid {
+  color: #fb8530 !important;
+  font-weight: 600 !important;
+}
+
+/* 操作按钮区域 */
+.success-order-actions {
+  display: flex !important;
+  justify-content: center !important;
+  gap: 30px !important;
+  margin: 20px 0 10px 0!important;
+  padding: 20px 0 !important;
+  border-top: 2px solid #c0d7eb !important;
+}
+
+.success-order-button {
+  padding: 10px 40px !important;
+  border: none !important;
+  border-radius: 5px !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  min-width: 140px !important;
+}
+
+.success-order-button:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
+
+.food-button,
+.continue-button {
+  background-color: #fff !important;
+  color: #666 !important;
+  border: 1px solid #d0d0d0 !important;
+}
+
+.food-button:hover,
+.continue-button:hover {
+  background-color: #f5f5f5 !important;
+  border-color: #b0b0b0 !important;
+}
+
+.view-details-button {
+  background-color: #ff7200 !important;
+  color: #fff !important;
+  border: 1px solid #ff7200 !important;
+}
+
+.view-details-button:hover {
+  background-color: #ff8533 !important;
+  border-color: #ff8533 !important;
+}
+
+/* 温馨提示容器（包含文字和二维码） */
+.success-order-warm-tips-container {
+  background-color: #fffbe5 !important;
+  border: 1px solid #f5e6a8 !important;
+  border-radius: 0 !important;
+  padding: 10px 15px !important;
+  margin-top: 0px !important;
+  display: flex !important;
+  gap: 40px !important;
+  align-items: center !important;
+}
+
+/* 温馨提示文字内容区域 */
+.success-order-warm-tips-content {
+  flex: 1 !important;
+  max-width: 600px !important;
+}
+
+.success-order-tips-title {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: #333333 !important;
+  margin: 0 0 5px 0 !important;
+}
+
+.success-order-tips-list {
+  margin: 0 !important;
+  padding-left: 15px !important;
+  list-style-position: outside !important;
+  list-style-type: decimal !important;
+}
+
+.success-order-tip-item {
+  font-size: 14px !important;
+  color: #000000 !important;
+  line-height: 22px !important;
+  margin-bottom: 2px !important;
+  padding-left: 4px !important;
+}
+
+.success-order-tip-item:last-child {
+  margin-bottom: 0 !important;
+}
+
+.success-order-tip-item a {
+  color: #0073e7 !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+}
+
+.success-order-tip-item a:hover {
+  color: #0052a3 !important;
+}
+
+/* 二维码区域（在温馨提示框内右侧，横向排列） */
+.success-order-qr-codes-inline {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 30px !important;
+  flex-shrink: 0 !important;
+}
+
+.success-order-qr-item-inline {
+  text-align: center !important;
+}
+
+.success-order-qr-item-inline img {
+  width: 150px !important;
+  height: 150px !important;
+  border: 1px solid #e0e0e0 !important;
+  margin-bottom: 10px !important;
+  display: block !important;
+}
+
+.success-order-qr-text-inline {
+  font-size: 12px !important;
+  color: #222 !important;
+  margin: 0 !important;
+  max-width: 150px !important;
+  line-height: 1.4 !important;
+  text-align: left !important;
+}
+
+/* 广告区域 */
+.success-order-advertisement {
+  margin-top: 10px !important;
+  text-align: center !important;
+  padding-bottom: 0px !important;
+}
+
+.success-order-advertisement img {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .success-passenger-table {
+    font-size: 12px !important;
+  }
+  
+  .success-passenger-table thead th,
+  .success-passenger-table tbody td {
+    padding: 8px 4px !important;
+  }
+  
+  .success-train-info-row {
+    font-size: 16px !important;
+  }
+  
+  .success-train-date,
+  .success-train-no,
+  .success-train-station,
+  .success-train-bold-group {
+    font-size: 16px !important;
+  }
+  
+  .success-train-text {
+    font-size: 14px !important;
+  }
+  
+  .success-order-actions {
+    flex-direction: column !important;
+    gap: 15px !important;
+  }
+  
+  .success-order-button {
+    width: 100% !important;
+  }
+  
+  .success-order-warm-tips-container {
+    flex-direction: column !important;
+  }
+  
+  .success-order-qr-codes-inline {
+    flex-direction: row !important;
+    justify-content: center !important;
+  }
+}
+

@@ -1,0 +1,381 @@
+/* 车次信息筛选区域样式 */
+.train-filter-panel {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  overflow: visible;
+  position: relative;
+}
+
+/* 日期筛选标签行 */
+.date-filter-tabs {
+  display: flex;
+  overflow: hidden;
+  border-bottom: none;
+  background-color: transparent;
+  padding: 0;
+  gap: 0;
+}
+
+.date-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.date-tab {
+  flex: 1;
+  padding: 8px 16px;
+  background: linear-gradient(to bottom, #f9f9f9 0%, #e7e7e7 100%);
+  border: 1px solid transparent;
+  border-radius: 0;
+  border-right: 1px solid #d0d0d0;
+  border-bottom: 1px solid #569ecf;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 13px;
+  color: #333333;
+  white-space: nowrap;
+  font-weight: 500;
+  position: relative;
+}
+
+.date-tab:last-child {
+  border-right: 1px solid transparent;
+}
+
+.date-tab:hover {
+  background: linear-gradient(to bottom, #f0f0f0 0%, #e0e0e0 100%);
+}
+
+.date-tab.active {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  color: #499bd5;
+  font-weight: 1000;
+  border-top: 1px solid #569ecf !important;
+  border-left: 1px solid #569ecf !important;
+  border-right: 1px solid #569ecf !important;
+  border-bottom: none !important;
+  z-index: 1;
+}
+
+.date-tab-date {
+  font-size: 13px;
+}
+
+/* 筛选条件面板 */
+.filter-panel-container {
+  padding: 16px 20px;
+  border: 1px solid #569ecf;
+  border-top: none;
+  margin: -1px;
+  background-color: #ffffff;
+}
+
+/* 筛选行 */
+.filter-row {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  gap: 10px;
+  align-items: start;
+  margin-bottom: 14px;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.filter-row:last-child {
+  margin-bottom: 0;
+}
+
+/* 筛选标签 */
+.filter-label {
+  font-size: 14px;
+  font-weight: 800;
+  color: #000000;
+  white-space: nowrap;
+  line-height: 28px;
+}
+
+/* 全部按钮 */
+.filter-all-btn {
+  padding: 0px 8px;
+  background-color: #8ea7d4;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  height: 25px;
+  border: 1px solid #8ea7d4;
+  text-align: center;
+}
+
+.filter-all-btn:hover {
+  background-color: #7a95c5;
+}
+
+.filter-all-btn:active {
+  transform: scale(0.95);
+}
+
+/* 全部按钮 - 部分选择状态 */
+.filter-all-btn.partial {
+  background-color: white;
+  color: #999999;
+  border: 1px solid #8ea7d4;
+}
+
+/* 筛选选项容器 */
+.filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  align-items: center;
+}
+
+/* 筛选复选框 */
+.filter-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  min-width: 110px;
+}
+
+.filter-checkbox input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  margin: 0;
+  accent-color: #8fc0e5;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid #8fc0e5;
+  border-radius: 2px;
+  position: relative;
+  background-color: white;
+}
+
+.filter-checkbox input[type="checkbox"]:checked {
+  background-color: #8fc0e5;
+}
+
+.filter-checkbox input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.checkbox-label {
+  font-size: 13px;
+  color: #000000;
+  cursor: pointer;
+  font-weight: 400;
+}
+
+.filter-checkbox input[type="checkbox"]:checked + .checkbox-label {
+  color: #333333;
+  font-weight: 400;
+}
+
+/* 发车时间选择 */
+.filter-time-select {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  height: 28px;
+  justify-self: end;
+}
+
+.time-label {
+  font-size: 13px;
+  color: #000000;
+  white-space: nowrap;
+  line-height: 28px;
+}
+
+.time-dropdown {
+  padding: 4px 10px;
+  border: 1px solid #d0d0d0;
+  border-radius: 3px;
+  font-size: 13px;
+  color: #000000;
+  background-color: white;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+  height: 28px;
+}
+
+.time-dropdown:hover {
+  border-color: #2196f3;
+}
+
+.time-dropdown:focus {
+  border-color: #2196f3;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+}
+
+.time-dropdown option {
+  color: #333333;
+}
+
+/* 筛选摘要/清除按钮 */
+.filter-summary {
+  padding: 0;
+  border-top: none;
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 -20px -16px 0;
+  margin-top: 12px;
+}
+
+.clear-filters-btn {
+  padding: 6px 24px;
+  background: #ff7f02;
+  color: white;
+  border: none;
+  border-radius: 0 0 0 0;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+}
+
+.clear-filters-btn:hover {
+  background: linear-gradient(to bottom, #ffaa44 0%, #ff8822 100%);
+}
+
+.clear-filters-btn:active {
+  transform: scale(0.98);
+}
+
+.clear-icon {
+  font-size: 14px;
+  font-weight: normal;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .train-filter-panel {
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+
+  .filter-panel-container {
+    gap: 15px;
+  }
+
+  .filter-group {
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 12px;
+  }
+
+  .filter-label {
+    min-width: auto;
+    padding-top: 0;
+    font-size: 13px;
+  }
+
+  .filter-options {
+    gap: 10px;
+  }
+
+  .filter-option {
+    padding: 5px 8px;
+  }
+
+  .filter-option-label {
+    font-size: 13px;
+  }
+
+  .filter-option input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+  }
+
+  .filter-clear-btn {
+    padding: 5px 14px;
+    font-size: 12px;
+    margin-left: 0;
+  }
+
+  .filter-hint {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  .filter-stats {
+    padding-top: 12px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .train-filter-panel {
+    padding: 12px;
+  }
+
+  .filter-panel-container {
+    gap: 12px;
+  }
+
+  .filter-group {
+    gap: 8px;
+    padding-bottom: 10px;
+  }
+
+  .filter-label {
+    font-size: 12px;
+  }
+
+  .filter-options {
+    gap: 8px;
+  }
+
+  .filter-option {
+    padding: 4px 6px;
+  }
+
+  .filter-option-label {
+    font-size: 12px;
+  }
+
+  .filter-option input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+  }
+
+  .filter-clear-btn {
+    padding: 4px 12px;
+    font-size: 11px;
+  }
+
+  .filter-hint {
+    font-size: 11px;
+    padding: 5px 8px;
+  }
+
+  .filter-stats {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    padding-top: 10px;
+    font-size: 11px;
+  }
+}

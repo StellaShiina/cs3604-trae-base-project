@@ -1,0 +1,12 @@
+/* ==================== 手机找回流程容器 ==================== */
+.phone-recovery-flow {
+  width: 100% !important;
+  max-width: 800px !important;
+  margin: 0 auto !important;
+}
+
+/* ==================== 步骤内容 ==================== */
+.phone-recovery-flow .step-content {
+  margin-top: 10px !important; /* 减少上边距，从40px改为10px */
+}
+

@@ -1,0 +1,223 @@
+/* 乘车人列表面板样式 */
+.passenger-list-panel {
+  background-color: #fff;
+  margin: 15px 30px;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.search-section {
+  padding: 20px 0px;
+  background-color: #fff;
+}
+
+.search-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-input-wrapper {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.passenger-list-panel .search-input {
+  width: 200px !important;
+  padding: 7px 32px 7px 12px;
+  border: 1px solid #d0d0d0;
+  border-radius: 0;
+  font-size: 14px;
+  outline: none;
+}
+
+.passenger-list-panel .search-input::placeholder {
+  color: #333;
+}
+
+.passenger-list-panel .search-input:focus {
+  border-color: #2876c8;
+}
+
+.clear-input-button {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #ccc;
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+  z-index: 10;
+}
+
+.clear-input-button:hover {
+  background-color: #999;
+}
+
+.passenger-search-button {
+  padding: 6px 28px;
+  background-color: #fff !important;
+  border: 1px solid #d0d0d0 !important;
+  border-radius: 2;
+  color: #333 !important;
+  cursor: pointer;
+  font-size: 14px !important;
+  text-align: center;
+  font-weight: 400 !important;
+  transition: all 0.2s ease;
+}
+
+.passenger-list-panel .passenger-search-button:hover {
+  border-color: #ff8000 !important;
+  color: #ff8000 !important;
+}
+
+.table-section {
+  padding: 0;
+}
+
+.table-header-row {
+  background-color: #f8f8f8;
+  margin-bottom: 20px;
+}
+
+.header-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.header-table th {
+  padding: 12px 0px;
+  text-align: center;
+  font-size: 14px;
+  color: #444;
+  font-weight: 500;
+}
+
+.checkbox-index-header {
+  width: 100px;
+  text-align: center;
+}
+
+.name-header {
+  width: 120px;
+}
+
+.id-type-header {
+  width: 150px;
+}
+
+.id-number-header {
+  width: 200px;
+}
+
+.phone-header {
+  width: 150px;
+}
+
+.verification-header {
+  width: 120px;
+  text-align: center;
+}
+
+.action-header {
+  width: 100px;
+  text-align: center;
+}
+
+.table-actions {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  background-color: #f0f8ff;
+  border-bottom: 1px solid #e8e8e8;
+  gap: 20px;
+  border: 1px solid #b1dbff;
+  border-bottom: none;
+  border-radius: 0;
+}
+
+.add-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  transition: all 0.2s ease;
+}
+
+.add-icon {
+  width: 20px;
+  height: 20px;
+  filter: invert(54%) sepia(37%) saturate(530%) hue-rotate(93deg) brightness(97%) contrast(85%);
+}
+
+.add-text {
+  font-weight: 400;
+}
+
+.add-button:hover {
+  opacity: 0.8;
+}
+
+.batch-delete-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  transition: all 0.2s ease;
+}
+
+.delete-icon {
+  width: 18px;
+  height: 18px;
+  filter: invert(35%) sepia(77%) saturate(6133%) hue-rotate(342deg) brightness(91%) contrast(84%);
+}
+
+.delete-text {
+  font-weight: 400;
+}
+
+.batch-delete-button:hover {
+  opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+  .passenger-list-panel {
+    margin: 10px;
+  }
+  
+  .search-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-input {
+    max-width: 100%;
+  }
+  
+  .search-button {
+    width: 100%;
+  }
+}
+

@@ -1,0 +1,35 @@
+{
+  "name": "frontend_part",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "test": "vitest",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.2",
+    "axios": "^1.13.2",
+    "element-plus": "^2.12.0",
+    "pinia": "^3.0.4",
+    "sass": "^1.96.0",
+    "vue": "^3.5.24",
+    "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/user-event": "^14.6.1",
+    "@testing-library/vue": "^8.1.0",
+    "@types/node": "^24.10.3",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "@vue/tsconfig": "^0.8.1",
+    "happy-dom": "^20.0.11",
+    "jsdom": "^27.3.0",
+    "typescript": "~5.9.3",
+    "vite": "^7.2.4",
+    "vitest": "^4.0.15",
+    "vue-tsc": "^3.1.4"
+  }
+}

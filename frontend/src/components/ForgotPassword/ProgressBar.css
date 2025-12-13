@@ -1,0 +1,108 @@
+/* ==================== 密码重置进度条容器 ==================== */
+.password-reset-progress-bar {
+  width: 100% !important;
+  padding: 15px 0 !important; /* 减少上下padding，压缩间距 */
+}
+
+/* ==================== 进度线容器 ==================== */
+.password-reset-progress-bar .progress-line-container {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  position: relative !important;
+  margin-bottom: 10px !important;
+}
+
+/* ==================== 进度节点 ==================== */
+.password-reset-progress-bar .progress-node {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+.password-reset-progress-bar .node-circle {
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 50% !important;
+  background: #e4e7ed !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 18px !important;
+  color: white !important;
+  transition: all 0.3s ease !important;
+}
+
+.password-reset-progress-bar .progress-node.active .node-circle {
+  background: #3b99fc !important;
+  border-color: #3b99fc !important;
+}
+
+.password-reset-progress-bar .progress-node.current .node-circle {
+  background: #3b99fc !important;
+  box-shadow: 0 0 0 8px #e4e7ed !important;
+}
+
+/* ==================== 进度线 ==================== */
+.password-reset-progress-bar .progress-line {
+  flex: 1 !important;
+  height: 8px !important;
+  background: #e4e7ed !important;
+  margin: 0 10px !important;
+  transition: all 0.3s ease !important;
+}
+
+.password-reset-progress-bar .progress-line.active {
+  background: #3b99fc !important;
+}
+
+/* ==================== 进度标签容器 ==================== */
+.password-reset-progress-bar .progress-labels {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  position: relative !important;
+  /* 与 progress-line-container 使用相同的布局方式 */
+}
+
+/* ==================== 进度标签 ==================== */
+.password-reset-progress-bar .progress-label {
+  flex: 0 0 auto !important; /* 不自动增长，根据内容自适应宽度 */
+  text-align: center !important; /* 居中对齐，使标签中心对齐到节点中心 */
+  font-size: 14px !important;
+  color: #333 !important;
+  transition: all 0.3s ease !important;
+  white-space: nowrap !important; /* 确保标签文字不换行，保持在同一行 */
+  position: relative !important;
+  /* 通过负margin微调，使标签中心对齐到节点中心 */
+  /* 由于节点容器中有进度线，而标签容器没有，需要微调对齐 */
+  margin-left: -2px !important; /* 微调向左偏移，使标签中心对齐到节点中心 */
+}
+
+/* 第一个标签不需要向左偏移 */
+.password-reset-progress-bar .progress-label:first-child {
+  margin-left: 0 !important;
+}
+
+/* 最后一个标签不需要向左偏移 */
+.password-reset-progress-bar .progress-label:last-child {
+  margin-left: 0 !important;
+}
+
+.password-reset-progress-bar .progress-label.active {
+  color: #333 !important;
+  font-weight: 500 !important;
+}
+
+/* ==================== 响应式设计 ==================== */
+@media (max-width: 768px) {
+  .password-reset-progress-bar .node-circle {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 14px !important;
+  }
+
+  .password-reset-progress-bar .progress-label {
+    font-size: 12px !important;
+  }
+}
+

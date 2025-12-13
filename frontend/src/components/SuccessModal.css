@@ -1,0 +1,98 @@
+/* SuccessModal组件样式 */
+.overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  z-index: 10001 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.modal-30-percent {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 30% !important;
+  min-width: 300px !important;
+  max-width: 300px !important;
+  background: white !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  z-index: 10002 !important;
+}
+
+.centered {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.modal-30-percent .modal-content {
+  text-align: center !important;
+  width: 100% !important;
+}
+
+.modal-30-percent .modal-content p {
+  font-size: 16px !important;
+  color: #333 !important;
+  margin-top: 20px !important;
+  margin-bottom: 24px !important;
+  line-height: 1.6 !important;
+}
+
+.modal-30-percent .modal-content button {
+  padding: 10px 32px !important;
+  background-color: #1890ff !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 0px !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  transition: all 0.3s !important;
+  font-weight: 500 !important;
+}
+
+.modal-30-percent .modal-content button:hover {
+  background-color: #40a9ff !important;
+  border-color: transparent !important;
+}
+
+.modal-30-percent .modal-content button:active {
+  background-color: #096dd9 !important;
+}
+
+.modal-30-percent .modal-content button:focus,
+.modal-30-percent .modal-content button:focus-visible {
+  outline: none !important;
+  border-color: transparent !important;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .modal-30-percent {
+    width: 80%;
+    min-width: 280px;
+  }
+}
+

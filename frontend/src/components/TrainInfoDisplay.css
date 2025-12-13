@@ -1,0 +1,36 @@
+/* 车次信息展示样式（信息核对弹窗） */
+.train-info-display {
+  padding: 5px 0 5px 0;
+  margin-bottom: 10px !important;
+}
+
+.train-info-line {
+  font-size: 20px;
+  color: #333333;
+  line-height: 20px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.info-group {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0;
+  white-space: nowrap;
+}
+
+.info-date, .info-train-no, .info-station, .info-bold-group {
+  font-weight: 800;
+  color: #000000;
+  font-size: 20px;
+}
+
+.info-text {
+  font-weight: 400;
+  color: #000000;
+  font-size: 16px;
+}
+
+

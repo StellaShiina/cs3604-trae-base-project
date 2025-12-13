@@ -1,0 +1,49 @@
+/* 用户基本信息页样式 */
+.personal-info-page {
+  min-height: 100vh;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  display: flex;
+  flex: 1;
+  background-color: #ffffff;
+  max-width: 1200px !important;
+  margin: 0 auto;
+  width: 100%;
+  gap: 0;
+}
+
+.content-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+}
+
+.loading-container,
+.error-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  font-size: 16px;
+  color: #666;
+  background-color: #fff;
+  margin: 25px 30px;
+  border: 1px solid #e8e8e8;
+}
+
+.error-container {
+  color: #f44336;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .main-content {
+    flex-direction: column;
+  }
+}
+

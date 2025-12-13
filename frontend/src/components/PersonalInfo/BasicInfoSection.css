@@ -1,0 +1,100 @@
+/* 基本信息模块样式 */
+.basic-info-section {
+  background-color: transparent;
+  padding: 20px 20px;
+  border-radius: 0;
+  margin-bottom: 0;
+  box-shadow: none;
+  border: none;
+  position: relative;
+}
+
+.basic-info-section::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 20px;
+  right: 20px;
+  height: 1px;
+  border-bottom: 1px dashed #e8e8e8;
+}
+
+.basic-info-section .section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333 !important;
+  margin: 0 0 0 0;
+  padding: 5px 15px 10px 15px;
+  border-bottom: none;
+  text-align: left;
+}
+
+.basic-info-section .info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.basic-info-section .info-row {
+  display: flex;
+  align-items: center;
+  line-height: 2;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.basic-info-section .info-label {
+  color: #333333 !important;
+  font-size: 14px;
+  text-align: right;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 300px;
+  flex-shrink: 0;
+  margin-right: 5px;
+  font-weight: 400;
+}
+
+.basic-info-section .required-mark {
+  color: #e60000 !important;
+  font-weight: 400;
+}
+
+.basic-info-section .info-value {
+  color: #333 !important;
+  font-size: 14px;
+  text-align: left;
+  padding-left: 10px;
+  flex: 1;
+  padding-left: 5px;
+  font-weight: 450;
+}
+
+.basic-info-section .verification-status {
+  color: #ff9800 !important;
+  font-weight: 500;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .basic-info-section {
+    padding: 15px;
+  }
+  
+  .basic-info-section .section-title {
+    font-size: 16px;
+  }
+  
+  .basic-info-section .info-label,
+  .basic-info-section .info-value {
+    font-size: 13px;
+  }
+  
+  .basic-info-section .info-label {
+    min-width: 100px;
+  }
+}
+

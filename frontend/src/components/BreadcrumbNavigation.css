@@ -1,0 +1,41 @@
+/* 位置导航样式 */
+.breadcrumb-navigation {
+  background-color: #ffffff;
+  padding: 12px 0px;
+  font-size: 13px;
+  color: #666;
+  border-bottom: none;
+  text-align: left;
+  width: 1200px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.breadcrumb-label {
+  color: #666;
+  margin-right: 3px;
+}
+
+.breadcrumb-item {
+  color: #666;
+  margin-right: 3px;
+}
+
+.breadcrumb-separator {
+  color: #666;
+  margin: 0 3px;
+}
+
+.breadcrumb-current {
+  color: #0099ff;
+  font-weight: 400;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .breadcrumb-navigation {
+    padding: 10px 20px;
+    font-size: 12px;
+  }
+}
+

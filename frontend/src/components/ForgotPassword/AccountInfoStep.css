@@ -1,0 +1,295 @@
+/* ==================== 账户信息步骤容器 ==================== */
+.account-info-step {
+  max-width: 1000px !important;
+  margin: 0 auto !important;
+}
+
+.account-info-step form {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* ==================== 表单行布局 ==================== */
+.account-info-step .form-row {
+  display: flex !important;
+  align-items: center !important;
+  margin-bottom: 20px !important; /* 减少间距，从35px改为20px */
+  margin-left: 80px !important; /* 整体向右移动 */
+  position: relative !important;
+}
+
+.account-info-step .form-label {
+  width: 120px !important;
+  text-align: right !important;
+  padding-right: 8px !important; /* 减小标签与输入框之间的距离，从15px改为8px */
+  font-size: 14px !important;
+  color: #333 !important;
+  flex-shrink: 0 !important;
+}
+
+.account-info-step .required-mark {
+  color: #ff4d4f !important;
+  margin-right: 2px !important;
+}
+
+/* ==================== 输入框容器 ==================== */
+.account-info-step .input-wrapper {
+  display: flex !important;
+  align-items: center !important;
+  gap: 15px !important;
+  margin-left: 20px !important; /* 减小标签与输入框之间的距离，从40px改为20px */
+}
+
+/* ==================== 手机号输入组 ==================== */
+.account-info-step .phone-input-group {
+  display: flex !important;
+  gap: 5px !important; /* 两个框之间间距为5px */
+  align-items: center !important;
+  flex-shrink: 0 !important;
+}
+
+/* ==================== 国家代码下拉框 ==================== */
+.account-info-step .country-code-select {
+  flex-shrink: 0 !important;
+}
+
+.account-info-step .country-code-select .select-dropdown {
+  width: 120px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
+}
+
+.account-info-step .country-code-select .select-dropdown .selected-value-display {
+  width: 120px !important;
+  height: 30px !important;
+  line-height: 20px !important;
+  border: 1px solid #dedede !important;
+  border-radius: 0px !important; /* 改为完整的圆角，因为现在有间隙了 */
+  font-size: 14px !important;
+  padding: 4px 10px !important;
+  background-color: #ffffff !important;
+  width: 120px !important;
+  color: #333 !important;
+  box-sizing: border-box !important;
+}
+
+.account-info-step .country-code-select .select-dropdown:not(.disabled) .selected-value-display:hover {
+  border-color: #40a9ff !important;
+}
+
+.account-info-step .country-code-select .select-dropdown.expanded .selected-value-display {
+  border-color: #40a9ff !important;
+  box-shadow: 0 0 0 2px rgba(64, 169, 255, 0.1) !important;
+}
+
+.account-info-step .country-code-select .select-dropdown .options-list {
+  width: auto !important; /* 根据内容自适应宽度 */
+  min-width: 120px !important; /* 最小宽度与下拉框一致 */
+  border: 1px solid #d9d9d9 !important;
+  border-radius: 2px !important;
+}
+
+.account-info-step .country-code-select .select-dropdown .option {
+  white-space: nowrap !important; /* 确保选项文字不换行，所有文字在同一行 */
+  overflow: visible !important; /* 允许文字完整显示 */
+  min-width: 120px !important; /* 选项最小宽度与下拉框一致 */
+}
+
+.account-info-step .country-code-select .select-dropdown .option {
+  padding: 8px 12px !important;
+  font-size: 14px !important;
+  color: #333 !important;
+  cursor: pointer !important;
+}
+
+.account-info-step .country-code-select .select-dropdown .option:hover,
+.account-info-step .country-code-select .select-dropdown .option.selected {
+  background-color: #e6f7ff !important;
+  color: #1890ff !important;
+}
+
+/* ==================== 手机号输入框 ==================== */
+.account-info-step .phone-input-group .phone-input {
+  width: 135px !important;
+  height: 30px !important; /* 统一高度为30px，与下拉框一致 */
+  line-height: 20px !important;
+  border: 1px solid #dedede !important;
+  border-radius: 0px !important; /* 改为完整的圆角，因为现在有间隙了 */
+  margin-left: 0 !important; /* 移除负margin，因为现在有gap了 */
+  box-sizing: border-box !important;
+  padding: 4px 10px !important;
+  font-size: 14px !important;
+  
+}
+
+.account-info-step .phone-input-group:focus-within .phone-input {
+  border-color: #40a9ff !important;
+  box-shadow: 0 0 0 2px rgba(64, 169, 255, 0.1) !important;
+}
+
+.account-info-step .phone-input-group:focus-within .country-code-select .select-dropdown .selected-value-display {
+  border-color: #40a9ff !important;
+  box-shadow: 0 0 0 2px rgba(64, 169, 255, 0.1) !important;
+}
+
+/* ==================== 输入框 ==================== */
+.account-info-step .form-input {
+  width: 260px !important; /* 宽度调整为260px */
+  height: 30px !important; /* 高度调整为30px */
+  line-height: 20px !important;
+  padding: 4px 10px !important; /* 调整padding以适应30px高度 */
+  border: 1px solid #dedede !important;
+  border-radius: 0px !important;
+  font-size: 14px !important;
+  transition: border-color 0.3s !important;
+  background: white !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+}
+
+.account-info-step .form-input:focus {
+  outline: none !important;
+  border-color: #40a9ff !important;
+  box-shadow: 0 0 0 2px rgba(64, 169, 255, 0.1) !important;
+}
+
+.account-info-step .form-input:disabled {
+  background: #f5f5f5 !important;
+  cursor: not-allowed !important;
+}
+
+/* ==================== 证件类型下拉框（SelectDropdown组件） ==================== */
+.account-info-step .id-card-type-select {
+  flex-shrink: 0 !important;
+}
+
+.account-info-step .id-card-type-select .select-dropdown {
+  width: 260px !important; /* 宽度与输入框一致 */
+  min-width: 260px !important;
+  max-width: 260px !important;
+}
+
+.account-info-step .id-card-type-select .select-dropdown .selected-value-display {
+  width: 260px !important;
+  height: 30px !important; /* 高度与手机号码下拉框一致 */
+  line-height: 20px !important;
+  border: 1px solid #dedede !important; /* 边框样式与手机号码下拉框一致 */
+  border-radius: 0px !important; /* 圆角与手机号码下拉框一致 */
+  font-size: 14px !important;
+  padding: 4px 10px !important; /* padding与手机号码下拉框一致 */
+  background-color: #ffffff !important;
+  color: #333 !important;
+  box-sizing: border-box !important;
+}
+
+.account-info-step .id-card-type-select .select-dropdown:not(.disabled) .selected-value-display:hover {
+  border-color: #40a9ff !important;
+}
+
+.account-info-step .id-card-type-select .select-dropdown.expanded .selected-value-display {
+  border-color: #40a9ff !important;
+  box-shadow: 0 0 0 2px rgba(64, 169, 255, 0.1) !important;
+}
+
+.account-info-step .id-card-type-select .select-dropdown .options-list {
+  width: auto !important; /* 根据内容自适应宽度 */
+  min-width: 260px !important; /* 最小宽度与下拉框一致 */
+  border: 1px solid #d9d9d9 !important;
+  border-radius: 2px !important;
+}
+
+.account-info-step .id-card-type-select .select-dropdown .option {
+  white-space: nowrap !important; /* 确保选项文字不换行，所有文字在同一行 */
+  overflow: visible !important; /* 允许文字完整显示 */
+  min-width: 260px !important; /* 选项最小宽度与下拉框一致 */
+  padding: 8px 12px !important;
+  font-size: 14px !important;
+  color: #333 !important;
+  cursor: pointer !important;
+  text-align: left !important; /* 选项文字靠左对齐 */
+}
+
+.account-info-step .id-card-type-select .select-dropdown .option:hover,
+.account-info-step .id-card-type-select .select-dropdown .option.selected {
+  background-color: #e6f7ff !important;
+  color: #1890ff !important;
+}
+
+/* ==================== 提示文字 ==================== */
+.account-info-step .hint-text {
+  color: #ff8000 !important;
+  font-size: 13px !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+}
+
+/* ==================== 错误提示 ==================== */
+.account-info-step .error-text {
+  position: absolute !important;
+  left: 135px !important;
+  bottom: -22px !important;
+  color: #FF2626 !important;
+  font-size: 13px !important;
+}
+
+.account-info-step .general-error {
+  text-align: center !important;
+  padding: 10px 15px !important;
+  background: #fff2f0 !important;
+  border: 1px solid #ffccc7 !important;
+  border-radius: 2px !important;
+  margin-left: 135px !important;
+  margin-bottom: 20px !important;
+  position: static !important;
+}
+
+/* ==================== 按钮行 ==================== */
+.account-info-step .button-row {
+  display: flex !important;
+  justify-content: center !important;
+  margin-top: 15px !important; /* 减少上边距，从30px改为15px */
+  margin-bottom: 10px !important; /* 减少下边距，从20px改为10px */
+}
+
+/* ==================== 提交按钮 ==================== */
+.account-info-step .submit-button {
+  padding: 4px 10px !important;
+  background: #ff8000 !important;
+  color: white !important;
+  border: 1px solid #dedede !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  transition: background 0.3s !important;
+  min-width: 200px !important;
+  height:30px !important;
+  line-height:20px !important;
+  min-width: 120px !important;
+
+}
+
+.account-info-step .submit-button:hover:not(:disabled) {
+  background: #ff8000 !important;
+}
+
+.account-info-step .submit-button:disabled {
+  background: #d9d9d9 !important;
+  cursor: not-allowed !important;
+}
+
+/* ==================== 帮助链接 ==================== */
+.account-info-step .help-link {
+  text-align: center !important;
+  font-size: 14px !important;
+  color: #666 !important;
+  margin-top: 10px !important;
+}
+
+.account-info-step .help-link a {
+  color: #1890ff !important;
+  text-decoration: none !important;
+}
+
+.account-info-step .help-link a:hover {
+  text-decoration: underline !important;
+}

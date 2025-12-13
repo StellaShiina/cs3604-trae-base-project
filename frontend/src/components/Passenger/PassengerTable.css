@@ -1,0 +1,149 @@
+/* 乘客信息表格样式 */
+.passenger-table-container {
+  overflow-x: auto;
+}
+
+.passenger-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  background-color: #fff;
+}
+
+.passenger-table tbody tr {
+  border-top: 1px solid #e8e8e8;
+  border-bottom: 1px solid #e8e8e8;
+  border-left: 1px solid #b1dbff;
+  border-right: 1px solid #b1dbff;
+}
+
+.passenger-table tbody tr:last-child {
+  border-bottom: 1px solid #b1dbff;
+}
+
+.passenger-table tbody tr:hover {
+  background-color: #fafafa;
+}
+
+.passenger-table td {
+  padding: 12px;
+  color: #333;
+  font-size: 14px;
+}
+
+.passenger-table .checkbox-index-cell {
+  width: 100px;
+  text-align: center;
+  border-right: 1px solid #e8e8e8;
+  padding: 15px 0px;
+}
+
+.checkbox-index-cell input[type="checkbox"] {
+  margin-right: 15px;
+  vertical-align: middle;
+}
+
+.index-number {
+  vertical-align: middle;
+}
+
+.name-cell {
+  width: 120px;
+  text-align: center;
+}
+
+.id-type-cell {
+  width: 150px;
+  text-align: center;
+}
+
+.id-number-cell {
+  width: 200px;
+  text-align: center;
+}
+
+.phone-cell {
+  width: 150px;
+  text-align: center;
+}
+
+.verification-cell {
+  width: 120px;
+  text-align: center;
+}
+
+.verification-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background-color: #52c41a;
+  border-radius: 50%;
+  border: 2px solid #52c41a;
+}
+
+.verification-icon {
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.action-cell {
+  width: 100px;
+  text-align: center;
+}
+
+.passenger-table .action-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0px 0px;
+  margin: 0 4px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.edit-button .action-icon {
+  filter: invert(49%) sepia(98%) saturate(2976%) hue-rotate(192deg) brightness(101%) contrast(98%);
+}
+
+.edit-button:hover {
+  transform: scale(1.15);
+}
+
+.delete-button .action-icon {
+  filter: invert(35%) sepia(77%) saturate(6133%) hue-rotate(342deg) brightness(91%) contrast(84%);
+}
+
+.delete-button:hover {
+  transform: scale(1.15);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 40px;
+  color: #999;
+  font-size: 14px;
+  background-color: #fff;
+}
+
+@media (max-width: 768px) {
+  .passenger-table {
+    font-size: 12px;
+  }
+  
+  .passenger-table th,
+  .passenger-table td {
+    padding: 8px 6px;
+  }
+}
+

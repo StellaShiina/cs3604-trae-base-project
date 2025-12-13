@@ -1,0 +1,79 @@
+/* 支付倒计时组件样式 */
+.payment-countdown-timer {
+  display: flex !important;
+  align-items: center !important;
+  padding: 16px 40px !important;
+  background-color: #ffffff !important;
+  border: 1px solid #69afdd !important;
+  border-radius: 0 !important;
+  margin: 0 auto 20px !important;
+  max-width: 1100px !important;
+  gap: 20px !important;
+}
+
+.payment-countdown-icon {
+  flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.payment-countdown-icon img {
+  width: 40px !important;
+  height: 40px !important;
+  display: block !important;
+}
+
+.payment-countdown-text {
+  flex: 1 !important;
+  font-size: 16px !important;
+  color: #000 !important;
+  line-height: 1.6 !important;
+}
+
+.payment-countdown-time {
+  font-weight: 800 !important;
+  color: #ff6600 !important;
+  font-size: 16px !important;
+}
+
+/* 警告状态（时间少于5分钟）*/
+.payment-countdown-timer.payment-countdown-warning .payment-countdown-time {
+  color: #ff0000 !important;
+  animation: payment-countdown-pulse 1s infinite !important;
+}
+
+@keyframes payment-countdown-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* 过期状态 */
+.payment-countdown-timer.payment-countdown-expired {
+  background-color: #fff3f3 !important;
+  border-color: #ffcccc !important;
+}
+
+.payment-countdown-timer.payment-countdown-expired .payment-countdown-time {
+  color: #ff0000 !important;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .payment-countdown-timer {
+    padding: 12px 15px !important;
+  }
+  
+  .payment-countdown-icon img {
+    width: 50px !important;
+    height: 50px !important;
+  }
+  
+  .payment-countdown-text {
+    font-size: 13px !important;
+  }
+}

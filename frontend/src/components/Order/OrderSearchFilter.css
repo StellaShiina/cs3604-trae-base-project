@@ -1,0 +1,217 @@
+/* 订单搜索筛选样式 */
+.order-search-filter {
+  padding: 20px 10px;
+  background-color: #fff;
+  border: 1px solid #d0d0d0;
+  border-top: none;
+  border-bottom: none;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* 历史订单和未出行订单：单行布局 */
+.order-search-filter.history-filter .single-row,
+.order-search-filter.unpaid-filter .single-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: nowrap;
+  max-width: 100%;
+  overflow: visible;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.date-group {
+  flex: 0 0 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dropdown-group {
+  flex: 0 0 auto;
+}
+
+.keyword-group {
+  flex: 1 1 auto;
+  position: relative;
+  min-width: 200px;
+  max-width: 250px;
+}
+
+.filter-label {
+  font-size: 14px;
+  color: #333;
+  white-space: nowrap;
+  margin-right: 5px;
+  flex-shrink: 0;
+}
+
+.filter-dropdown {
+  padding: 6px 30px 6px 12px;
+  border: 1px solid #d0d0d0;
+  border-radius: 0;
+  font-size: 14px;
+  color: #333;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px 8px;
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+  min-width: 140px;
+  transition: border-color 0.2s ease;
+}
+
+.filter-dropdown:hover {
+  border-color: #999;
+}
+
+.filter-dropdown:focus {
+  border-color: #2876c8;
+}
+
+/* 订单筛选器中的日期分隔符 - 独立设置 */
+.order-search-filter .date-separator {
+  color: #666;
+  padding: 0 4px;
+  flex-shrink: 0;
+  font-size: 13px;
+}
+
+/* 订单筛选器中的DatePicker样式 - 独立设置 */
+.order-search-filter .date-picker {
+  width: 130px;
+  flex-shrink: 0;
+}
+
+.order-search-filter .date-input {
+  width: 130px;
+  padding: 6px 28px 6px 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 0;
+  font-size: 13px;
+  color: #333;
+  background-color: #fff;
+  cursor: pointer;
+  height: 32px;
+  box-sizing: border-box;
+}
+
+.order-search-filter .date-input:focus {
+  outline: none;
+  border-color: #2876c8;
+  box-shadow: none;
+}
+
+.order-search-filter .calendar-icon {
+  color: #666;
+}
+
+.filter-input {
+  padding: 7px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 0;
+  font-size: 14px;
+  background-color: #fff;
+  width: 100%;
+  max-width: 100%;
+  padding-right: 30px;
+  box-sizing: border-box;
+}
+
+.filter-input:focus {
+  outline: none;
+  border-color: #2876c8;
+}
+
+.order-search-button {
+  padding: 7px 24px;
+  background-color: #fff !important;
+  border: 1px solid #d0d0d0 !important;
+  border-radius: 0 !important;
+  color: #333 !important;
+  cursor: pointer;
+  font-size: 14px !important;
+  text-align: center;
+  font-weight: 400 !important;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 70px;
+  max-width: 80px;
+}
+
+.order-search-button:hover {
+  background-color: #f5f5f5 !important;
+  border-color: #999 !important;
+}
+
+/* 订单筛选器专用清空按钮 - 圆形灰底白叉 */
+.order-search-filter .clear-button {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #ccc;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.order-search-filter .clear-button:hover {
+  background-color: #999;
+}
+
+@media (max-width: 768px) {
+  .order-search-filter {
+    padding: 15px;
+  }
+  
+  .order-search-filter.history-filter .single-row,
+  .order-search-filter.unpaid-filter .single-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+  
+  .filter-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .date-group,
+  .keyword-group,
+  .dropdown-group {
+    flex: 1;
+  }
+  
+  .filter-input,
+  .filter-dropdown {
+    width: 100%;
+  }
+  
+  .search-button {
+    width: 100%;
+  }
+}
+

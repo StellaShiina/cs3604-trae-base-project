@@ -1,0 +1,246 @@
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f5f5f5;
+}
+
+.login-content {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  min-height: 500px;
+  background-image: url('/images/登录页-背景-新.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.login-promotion {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 60px 80px;
+  color: white;
+}
+
+.promotion-title {
+  display: none;
+}
+
+.promotion-subtitle {
+  display: none;
+}
+
+.promotion-features {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 40px;
+  display: none;
+}
+
+.promotion-features li {
+  font-size: 18px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+}
+
+.promotion-features li:before {
+  content: '✓';
+  color: #4caf50;
+  font-weight: bold;
+  margin-right: 10px;
+  background: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.app-download {
+  display: none;
+}
+
+.qr-code-section {
+  display: none;
+}
+
+.qr-code-section img {
+  display: none;
+}
+
+.qr-code-text {
+  display: none;
+}
+
+.login-form-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin: 40px 40px 40px 0;
+  width: 300px;
+  min-width: 200px;
+  align-self: center;
+}
+
+.background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-size: cover;
+  background-position: center;
+}
+
+.content-overlay {
+  position: relative;
+  display: flex;
+  min-height: 500px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+.left-content {
+  flex: 1;
+  padding: 60px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+}
+
+.promotion-text h1 {
+  font-size: 32px;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 10px;
+  line-height: 1.2;
+}
+
+.promotion-text h2 {
+  font-size: 18px;
+  color: #666666;
+  margin-bottom: 30px;
+  font-weight: normal;
+}
+
+.features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 40px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  color: #333333;
+}
+
+.feature-icon {
+  font-size: 20px;
+  width: 24px;
+  text-align: center;
+}
+
+.app-download {
+  display: none;
+}
+
+.download-text {
+  flex: 1;
+}
+
+.download-text p {
+  margin: 5px 0;
+  color: #333333;
+  font-size: 14px;
+}
+
+.download-text p:first-child {
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.download-qr-image {
+  width: 80px;
+  height: 80px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+}
+
+.right-content {
+  flex: 0 0 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+  .content-overlay {
+    flex-direction: column;
+  }
+  
+  .left-content {
+    padding: 40px 30px;
+  }
+  
+  .right-content {
+    flex: none;
+    padding: 30px;
+  }
+  
+  .promotion-text h1 {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 768px) {
+  .login-content {
+    padding: 20px 10px;
+  }
+  
+  .background-container {
+    margin: 0;
+    border-radius: 8px;
+  }
+  
+  .left-content {
+    padding: 30px 20px;
+  }
+  
+  .right-content {
+    padding: 20px;
+  }
+  
+  .promotion-text h1 {
+    font-size: 24px;
+  }
+  
+  .app-download {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+  
+  .features-list {
+    gap: 12px;
+  }
+  
+  .feature-item {
+    font-size: 14px;
+  }
+}

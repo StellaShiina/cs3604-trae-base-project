@@ -1,0 +1,30 @@
+/* 手机核验页样式 */
+.phone-verification-page {
+  min-height: 100vh;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+}
+
+.phone-verification-page .main-content {
+  display: flex;
+  flex: 1;
+  background-color: #ffffff;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  gap: 0;
+}
+
+.phone-verification-page .content-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+}
+
+@media (max-width: 768px) {
+  .phone-verification-page .main-content {
+    flex-direction: column;
+  }
+}

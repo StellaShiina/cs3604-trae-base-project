@@ -1,0 +1,76 @@
+.booking-failed-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10001;
+}
+
+.booking-failed-modal {
+  background: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.booking-failed-header {
+  background-color: #2196f3;
+  padding: 15px 20px;
+  border-radius: 8px 8px 0 0;
+}
+
+.booking-failed-header h3 {
+  margin: 0;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.booking-failed-body {
+  padding: 30px 20px;
+  text-align: center;
+}
+
+.error-icon {
+  margin-bottom: 15px;
+}
+
+.error-title {
+  color: #f44336;
+  font-size: 24px;
+  font-weight: bold;
+  margin: 10px 0 20px 0;
+}
+
+.error-message {
+  color: #666;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 15px 0;
+  text-align: left;
+}
+
+.error-suggestion {
+  color: #666;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 15px 0;
+}
+
+.link-text {
+  color: #2196f3;
+  cursor: pointer;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.link-text:hover {
+  text-decoration: underline;
+}
+

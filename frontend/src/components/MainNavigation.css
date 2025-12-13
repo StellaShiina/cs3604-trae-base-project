@@ -1,0 +1,165 @@
+/* 主导航栏样式 - 12306蓝色导航 */
+.main-navigation {
+  background: #3B99FC;
+  border-bottom: 1px solid #2a88eb;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: stretch;
+  height: 45px;
+  padding: 0 40px;
+}
+
+/* 导航项目 */
+.nav-item {
+  color: white;
+  text-decoration: none;
+  padding: 0 24px;
+  font-size: 16px;
+  font-weight: normal;
+  transition: all 0.2s;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  white-space: nowrap;
+  flex: 1;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-item:first-child {
+  border-left: none;
+}
+
+.nav-item:hover {
+  background: #2676E3;
+  color: #ffffff;
+}
+
+.nav-item.active {
+  background: #2676E3;
+  font-weight: normal;
+  color: #ffffff;
+}
+
+/* 导航箭头 */
+.nav-arrow {
+  margin-left: 4px;
+  font-size: 10px;
+  opacity: 0.8;
+}
+
+.nav-auth-button {
+  padding: 6px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.nav-auth-button:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: white;
+}
+
+.nav-auth-button:active {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.login-button {
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+.register-button {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.personal-center-button {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* 响应式适配 */
+@media (max-width: 1024px) {
+  .nav-container {
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+    padding: 0 15px;
+  }
+
+  .nav-container::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+  }
+
+  .nav-item {
+    padding: 0 12px;
+    font-size: 14px;
+  }
+
+  .nav-auth-button {
+    padding: 5px 14px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-container {
+    padding: 0 10px;
+  }
+
+  .nav-item {
+    padding: 0 10px;
+    font-size: 13px;
+  }
+
+  .nav-arrow {
+    font-size: 9px;
+  }
+
+  .nav-auth-button {
+    padding: 5px 12px;
+    font-size: 12px;
+  }
+
+  .nav-right {
+    gap: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-navigation {
+    height: auto;
+  }
+
+  .nav-container {
+    height: auto;
+    flex-wrap: wrap;
+    padding: 8px 10px;
+  }
+
+  .nav-item {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  .nav-right {
+    width: 100%;
+    justify-content: center;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+  }
+}

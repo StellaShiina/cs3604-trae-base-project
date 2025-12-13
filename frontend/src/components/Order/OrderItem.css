@@ -1,0 +1,351 @@
+/* 订单项样式 */
+.order-item {
+  background-color: #fff;
+  border: 1px solid #b1dbff;
+  border-radius: 0;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+/* 订单日期行 */
+.order-item-date-row {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  background-color: #f0f8ff;
+  border-bottom: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.order-item-date-row:hover {
+  background-color: #e6f2ff;
+}
+
+.order-item-date-icon {
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+.order-item-date-label {
+  font-size: 14px;
+  color: #444444;
+  margin-right: 5px;
+}
+
+.order-item-date-value {
+  font-size: 14px;
+  color: #222222;
+  margin-right: 20px;
+}
+
+.order-item-number-label {
+  font-size: 14px;
+  color: #444444;
+  margin-right: 5px;
+}
+
+.order-item-number-value {
+  font-size: 14px;
+  color: #222222;
+}
+
+/* 订单主体内容 - 左侧车次+右侧乘客列表 */
+.order-item-main-content {
+  display: flex;
+  align-items: flex-start;
+  border-top: 1px solid #d0d0d0;
+  padding: 0;
+  gap: 0;
+  border-bottom: 1px solid #d0d0d0;
+}
+
+/* 车次信息列（左侧，只显示一次）*/
+.order-item-cell.order-item-train-cell {
+  flex: 1.2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding: 15px 20px 15px 20px;
+}
+
+.order-item-train-route {
+  font-size: 15px;
+  color: #333;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.order-item-train-from,
+.order-item-train-to {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.order-item-train-arrow {
+  margin: 0 5px;
+  color: #666;
+  font-weight: 600;
+}
+
+.order-item-train-number {
+  margin-left: 10px;
+  font-weight: 600;
+  color: #333;
+  text-decoration: none;
+}
+
+.order-item-train-datetime {
+  font-size: 15px;
+  color: #333;
+  font-weight: 500;
+}
+
+.order-item-train-time {
+  margin-left: 10px;
+  font-weight: 500;
+}
+
+/* 右侧乘客信息区域（多行）*/
+.order-item-passengers-info-area {
+  flex: 4;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 每个乘客一行 */
+.order-item-passenger-row {
+  display: flex;
+  align-items: center;
+  padding: 0px 0;
+  border-bottom: 1px solid #e8e8e8;
+  border-left: 1px solid #e8e8e8;
+}
+
+.order-item-passenger-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0px;
+}
+
+.order-item-passenger-row:first-child {
+  padding-top: 0px;
+}
+
+/* 旅客信息列 */
+.order-item-cell.order-item-passenger-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  min-width: 120px;
+  padding: 0 10px;
+  border-right: 1px solid #e8e8e8;
+  padding: 18px 0px;
+}
+
+.order-item-passenger-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: #222;
+}
+
+.order-item-passenger-id-type {
+  font-size: 13px;
+  color: #222;
+  text-align: center;
+}
+
+/* 席位信息列 */
+.order-item-cell.order-item-seat-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-width: 100px;
+  padding: 0 10px;
+  border-right: 1px solid #e8e8e8;
+  padding: 18px 0px;
+}
+
+.order-item-seat-detail {
+  font-size: 14px;
+  color: #222;
+  text-align: center;
+  line-height: 1.8;
+}
+
+/* 票价列 */
+.order-item-cell.order-item-price-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-width: 100px;
+  padding: 0 10px;
+  border-right: 1px solid #e8e8e8;
+  padding: 18px 0px;
+}
+
+.order-item-price-detail {
+  text-align: center;
+}
+
+.order-item-ticket-type {
+  font-size: 14px;
+  color: #222;
+  margin-bottom: 4px;
+}
+
+.order-item-price-amount {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.order-item-price-value {
+  font-size: 16px;
+  color: #ff6600;
+  font-weight: 600;
+}
+
+.order-item-price-discount {
+  font-size: 11px;
+  color: #ff6600;
+  background-color: #fff3e0;
+  padding: 2px 5px;
+  border-radius: 2px;
+}
+
+/* 车票状态列 */
+.order-item-cell.order-item-status-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 18px 0px;
+}
+
+.order-item-status-value {
+  font-size: 14px;
+  color: #222;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* 订单操作按钮 */
+.order-item-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 15px 20px;
+  gap: 10px;
+  background-color: #fff;
+}
+
+.order-item-action-button {
+  padding: 8px 24px;
+  border: 1px solid #d0d0d0;
+  border-radius: 0;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.order-item-cancel-button {
+  background-color: #fff;
+  color: #666;
+  border-radius: 5px;
+}
+
+.order-item-cancel-button:hover {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.order-item-pay-button {
+  background-color: #ff7200;
+  color: #fff;
+  border-color: #ff7200;
+  border-radius: 5px;
+}
+
+.order-item-pay-button:hover {
+  background-color: #ff8c1a;
+  border-color: #ff8c1a;
+}
+
+.order-item-footer {
+  padding: 15px 20px;
+  border-top: 1px solid #e0e0e0;
+  text-align: right;
+}
+
+.order-item-view-details-button {
+  padding: 8px 24px;
+  background-color: #2876c8;
+  color: #fff;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.order-item-view-details-button:hover {
+  background-color: #1e5fa8;
+}
+
+@media (max-width: 768px) {
+  .order-item-main-content {
+    flex-direction: column;
+    padding: 15px;
+  }
+  
+  .order-item-cell.order-item-train-cell {
+    border-right: none;
+    border-bottom: 1px solid #e8e8e8;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+  }
+  
+  .order-item-passenger-row {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px 0;
+  }
+  
+  .order-item-cell {
+    align-items: flex-start !important;
+    text-align: left !important;
+    padding: 5px 0 !important;
+  }
+  
+  .order-item-passenger-name,
+  .order-item-passenger-id-type,
+  .order-item-seat-detail,
+  .order-item-price-detail,
+  .order-item-status-value {
+    text-align: left !important;
+  }
+  
+  .order-item-actions {
+    flex-direction: column;
+  }
+  
+  .order-item-action-button {
+    width: 100%;
+  }
+}

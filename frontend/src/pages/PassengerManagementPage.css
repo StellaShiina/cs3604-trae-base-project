@@ -1,0 +1,32 @@
+/* 乘客管理页样式 */
+.passenger-management-page {
+  min-height: 100vh;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+}
+
+.passenger-management-page .main-content {
+  display: flex;
+  flex: 1;
+  background-color: #ffffff;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.passenger-management-page .content-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+  margin: 20px 0px;
+}
+
+@media (max-width: 768px) {
+  .passenger-management-page .main-content {
+    flex-direction: column;
+  }
+}
+

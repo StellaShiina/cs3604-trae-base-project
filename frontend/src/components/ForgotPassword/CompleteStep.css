@@ -1,0 +1,61 @@
+/* ==================== 完成步骤容器 ==================== */
+.complete-step {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 300px !important; /* 减少最小高度，从400px改为300px */
+  text-align: center !important;
+}
+
+/* ==================== 成功图标 ==================== */
+.complete-step .success-icon {
+  width: 60px !important; /* 减小图标尺寸 */
+  height: 60px !important;
+  border-radius: 50% !important;
+  background: #4caf50 !important;
+  color: white !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 36px !important; /* 减小字体 */
+  margin-bottom: 15px !important; /* 减少下边距，从30px改为15px */
+  animation: successPulse 0.6s ease-out !important;
+}
+
+@keyframes successPulse {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ==================== 成功消息 ==================== */
+.complete-step .success-message {
+  font-size: 14px !important;
+  color: #ff6f00 !important;
+  line-height: 1.8 !important;
+}
+
+/* ==================== 登录链接 ==================== */
+.complete-step .login-link {
+  color: #1e88e5 !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  font-weight: 500 !important;
+  font-size: 14px !important; /* 与橙色文字大小保持一致 */
+  transition: all 0.3s ease !important;
+}
+
+.complete-step .login-link:hover {
+  text-decoration: underline !important;
+  color: #1565c0 !important;
+}
+

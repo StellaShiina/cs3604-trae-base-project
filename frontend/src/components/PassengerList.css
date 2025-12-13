@@ -1,0 +1,15 @@
+/* 乘客列表样式 */
+.passenger-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 0;
+}
+
+.passenger-list-empty {
+  padding: 20px;
+  text-align: center;
+  color: #999999;
+  font-size: 14px;
+}
+

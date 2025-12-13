@@ -1,0 +1,58 @@
+/* 订单填写页样式 */
+.order-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #ffffff;
+}
+
+.order-main {
+  flex: 1;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 20px;
+  background-color: #ffffff;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 16px;
+  color: #666666;
+  background-color: #ffffff;
+  border-radius: 4px;
+  margin: 20px auto;
+  max-width: 1400px;
+}
+
+.order-page-error-message {
+  text-align: center;
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 1400px;
+  background-color: #fff3e0;
+  border: 1px solid #ff9800;
+  border-radius: 0;
+  color: #e65100;
+  font-size: 14px;
+}
+
+/* 响应式设计 */
+@media (max-width: 1440px) {
+  .order-main {
+    padding: 0 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .order-main {
+    padding: 0 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .order-main {
+    padding: 0 10px;
+  }
+}
+

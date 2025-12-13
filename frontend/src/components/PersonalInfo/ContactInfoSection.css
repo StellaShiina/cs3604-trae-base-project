@@ -1,0 +1,233 @@
+/* 联系方式模块样式 */
+.contact-info-section {
+  background-color: transparent;
+  padding: 20px 20px;
+  border-radius: 0;
+  margin-bottom: 0;
+  box-shadow: none;
+  border: none;
+  position: relative;
+}
+
+.contact-info-section::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 20px;
+  right: 20px;
+  height: 1px;
+  border-bottom: 1px dashed #e8e8e8;
+}
+
+.contact-info-section .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 0 0 0;
+  padding: 0px 15px 0px 0px;
+  border-bottom: none;
+}
+
+.contact-info-section .section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333 !important;
+  margin: 0;
+  padding: 5px 15px 10px 15px;
+  border-bottom: none;
+}
+
+.contact-info-section .edit-button {
+  background-color: transparent;
+  border: none;
+  color: #555 !important;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 3px 20px;
+  transition: color 0.2s ease;
+  text-decoration: none;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  transform: none !important;
+  pointer-events: auto !important;
+  z-index: 1;
+  position: relative;
+}
+
+.contact-info-section .edit-button:hover {
+  color: #ff8000 !important;
+  border-color: #ff8000;
+  transform: none !important;
+}
+
+.contact-info-section .save-button {
+  background-color: #ff8000;
+  border: none;
+  color: white !important;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 3px 20px;
+  transition: background-color 0.2s ease;
+  text-decoration: none;
+  border: 1px solid #ff8000;
+  border-radius: 5px;
+  transform: none !important;
+  pointer-events: auto !important;
+  z-index: 1;
+  position: relative;
+}
+
+.contact-info-section .save-button:hover {
+  background-color: #e67300;
+  border-color: #e67300;
+  transform: none !important;
+}
+
+.contact-info-section .info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.contact-info-section .info-row {
+  display: flex;
+  align-items: center;
+  line-height: 2;
+  justify-content: flex-start;
+  margin-bottom: 6px;
+}
+
+.contact-info-section .info-label {
+  color: #333 !important;
+  font-size: 14px;
+  text-align: right;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 300px;
+  flex-shrink: 0;
+  margin-right: 5px;
+  font-weight: 400;
+}
+
+.contact-info-section .required-mark {
+  color: #e60000 !important;
+  font-weight: 400;
+}
+
+.contact-info-section .info-value {
+  color: #333 !important;
+  font-size: 14px;
+  text-align: left;
+  padding-left: 5px;
+  font-weight: 450;
+}
+
+.contact-info-section .info-value-group {
+  display: flex;
+  align-items: center;
+  gap: 80px;
+  text-align: left;
+  padding-left: 5px;
+  flex: 1;
+}
+
+.contact-info-section .info-value-group .info-value {
+  padding-left: 0px;
+  text-align: left;
+}
+
+.contact-info-section .verification-status {
+  color: #ff9800 !important;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.contact-info-section .phone-verification-text {
+  color: #ff8000 !important;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.contact-info-section .phone-verification-link {
+  color: #2876c8 !important;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.contact-info-section .phone-verification-link:hover {
+  color: #1e5fa8 !important;
+}
+
+.contact-info-section .phone-link {
+  color: #2876c8 !important;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.contact-info-section .phone-link:hover {
+  color: #1e5fa8 !important;
+}
+
+.contact-info-section .email-edit-group {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  text-align: left;
+  padding-left: 0;
+  flex: 1;
+}
+
+.contact-info-section .email-input {
+  flex: 0 1 400px;
+  padding: 6px 0 6px 10px;
+  border: 1px solid #d0d0d0;
+  border-radius: 0;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.contact-info-section .email-input:focus {
+  border-color: #2876c8;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .contact-info-section {
+    padding: 15px;
+  }
+  
+  .contact-info-section .section-title {
+    font-size: 16px;
+  }
+  
+  .contact-info-section .info-label,
+  .contact-info-section .info-value {
+    font-size: 13px;
+  }
+  
+  .contact-info-section .info-label {
+    min-width: 80px;
+  }
+  
+  .contact-info-section .email-edit-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .contact-info-section .email-input {
+    width: 100%;
+  }
+  
+  .contact-info-section .save-button,
+  .contact-info-section .cancel-button {
+    width: 100%;
+  }
+}
+

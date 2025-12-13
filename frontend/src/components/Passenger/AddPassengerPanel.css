@@ -1,0 +1,340 @@
+/* 添加乘车人面板样式 - 像素级还原12306设计 */
+.add-passenger-panel {
+  background-color: #fff;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.passenger-form-container {
+  width: 100%;
+  max-width: 950px;
+  margin: 0 auto;
+  padding: 30px 30px;
+}
+
+/* 分节样式 */
+.passenger-section {
+  margin-bottom: 20px;
+}
+
+.passenger-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 20px 0;
+  line-height: 1.5;
+}
+
+.passenger-section-subtitle {
+  color: #ff8000;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+/* 表单行 */
+.passenger-form-row {
+  margin-bottom: 22px;
+  display: flex;
+  align-items: flex-start;
+}
+
+/* 标签区域 */
+.passenger-label-wrapper {
+  width: 250px;
+  text-align: right;
+  padding-top: 10px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.passenger-label {
+  font-size: 15px;
+  color: #333;
+  line-height: 20px;
+  display: inline-block;
+}
+
+.passenger-required {
+  color: #ff4d4f;
+  margin-right: 4px;
+  font-weight: bold;
+}
+
+/* 输入区域 */
+.passenger-input-container {
+  flex: 1;
+  margin-left: 20px;
+  max-width: 700px;
+}
+
+.passenger-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* 输入框 */
+.passenger-input {
+  width: 300px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid #c5c5c5;
+  border-radius: 0px;
+  font-size: 14px;
+  color: #333;
+  outline: none;
+  transition: all 0.3s;
+  box-sizing: border-box;
+  background: white;
+  flex-shrink: 0;
+}
+
+.passenger-input::placeholder {
+  color: #999;
+}
+
+.passenger-input:hover {
+  border-color: #40a9ff;
+}
+
+.passenger-input:focus {
+  border-color: #40a9ff;
+  box-shadow: 0 0 0 2px rgba(64, 169, 255, 0.1);
+}
+
+.passenger-input-error {
+  border-color: #ff4d4f;
+}
+
+.passenger-input-error:focus {
+  box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.1);
+}
+
+/* 下拉框统一宽度和样式 */
+.passenger-input-container > .select-dropdown {
+  width: 300px;
+  flex-shrink: 0;
+}
+
+/* 下拉框显示框样式 - 在这里可以单独调整高度、边框等 */
+.passenger-input-container .select-dropdown .selected-value-display {
+  height: 36px;
+  line-height: 36px;
+  border: 1px solid #c5c5c5;
+  border-radius: 0px;
+  font-size: 14px;
+  padding: 0 28px 0 12px;
+  background-color: #fff;
+  width: 300px;
+}
+
+.passenger-input-container .select-dropdown:not(.disabled) .selected-value-display:hover {
+  border-color: #40a9ff;
+}
+
+.passenger-input-container .select-dropdown.expanded .selected-value-display {
+  border-color: #40a9ff;
+  box-shadow: 0 0 0 2px rgba(64, 169, 255, 0.1);
+}
+
+/* 提示信息 */
+.passenger-hint {
+  color: #ff8800;
+  font-size: 12px;
+  margin-left: 12px;
+  line-height: 36px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.passenger-hint-block {
+  width: 100%;
+  margin-left: 0;
+  margin-top: 8px;
+  line-height: 1.6;
+  white-space: normal;
+}
+
+/* 错误消息 */
+.passenger-error-message {
+  color: #ff4d4f;
+  font-size: 12px;
+  margin-top: 6px;
+  line-height: 1.5;
+  min-height: 18px;
+  width: 100%;
+}
+
+/* 手机号码区域 */
+.passenger-phone-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  width: 350px;
+}
+
+/* 国家代码下拉框 - 可以调整这里的宽度 */
+.passenger-phone-group .select-dropdown {
+  width: 100px;
+  min-width: 100px;
+  max-width: 100px;
+  flex-shrink: 0;
+}
+
+/* 手机号区域的下拉框显示框样式 */
+.passenger-phone-group .select-dropdown .selected-value-display {
+  height: 36px;
+  line-height: 36px;
+  border: 1px solid #c5c5c5;
+  border-radius: 0px;
+  font-size: 14px;
+  padding: 0 33px 0 12px;
+  background-color: #fff;
+  width: 100px;
+  text-align: center;
+}
+
+.passenger-phone-group .select-dropdown:not(.disabled) .selected-value-display:hover {
+  border-color: #40a9ff;
+}
+
+/* 手机号输入框 - 可以调整这里的宽度 */
+.passenger-phone-input {
+  width: 240px;
+  flex-shrink: 0;
+}
+
+/* 按钮组 */
+.passenger-button-group {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 20px;
+  padding-top: 20px;
+}
+
+.passenger-button {
+  min-width: 100px;
+  height: 38px;
+  padding: 0 20px;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-sizing: border-box;
+  font-weight: normal;
+  font-weight: 500;
+}
+
+.passenger-button-cancel {
+  background-color: #fff;
+  color: #333;
+  border: 1px solid #d0d0d0;
+}
+
+.passenger-button-cancel:hover {
+  color: #ff8000;
+  border-color: #ff8000;
+}
+
+.passenger-button-submit {
+  background: #ff8000;
+  color: white;
+  font-weight: bold;
+}
+
+.passenger-button-submit:hover:not(:disabled) {
+  background: #ff6f00;
+  border: none;
+}
+
+.passenger-button-submit:active {
+  background: linear-gradient(to bottom, #ff7700 0%, #ee6600 100%);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.passenger-button-submit:disabled {
+  background: #cccccc;
+  border-color: #bbbbbb;
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.7;
+}
+
+/* 响应式适配 */
+@media (max-width: 768px) {
+  .passenger-form-container {
+    padding: 20px;
+  }
+
+  .passenger-form-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .passenger-label-wrapper {
+    width: 100%;
+    text-align: left;
+    padding-top: 0;
+    margin-bottom: 8px;
+  }
+
+  .passenger-input-container {
+    margin-left: 0;
+    max-width: 100%;
+  }
+
+  .passenger-input,
+  .passenger-input-container > .select-dropdown {
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  .passenger-phone-group {
+    width: 100%;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .passenger-phone-group .select-dropdown {
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  .passenger-phone-input {
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  .passenger-hint {
+    margin-left: 0;
+    margin-top: 8px;
+    line-height: 1.6;
+    white-space: normal;
+  }
+
+  .passenger-button-group {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .passenger-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .passenger-input {
+    font-size: 16px; /* 防止iOS自动缩放 */
+  }
+
+  .passenger-form-container {
+    padding: 15px;
+  }
+}
+

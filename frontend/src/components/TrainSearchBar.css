@@ -1,0 +1,270 @@
+/* 车次搜索和查询区域样式 */
+.train-search-bar {
+  background-color: #eff1f9;
+  border: 1px solid #bbd7ee;
+  border-radius: 4px;
+  padding: 16px 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.search-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* 单程/往返选择器 */
+.trip-type-selector,
+.ticket-type-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.radio-option input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  margin: 0;
+  accent-color: #2196f3;
+}
+
+.radio-label {
+  font-size: 14px;
+  color: #000000;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* 竖线分隔 - 蓝色 */
+.vertical-divider-blue {
+  width: 1px;
+  height: 40px;
+  background-color: #5ba3e0;
+  align-self: center;
+  margin: 0px 8px 0px 8px;
+}
+
+/* 搜索输入框 - 横向布局 */
+.search-field-inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  position: relative;
+}
+
+.search-field-label-inline {
+  font-size: 13px;
+  color: #000000;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.return-label {
+  color: #999999;
+}
+
+.search-field-inline input,
+.search-field-inline select {
+  width: 120px;
+  padding: 6px 10px;
+  border: 1px solid #d0d5e8;
+  border-radius: 3px;
+  font-size: 13px;
+  color: #333333;
+  transition: border-color 0.2s;
+  background-color: #ffffff;
+  height: 30px;
+  box-sizing: border-box;
+}
+
+.search-field-inline input:focus,
+.search-field-inline select:focus {
+  outline: none;
+  border-color: #5ba3e0;
+  box-shadow: 0 0 0 2px rgba(91, 163, 224, 0.1);
+}
+
+.search-field-inline input::placeholder {
+  color: #bbb;
+  font-size: 12px;
+}
+
+.search-field-inline input.error {
+  border-color: #d32f2f;
+}
+
+/* 字段错误信息 - 使用绝对定位，不影响flex布局 */
+.search-field-inline .field-error {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 2px;
+  font-size: 12px;
+  color: #d32f2f;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+/* 交换按钮 */
+.swap-stations-btn {
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  padding: 0;
+  background-color: #eff1f9;
+  color: #5ba3e0;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.swap-stations-btn:hover {
+  background-color: #f0f7ff;
+  border-color: #1976d2;
+  box-shadow: 0 2px 5px rgba(33, 150, 243, 0.3);
+}
+
+.swap-stations-btn:active {
+  transform: scale(0.95);
+  background-color: #e3f2fd;
+}
+
+.swap-stations-btn .swap-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+  filter: invert(47%) sepia(85%) saturate(1087%) hue-rotate(183deg) brightness(93%) contrast(88%);
+}
+
+/* 查询按钮 */
+.search-submit-btn {
+  padding: 6px 30px;
+  background: #ff8001;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  height: 30px;
+  margin-left: 6px;
+}
+
+.search-submit-btn:hover {
+  background: #f7920a;
+}
+
+.search-submit-btn:active {
+  transform: none;
+}
+
+.search-submit-btn:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* 错误提示 */
+.search-error-message {
+  width: 100%;
+  color: #d32f2f;
+  font-size: 13px;
+  margin-top: 10px;
+  padding: 8px 20px;
+  background-color: #ffebee;
+  border-radius: 4px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .train-search-bar {
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+
+  .search-bar-container {
+    gap: 10px;
+  }
+
+  .search-field {
+    min-width: 150px;
+  }
+
+  .search-field-label {
+    font-size: 11px;
+    margin-bottom: 5px;
+  }
+
+  .search-field input,
+  .search-field select {
+    padding: 9px 10px;
+    font-size: 13px;
+  }
+
+  .swap-stations-btn {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    font-size: 16px;
+  }
+
+  .search-submit-btn {
+    padding: 9px 30px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .train-search-bar {
+    padding: 12px;
+  }
+
+  .search-bar-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .search-field {
+    min-width: 100%;
+  }
+
+  .swap-stations-btn {
+    margin-top: 0;
+    width: 100%;
+    border-radius: 4px;
+    height: 36px;
+  }
+
+  .search-submit-btn {
+    margin-top: 0;
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+  }
+
+  .search-error-message {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+}
