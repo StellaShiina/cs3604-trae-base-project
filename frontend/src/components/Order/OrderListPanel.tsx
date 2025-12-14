@@ -55,12 +55,21 @@ const OrderListPanel: React.FC<OrderListPanelProps> = ({
         return now < departureDateTime; // 当前时间早于发车时间
       });
     } else if (activeTab === 'history') {
-      // 历史订单：已完成且列车已发车（当前时间 >= 发车时间）
+      // 历史订单：已完成、已取消、已退票，或已支付且列车已发车
       return orders.filter(order => {
-        if (order.status !== 'completed') return false;
-        const departureDateTime = getDepartureDateTime(order);
-        if (!departureDateTime) return false;
-        return now >= departureDateTime; // 当前时间晚于或等于发车时间
+        // 已完成、已取消、已退票的订单直接显示在历史订单中
+        if (order.status === 'completed' || order.status === 'cancelled' || order.status === 'refunded') {
+          return true;
+        }
+        
+        // 已支付订单，如果已发车则显示在历史订单中
+        if (order.status === 'paid') {
+          const departureDateTime = getDepartureDateTime(order);
+          if (!departureDateTime) return false;
+          return now >= departureDateTime; // 当前时间晚于或等于发车时间
+        }
+        
+        return false;
       });
     }
     return [];
