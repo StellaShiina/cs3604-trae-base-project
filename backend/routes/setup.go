@@ -32,7 +32,9 @@ func SetupRouter() *gin.Engine {
 		auth := v1.Group("/auth")
 		{
 			auth.POST("/register", Register)
+			auth.POST("/register/complete", CompleteRegistration)
 			auth.POST("/login", Login)
+			auth.POST("/verify-login", VerifyLogin)
 			auth.POST("/send-sms", SendSMS)
 			auth.POST("/verify-sms", VerifySMS)
 		}
@@ -41,6 +43,8 @@ func SetupRouter() *gin.Engine {
 		{
 			passengers.GET("", GetPassengers)
 			passengers.POST("", AddPassenger)
+			passengers.PUT("/:id", UpdatePassenger)
+			passengers.DELETE("/:id", DeletePassenger)
 		}
 
 		trains := v1.Group("/trains")
@@ -48,12 +52,27 @@ func SetupRouter() *gin.Engine {
 			trains.GET("/search", SearchTrains)
 		}
 
+		stations := v1.Group("/stations")
+		{
+			stations.GET("", GetStations)
+		}
+
 		orders := v1.Group("/orders")
 		{
 			orders.POST("", CreateOrder)
 			orders.GET("", GetOrders)
+			orders.GET("/new", GetOrderPageData)
+			orders.GET("/:id/confirmation", GetOrderConfirmation)      // Add this
+			orders.GET("/:id/payment", GetPaymentInfo)                 // Add this
+			orders.GET("/:id/time-remaining", GetPaymentTimeRemaining) // Add this
+			orders.POST("/:id/confirm", ConfirmOrder)                  // Add this
 			orders.POST("/:id/pay", PayOrder)
 			orders.POST("/:id/cancel", CancelOrder)
+		}
+
+		users := v1.Group("/users")
+		{
+			users.GET("/info", GetUserInfo)
 		}
 
 		tickets := v1.Group("/tickets")

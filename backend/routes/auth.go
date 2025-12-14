@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"strings"
 	"time"
 
 	"sync"
@@ -15,8 +16,12 @@ import (
 )
 
 var (
-	smsCodes = make(map[string]string)
-	smsMutex sync.Mutex
+	smsCodes             = make(map[string]string)
+	smsMutex             sync.Mutex
+	pendingRegistrations = make(map[string]RegisterRequest)
+	pendingMutex         sync.Mutex
+	pendingLogins        = make(map[string]models.User)
+	loginMutex           sync.Mutex
 )
 
 type RegisterRequest struct {
@@ -31,6 +36,7 @@ type RegisterRequest struct {
 }
 
 // API-POST-Register
+// Now only validates and temporarily stores data, returning a sessionId
 func Register(c *gin.Context) {
 	var req RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -38,44 +44,119 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	// 1. Basic Validation (Check duplicates before proceeding)
+	var existingUser models.User
+	if err := db.GetDB().Where("username = ?", req.Username).First(&existingUser).Error; err == nil {
+		c.JSON(http.StatusConflict, gin.H{"error": "该用户名已经占用"})
+		return
+	}
+	if err := db.GetDB().Where("id_no = ?", req.IDNo).First(&existingUser).Error; err == nil {
+		c.JSON(http.StatusConflict, gin.H{"error": "该证件号已被注册"})
+		return
+	}
+
+	// 2. Generate Session ID
+	sessionID := fmt.Sprintf("%d", time.Now().UnixNano())
+
+	// 3. Store in temporary map (In production, use Redis with expiration)
+	pendingMutex.Lock()
+	pendingRegistrations[sessionID] = req
+	pendingMutex.Unlock()
+
+	c.JSON(http.StatusCreated, gin.H{
+		"message":   "注册信息已提交，请进行验证",
+		"sessionId": sessionID,
+	})
+}
+
+// API-POST-CompleteRegistration
+// Verifies SMS code and creates the user
+type CompleteRegistrationRequest struct {
+	SessionID string `json:"sessionId" binding:"required"`
+	SMSCode   string `json:"smsCode" binding:"required"`
+}
+
+func CompleteRegistration(c *gin.Context) {
+	var req CompleteRegistrationRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// 1. Retrieve pending registration data
+	pendingMutex.Lock()
+	regData, exists := pendingRegistrations[req.SessionID]
+	pendingMutex.Unlock()
+
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "会话无效或已过期，请重新提交注册信息"})
+		return
+	}
+
+	// 2. Verify SMS Code
+	smsMutex.Lock()
+	expectedCode, codeExists := smsCodes[regData.Mobile]
+	smsMutex.Unlock()
+
+	if !codeExists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "请先获取验证码"})
+		return
+	}
+	if expectedCode != req.SMSCode {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "验证码错误"})
+		return
+	}
+
+	// 3. Create User in Database
+	hash, err := bcrypt.GenerateFromPassword([]byte(regData.Password), bcrypt.DefaultCost)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
 		return
 	}
 
-	// Default gender to "male" if not provided, or handle it.
-	// For PostgreSQL enum 'gender_enum', valid values are 'male', 'female'.
-	// If empty string is passed, it fails.
-	gender := req.Gender
+	// Default gender handling
+	gender := regData.Gender
 	if gender == "" {
-		// We can default or make it null if pointer. Since User struct uses string,
-		// we should probably default to a valid value or leave it to DB default if we omit it?
-		// But struct will send "". Let's default to "male" for now as a quick fix,
-		// or "unknown" if enum supported it. The DB only supports 'male','female'.
-		// Ideally, frontend should send it.
 		gender = "male"
 	}
 
 	user := models.User{
-		Username:     req.Username,
-		Email:        req.Email,
-		Mobile:       req.Mobile,
+		Username:     regData.Username,
+		Email:        regData.Email,
+		Mobile:       regData.Mobile,
 		PasswordHash: string(hash),
-		Name:         req.Name,
+		Name:         regData.Name,
 		Gender:       gender,
-		IDType:       req.IDType,
-		IDNo:         req.IDNo,
+		IDType:       regData.IDType,
+		IDNo:         regData.IDNo,
 	}
 
 	if result := db.GetDB().Create(&user); result.Error != nil {
-		// Log the actual error for debugging
-		// fmt.Println("DB Create Error:", result.Error)
-		c.JSON(http.StatusConflict, gin.H{"error": result.Error.Error()})
+		errStr := result.Error.Error()
+		if strings.Contains(errStr, "duplicate key") || strings.Contains(errStr, "UNIQUE constraint") {
+			if strings.Contains(errStr, "username") {
+				c.JSON(http.StatusConflict, gin.H{"error": "该用户名已经占用"})
+				return
+			}
+			if strings.Contains(errStr, "id_no") || strings.Contains(errStr, "id_card_number") {
+				c.JSON(http.StatusConflict, gin.H{"error": "该证件号已被注册"})
+				return
+			}
+		}
+		c.JSON(http.StatusConflict, gin.H{"error": errStr})
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"userId": user.ID})
+	// 4. Cleanup
+	pendingMutex.Lock()
+	delete(pendingRegistrations, req.SessionID)
+	pendingMutex.Unlock()
+
+	smsMutex.Lock()
+	delete(smsCodes, regData.Mobile)
+	smsMutex.Unlock()
+
+	c.JSON(http.StatusCreated, gin.H{"userId": user.ID, "message": "注册成功"})
 }
 
 type LoginRequest struct {
@@ -103,22 +184,56 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	// Set session cookie
-	// In production, use a secure session store (Redis/DB)
-	c.SetCookie("sid", "dummy-session-"+user.ID.String(), 3600, "/", "", false, true)
+	// Generate Session ID for verification
+	sessionID := fmt.Sprintf("%d", time.Now().UnixNano())
 
-	c.JSON(http.StatusOK, gin.H{"user": user})
-}
+	// Store user in pending logins
+	loginMutex.Lock()
+	pendingLogins[sessionID] = user
+	loginMutex.Unlock()
 
-type SendSMSRequest struct {
-	Mobile string `json:"mobile" binding:"required"`
+	c.JSON(http.StatusOK, gin.H{
+		"success":   true,
+		"sessionId": sessionID,
+		"message":   "请完成短信验证",
+	})
 }
 
 // API-POST-SendSMS
+// Now accepts optional sessionId to send to the phone number associated with the session if mobile not provided
+type SendSMSRequest struct {
+	Mobile    string `json:"mobile"`
+	SessionID string `json:"sessionId"`
+}
+
 func SendSMS(c *gin.Context) {
 	var req SendSMSRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	mobile := req.Mobile
+
+	// If sessionId is provided, try to find pending registration or login
+	if req.SessionID != "" {
+		pendingMutex.Lock()
+		if data, ok := pendingRegistrations[req.SessionID]; ok {
+			mobile = data.Mobile
+		}
+		pendingMutex.Unlock()
+
+		if mobile == "" {
+			loginMutex.Lock()
+			if user, ok := pendingLogins[req.SessionID]; ok {
+				mobile = user.Mobile
+			}
+			loginMutex.Unlock()
+		}
+	}
+
+	if mobile == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Mobile number is required"})
 		return
 	}
 
@@ -128,22 +243,91 @@ func SendSMS(c *gin.Context) {
 
 	// Store in map
 	smsMutex.Lock()
-	smsCodes[req.Mobile] = code
+	smsCodes[mobile] = code
 	smsMutex.Unlock()
 
 	// Simulate sending (Print to console)
-	fmt.Printf("[SMS SERVICE] Sending code %s to mobile %s\n", code, req.Mobile)
+	fmt.Printf("[SMS SERVICE] Sending code %s to mobile %s\n", code, mobile)
 
 	// For testing convenience, return the code in the response
 	c.JSON(http.StatusOK, gin.H{
-		"message": "SMS sent successfully",
-		"code":    code, // TODO: Remove this in production
+		"message":          "SMS sent successfully",
+		"code":             code, // TODO: Remove this in production
+		"verificationCode": code, // Alias for frontend compatibility
+		"phone":            mobile,
+	})
+}
+
+type VerifyLoginRequest struct {
+	SessionID        string `json:"sessionId" binding:"required"`
+	VerificationCode string `json:"verificationCode" binding:"required"`
+	IDCardLast4      string `json:"idCardLast4"` // Optional verification
+}
+
+// API-POST-VerifyLogin
+func VerifyLogin(c *gin.Context) {
+	var req VerifyLoginRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	loginMutex.Lock()
+	user, exists := pendingLogins[req.SessionID]
+	loginMutex.Unlock()
+
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Session expired or invalid"})
+		return
+	}
+
+	// Verify ID Card Last 4 (if provided/required)
+	if len(user.IDNo) >= 4 && req.IDCardLast4 != "" {
+		last4 := user.IDNo[len(user.IDNo)-4:]
+		if req.IDCardLast4 != last4 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "证件号后4位不匹配"})
+			return
+		}
+	}
+
+	// Verify SMS
+	smsMutex.Lock()
+	expectedCode, codeExists := smsCodes[user.Mobile]
+	smsMutex.Unlock()
+
+	if !codeExists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "请先获取验证码"})
+		return
+	}
+
+	if expectedCode != req.VerificationCode {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "验证码错误"})
+		return
+	}
+
+	// Success - Cleanup
+	loginMutex.Lock()
+	delete(pendingLogins, req.SessionID)
+	loginMutex.Unlock()
+
+	smsMutex.Lock()
+	delete(smsCodes, user.Mobile)
+	smsMutex.Unlock()
+
+	// Set session cookie
+	c.SetCookie("sid", "dummy-session-"+user.ID.String(), 3600, "/", "", false, true)
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"token":   "dummy-token-" + user.ID.String(),
+		"user":    user,
 	})
 }
 
 type VerifySMSRequest struct {
-	Mobile string `json:"mobile" binding:"required"`
-	Code   string `json:"code" binding:"required"`
+	Mobile    string `json:"mobile"`
+	Code      string `json:"code" binding:"required"`
+	SessionID string `json:"sessionId"`
 }
 
 // API-POST-VerifySMS
