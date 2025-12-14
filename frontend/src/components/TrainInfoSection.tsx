@@ -1,5 +1,6 @@
 import React from 'react';
 import './TrainInfoSection.css';
+import { translateSeatType } from '../utils/translationUtils';
 
 interface TrainInfoSectionProps {
   trainInfo: any;
@@ -49,17 +50,27 @@ const TrainInfoSection: React.FC<TrainInfoSectionProps> = ({
         {fareInfo && availableSeats && (
           <div className="train-fare-info">
             {Object.keys(fareInfo).map((seatType) => {
-              const fare = fareInfo[seatType];
+              // 英文转中文映射
+              const zhSeatType = translateSeatType(seatType);
+              
+              // 兼容后端返回格式：可能是对象{price, ...}，也可能是直接的数字
+              const fareItem = fareInfo[seatType];
+              const price = typeof fareItem === 'object' ? fareItem.price : fareItem;
+              // 如果价格是分，转换为元；如果是0，可能是数据问题，显示暂无
+              const displayPrice = price > 0 ? (price / 100).toFixed(1) : '--';
+              
               const available = availableSeats[seatType];
+              
               return (
                 <div key={seatType} className="fare-item">
-                  <span className="seat-type-label">{seatType}</span>
+                  <span className="seat-type-label">{zhSeatType}</span>
                   <span className="seat-price-bracket">（</span>
-                  <span className="seat-price">¥{fare.price}.0元</span>
+                  <span className="seat-price">¥{displayPrice}元</span>
                   <span className="seat-price-bracket">）</span>
-                  <span className="seat-discount">{fare.discount ? `${fare.discount}折` : ''}</span>
+                  {typeof fareItem === 'object' && fareItem.discount && (
+                    <span className="seat-discount">{fareItem.discount}折</span>
+                  )}
                   <span className="seat-available">{available !== undefined ? ` ${available}张票` : ' 无票'}</span>
-                  {fare.status && <span className="seat-status"> {fare.status}</span>}
                 </div>
               );
             })}

@@ -13,6 +13,8 @@ import ConfirmModal from '../components/ConfirmModal';
 import SuccessModal from '../components/SuccessModal';
 import './PassengerManagementPage.css';
 
+import { API_BASE_URL } from '../config';
+
 const PassengerManagementPage = () => {
   const navigate = useNavigate();
   const [passengers, setPassengers] = useState<any[]>([]);
@@ -80,7 +82,7 @@ const PassengerManagementPage = () => {
         return;
       }
       
-      const response = await fetch('/api/passengers', {
+      const response = await fetch(`${API_BASE_URL}/passengers`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
@@ -97,9 +99,9 @@ const PassengerManagementPage = () => {
       if (response.ok) {
         const data = await response.json();
         console.log('获取到乘客数据:', data);
-        setPassengers(data.passengers || []);
-        setFilteredPassengers(data.passengers || []);
-        console.log('乘客列表设置成功，数量:', (data.passengers || []).length);
+        setPassengers(data || []);
+        setFilteredPassengers(data || []);
+        console.log('乘客列表设置成功，数量:', (data || []).length);
       } else {
         const errorText = await response.text();
         console.error('API错误响应:', errorText);
@@ -161,7 +163,7 @@ const PassengerManagementPage = () => {
       }
 
       console.log('删除乘客，ID:', pendingDeleteId);
-      const response = await fetch(`/api/passengers/${pendingDeleteId}`, {
+      const response = await fetch(`${API_BASE_URL}/passengers/${pendingDeleteId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -217,13 +219,21 @@ const PassengerManagementPage = () => {
   const handleAddSubmit = async (passengerData: any) => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch('/api/passengers', {
+      // Map frontend fields to backend struct
+      const payload = {
+        name: passengerData.name,
+        card_type: passengerData.idCardType,
+        card_no: passengerData.idCardNumber,
+        type: passengerData.discountType
+      };
+
+      const response = await fetch(`${API_BASE_URL}/passengers`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(passengerData)
+        body: JSON.stringify(payload)
       });
 
       if (response.ok) {
@@ -260,13 +270,20 @@ const PassengerManagementPage = () => {
         data: passengerData
       });
       
-      const response = await fetch(`/api/passengers/${editingPassenger.id}`, {
+      const payload = {
+        name: passengerData.name,
+        card_type: passengerData.idCardType,
+        card_no: passengerData.idCardNumber,
+        type: passengerData.discountType
+      };
+
+      const response = await fetch(`${API_BASE_URL}/passengers/${editingPassenger.id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(passengerData)
+        body: JSON.stringify(payload)
       });
 
       console.log('📡 响应状态:', response.status);

@@ -11,6 +11,7 @@ import BottomNavigation from '../components/BottomNavigation';
 import OrderConfirmationModal from '../components/OrderConfirmationModal';
 import ConfirmModal from '../components/ConfirmModal';
 import { getCityByStation } from '../services/stationService';
+import { API_BASE_URL } from '../config';
 
 /**
  * 订单填写页主容器组件
@@ -90,11 +91,12 @@ const OrderPage: React.FC = () => {
         console.log('Query string:', queryParams.toString());
         
         const response = await fetch(
-          `/api/orders/new?${queryParams.toString()}`,
+          `${API_BASE_URL}/orders/new?${queryParams.toString()}`,
           {
             headers: {
               ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
             },
+            credentials: 'include', // 允许携带跨域cookie
           }
         );
         
@@ -246,18 +248,29 @@ const OrderPage: React.FC = () => {
       }));
       
       // 调用API提交订单
-      const response = await fetch('/api/orders/submit', {
+      const response = await fetch(`${API_BASE_URL}/orders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          trainNo,
-          departureStation,
-          arrivalStation,
-          departureDate,
-          passengers: passengersData,
+            trainNo,
+            seatType: passengersData[0]?.seatType || '二等座',
+            departureStation,
+            arrivalStation,
+            departureDate,
+            passengers: passengersData.map(p => {
+            const info = purchaseInfo.find(info => info.passenger.id === p.passengerId);
+            const passenger = info?.passenger;
+            return {
+              id: p.passengerId,
+              name: passenger?.name || '',
+              card_no: passenger?.card_no || passenger?.idCardNumber || '',
+              card_type: passenger?.card_type || passenger?.idCardType || '',
+              seat_type: info?.seatType || seatType
+            };
+          })
         }),
       });
       
@@ -351,7 +364,7 @@ const OrderPage: React.FC = () => {
               passengers={passengers}
               onPassengerSelect={handlePassengerSelect}
               onSearchPassenger={() => {}}
-              availableSeatTypes={fareInfo ? Object.keys(fareInfo).filter(key => fareInfo[key].available > 0) : []}
+              availableSeatTypes={availableSeats ? Object.keys(availableSeats).filter(key => availableSeats[key] > 0) : []}
               defaultSeatType={defaultSeatType}
               selectedPassengers={selectedPassengers}
               purchaseInfo={purchaseInfo}

@@ -1,6 +1,7 @@
 // 用户基本信息页
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../config';
 import TrainListTopBar from '../components/TrainListTopBar';
 import MainNavigation from '../components/MainNavigation';
 import SideMenu from '../components/SideMenu';
@@ -69,7 +70,7 @@ const PersonalInfoPage = () => {
       // 从localStorage获取token
       const token = localStorage.getItem('authToken');
       
-      const response = await fetch('/api/user/info', {
+      const response = await fetch(`${API_BASE_URL}/users/info`, {
         headers: { 
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

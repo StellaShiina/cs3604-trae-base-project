@@ -77,6 +77,8 @@ const LoginPage: React.FC = () => {
         sessionId,
         idCardLast4: data.idCardLast4,
         verificationCode: data.code
+      }, {
+        withCredentials: true // 允许跨域携带cookie
       })
       
       if (response.data.success || response.data.token) {

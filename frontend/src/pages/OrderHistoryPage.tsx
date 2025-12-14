@@ -1,6 +1,7 @@
 // 历史订单页
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../config';
 import TrainListTopBar from '../components/TrainListTopBar';
 import MainNavigation from '../components/MainNavigation';
 import SideMenu from '../components/SideMenu';
@@ -47,14 +48,16 @@ const OrderHistoryPage = () => {
       setIsLoading(true);
       setError('');
       const token = localStorage.getItem('authToken');
-      const response = await fetch('/api/user/orders', {
+      const response = await fetch(`${API_BASE_URL}/orders`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
       if (response.ok) {
         const data = await response.json();
-        setOrders(data.orders || []);
-        setFilteredOrders(data.orders || []);
+        // 兼容后端直接返回数组或返回对象的情况
+        const orderList = Array.isArray(data) ? data : (data.orders || []);
+        setOrders(orderList);
+        setFilteredOrders(orderList);
       } else {
         setError('获取订单列表失败');
       }
@@ -79,13 +82,14 @@ const OrderHistoryPage = () => {
       if (kw) params.append('keyword', kw);
       if (searchType) params.append('searchType', searchType);
 
-      const response = await fetch(`/api/user/orders?${params}`, {
+      const response = await fetch(`${API_BASE_URL}/orders?${params}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
       if (response.ok) {
         const data = await response.json();
-        setFilteredOrders(data.orders || []);
+        const orderList = Array.isArray(data) ? data : (data.orders || []);
+        setFilteredOrders(orderList);
       }
     } catch (err) {
       console.error('Search error:', err);

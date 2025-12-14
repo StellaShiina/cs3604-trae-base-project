@@ -18,7 +18,7 @@ const OrderListPanel: React.FC<OrderListPanelProps> = ({
   onNavigateToTrainList,
   onOrderCancelled
 }) => {
-  const [activeTab, setActiveTab] = useState<'pending' | 'unpaid' | 'history'>('unpaid');
+  const [activeTab, setActiveTab] = useState<'pending' | 'upcoming' | 'history'>('upcoming');
 
   // 根据选中标签过滤订单
   const filteredOrders = useMemo(() => {
@@ -45,8 +45,8 @@ const OrderListPanel: React.FC<OrderListPanelProps> = ({
     if (activeTab === 'pending') {
       // 未完成订单：仅 confirmed_unpaid（已确认未支付）状态
       // pending 状态属于系统内部状态，用户不可见
-      return orders.filter(order => order.status === 'confirmed_unpaid');
-    } else if (activeTab === 'unpaid') {
+      return orders.filter(order => order.status === 'confirmed_unpaid' || order.status === 'pending_payment');
+    } else if (activeTab === 'upcoming') {
       // 未出行订单：已支付（paid）或已完成（completed）且列车尚未发车（当前时间 < 发车时间）
       return orders.filter(order => {
         if (order.status !== 'paid' && order.status !== 'completed') return false;
@@ -94,29 +94,29 @@ const OrderListPanel: React.FC<OrderListPanelProps> = ({
     <div className="order-list-panel">
       <div className="order-type-section">
         <div className="order-tabs">
-          <button 
+          <div 
+            className={`order-tab ${activeTab === 'upcoming' ? 'active' : ''}`}
+            onClick={() => setActiveTab('upcoming')}
+          >
+            未出行订单
+          </div>
+          <div 
             className={`order-tab ${activeTab === 'pending' ? 'active' : ''}`}
             onClick={() => setActiveTab('pending')}
           >
-            未完成订单
-          </button>
-          <button 
-            className={`order-tab ${activeTab === 'unpaid' ? 'active' : ''}`}
-            onClick={() => setActiveTab('unpaid')}
-          >
-            未出行订单
-          </button>
-          <button 
+            未支付订单
+          </div>
+          <div 
             className={`order-tab ${activeTab === 'history' ? 'active' : ''}`}
             onClick={() => setActiveTab('history')}
           >
             历史订单
-          </button>
+          </div>
         </div>
       </div>
 
       {/* 未出行订单和历史订单都显示搜索筛选 */}
-      {(activeTab === 'unpaid' || activeTab === 'history') && (
+      {(activeTab === 'upcoming' || activeTab === 'history') && (
         <OrderSearchFilter 
           onSearch={onSearch} 
           variant={activeTab === 'history' ? 'history' : 'unpaid'} 

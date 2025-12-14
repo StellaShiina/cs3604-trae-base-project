@@ -3,7 +3,7 @@
  * 支持城市级查询
  */
 
-const API_BASE_URL = 'http://localhost:3000/api';
+import { API_BASE_URL } from '../config';
 
 export interface Station {
   stationName: string;
@@ -43,7 +43,14 @@ export const getAllStations = async (): Promise<Station[]> => {
     }
 
     const data = await response.json();
-    return data.stations || [];
+    const stations = data.stations || [];
+    
+    // 映射后端数据模型到前端模型
+    return stations.map((s: any) => ({
+      stationName: s.name_zh,
+      pinyin: s.name_en,
+      shortPinyin: s.code
+    }));
   } catch (error) {
     console.error('获取站点列表失败:', error);
     return [];
@@ -55,7 +62,8 @@ export const getAllStations = async (): Promise<Station[]> => {
  */
 export const searchStations = async (keyword: string): Promise<Station[]> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/stations?keyword=${encodeURIComponent(keyword)}`, {
+    // 后端支持 ?q=keyword
+    const response = await fetch(`${API_BASE_URL}/stations?q=${encodeURIComponent(keyword)}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -67,7 +75,13 @@ export const searchStations = async (keyword: string): Promise<Station[]> => {
     }
 
     const data = await response.json();
-    return data.stations || [];
+    const stations = data.stations || [];
+    
+    return stations.map((s: any) => ({
+      stationName: s.name_zh,
+      pinyin: s.name_en,
+      shortPinyin: s.code
+    }));
   } catch (error) {
     console.error('搜索站点失败:', error);
     return [];
@@ -76,29 +90,24 @@ export const searchStations = async (keyword: string): Promise<Station[]> => {
 
 /**
  * 验证站点是否有效
+ * 由于后端没有专门的validate接口，我们在前端通过搜索来验证
  */
 export const validateStation = async (stationName: string): Promise<ValidationResult> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/stations/validate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ stationName }),
-    });
+    // 精确匹配
+    const stations = await searchStations(stationName);
+    const exactMatch = stations.find(s => s.stationName === stationName);
 
-    const data = await response.json();
-
-    if (response.ok) {
+    if (exactMatch) {
       return {
         valid: true,
-        station: data.station,
+        station: exactMatch,
       };
     } else {
       return {
         valid: false,
-        error: data.error || '无法匹配该站点',
-        suggestions: data.suggestions || [],
+        error: '无法匹配该站点',
+        suggestions: stations,
       };
     }
   } catch (error) {
@@ -113,22 +122,13 @@ export const validateStation = async (stationName: string): Promise<ValidationRe
 
 /**
  * 获取所有支持的城市列表
+ * 目前后端将站点作为城市处理
  */
 export const getAllCities = async (): Promise<string[]> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/trains/cities`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('获取城市列表失败');
-    }
-
-    const data = await response.json();
-    return data.cities || [];
+    const stations = await getAllStations();
+    // 提取所有站点名称作为城市列表
+    return stations.map(s => s.stationName);
   } catch (error) {
     console.error('获取城市列表失败:', error);
     return [];
@@ -137,22 +137,16 @@ export const getAllCities = async (): Promise<string[]> => {
 
 /**
  * 根据城市名获取车站列表
+ * 目前后端没有城市-车站的层级关系，直接返回该城市（站点）本身
  */
 export const getStationsByCity = async (cityName: string): Promise<string[]> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/trains/cities/${encodeURIComponent(cityName)}/stations`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      return [];
+    // 验证该城市（站点）是否存在
+    const validation = await validateStation(cityName);
+    if (validation.valid) {
+      return [cityName];
     }
-
-    const data = await response.json();
-    return data.stations || [];
+    return [];
   } catch (error) {
     console.error('获取城市车站列表失败:', error);
     return [];
@@ -167,17 +161,18 @@ export const validateCity = async (cityName: string): Promise<CityValidationResu
     const allCities = await getAllCities();
     
     if (allCities.includes(cityName)) {
-      const stations = await getStationsByCity(cityName);
       return {
         valid: true,
         city: cityName,
-        stations: stations,
+        stations: [cityName],
       };
     } else {
+      // 尝试模糊匹配作为建议
+      const suggestions = allCities.filter(c => c.includes(cityName)).slice(0, 5);
       return {
         valid: false,
         error: '无法匹配该城市',
-        suggestions: allCities,
+        suggestions: suggestions,
       };
     }
   } catch (error) {
@@ -192,25 +187,9 @@ export const validateCity = async (cityName: string): Promise<CityValidationResu
 
 /**
  * 根据车站名获取所属城市
+ * 目前城市即车站
  */
 export const getCityByStation = async (stationName: string): Promise<string | null> => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/trains/stations/${encodeURIComponent(stationName)}/city`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const data = await response.json();
-    return data.city || null;
-  } catch (error) {
-    console.error('获取车站所属城市失败:', error);
-    return null;
-  }
+  const validation = await validateStation(stationName);
+  return validation.valid ? stationName : null;
 };
-

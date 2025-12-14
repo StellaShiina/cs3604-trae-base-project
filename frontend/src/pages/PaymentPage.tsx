@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { API_BASE_URL } from '../config';
 import './PaymentPage.css';
 import TrainListTopBar from '../components/TrainListTopBar';
 import MainNavigation from '../components/MainNavigation';
@@ -52,7 +53,7 @@ const PaymentPage: React.FC = () => {
 
       try {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`/api/payment/${orderId}`, {
+        const response = await fetch(`${API_BASE_URL}/orders/${orderId}/payment`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -87,7 +88,7 @@ const PaymentPage: React.FC = () => {
     setIsProcessing(true);
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`/api/payment/${orderId}/cancel`, {
+      const response = await fetch(`${API_BASE_URL}/orders/${orderId}/cancel`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -117,7 +118,7 @@ const PaymentPage: React.FC = () => {
     setIsProcessing(true);
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`/api/payment/${orderId}/confirm`, {
+      const response = await fetch(`${API_BASE_URL}/orders/${orderId}/pay`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`

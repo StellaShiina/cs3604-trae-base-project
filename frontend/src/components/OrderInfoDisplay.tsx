@@ -1,6 +1,7 @@
 import React from 'react';
 import './OrderInfoDisplay.css';
 import { formatSeatNumber } from '../utils/seatNumberFormatter';
+import { translateSeatType, translateTicketType } from '../utils/translationUtils';
 
 interface Passenger {
   sequence: number;
@@ -139,8 +140,8 @@ const OrderInfoDisplay: React.FC<OrderInfoDisplayProps> = ({
                     <td>{passenger.name}</td>
                     <td>{passenger.idCardType}</td>
                     <td>{maskIdCard(passenger.idCardNumber)}</td>
-                    <td>{passenger.ticketType}</td>
-                    <td>{passenger.seatType}</td>
+                    <td>{translateTicketType(passenger.ticketType)}</td>
+                    <td>{translateSeatType(passenger.seatType)}</td>
                     <td>{passenger.carNumber ? `${String(passenger.carNumber).padStart(2, '0')}` : ''}</td>
                     <td>{formatSeatDisplay(passenger.seatNumber, passenger.seatType)}</td>
                     <td>{passenger.price.toFixed(1)}元</td>

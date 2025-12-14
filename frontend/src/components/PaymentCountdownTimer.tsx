@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './PaymentCountdownTimer.css';
 
+import { API_BASE_URL } from '../config';
+
 interface PaymentCountdownTimerProps {
   orderId: string;
   initialTimeRemaining?: number; // 初始剩余时间（秒）
@@ -31,7 +33,7 @@ const PaymentCountdownTimer: React.FC<PaymentCountdownTimerProps> = ({
   const fetchTimeRemaining = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`/api/payment/${orderId}/time-remaining`, {
+      const response = await fetch(`${API_BASE_URL}/orders/${orderId}/time-remaining`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

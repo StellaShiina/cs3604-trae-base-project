@@ -55,8 +55,8 @@ const PassengerTable: React.FC<PassengerTableProps> = ({
                 <span className="index-number">{index + 1}</span>
               </td>
               <td className="name-cell">{passenger.name}</td>
-              <td className="id-type-cell">{passenger.idCardType || passenger.id_card_type}</td>
-              <td className="id-number-cell">{maskIdCard(passenger.idCardNumber || passenger.id_card_number)}</td>
+              <td className="id-type-cell">{passenger.idCardType || passenger.id_card_type || passenger.card_type}</td>
+              <td className="id-number-cell">{maskIdCard(passenger.idCardNumber || passenger.id_card_number || passenger.card_no)}</td>
               <td className="phone-cell">
                 {(() => {
                   const phone = passenger.phone || passenger.phoneNumber || passenger.phone_number;

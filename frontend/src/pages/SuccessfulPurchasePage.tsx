@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { API_BASE_URL } from '../config';
 import './SuccessfulPurchasePage.css';
 import TrainListTopBar from '../components/TrainListTopBar';
 import MainNavigation from '../components/MainNavigation';
@@ -44,7 +45,7 @@ const SuccessfulPurchasePage: React.FC = () => {
       try {
         const token = localStorage.getItem('authToken');
         // 从订单详情获取数据
-        const detailResponse = await fetch(`/api/orders/${orderId}/confirmation`, {
+        const detailResponse = await fetch(`${API_BASE_URL}/orders/${orderId}/payment`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

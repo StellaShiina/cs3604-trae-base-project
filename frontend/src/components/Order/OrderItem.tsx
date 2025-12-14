@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import './OrderItem.css';
 import { formatSeatInfoForDisplay } from '../../utils/seatNumberFormatter';
+import { translateSeatType, translateTicketType } from '../../utils/translationUtils';
 
 interface OrderItemProps {
   order: any;
@@ -33,7 +34,10 @@ const OrderItem: React.FC<OrderItemProps> = ({
   const formatSeatInfo = (passenger: any, status: string) => {
     // 已确认未支付（confirmed_unpaid）、已支付（paid）或已完成（completed）的订单，如果有座位号则显示完整信息
     if ((status === 'confirmed_unpaid' || status === 'paid' || status === 'completed') && passenger.seat_number) {
-      const seatType = passenger.seat_type || passenger.seatType || '二等座';
+      const seatType = translateSeatType(passenger.seat_type || passenger.seatType || '二等座');
+      // 注意：seatType 可能是英文，formatSeatInfoForDisplay 内部不一定翻译，所以这里最好也翻译一下？
+      // 但 formatSeatInfoForDisplay 逻辑似乎是接收 seatType 用来格式化座位号显示（比如 A/B/C/D/F），不一定显示文字。
+      // 检查 formatSeatInfoForDisplay 实现，它可能需要原始的 seatType。
       return formatSeatInfoForDisplay(passenger.seat_number, passenger.car_number, seatType);
     } else if (passenger.car_number && !passenger.seat_number) {
       // 有车厢号但没有座位号（pending 状态）
@@ -105,7 +109,7 @@ const OrderItem: React.FC<OrderItemProps> = ({
               {/* 席位信息列 */}
               <div className="order-item-cell order-item-seat-cell">
                 <div className="order-item-seat-detail">
-                  {passenger.seat_type}
+                  {translateSeatType(passenger.seat_type)}
                   <br />
                   {formatSeatInfo(passenger, order.status)}
                 </div>
@@ -114,7 +118,7 @@ const OrderItem: React.FC<OrderItemProps> = ({
               {/* 票价列 */}
               <div className="order-item-cell order-item-price-cell">
                 <div className="order-item-price-detail">
-                  <div className="order-item-ticket-type">{passenger.ticket_type || '成人票'}</div>
+                  <div className="order-item-ticket-type">{translateTicketType(passenger.ticket_type || '成人票')}</div>
                   <div className="order-item-price-amount">
                     <span className="order-item-price-value">{singlePrice.toFixed(1)}元</span>
                     {order.discount && (

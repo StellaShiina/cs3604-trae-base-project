@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './OrderSuccessModal.css';
 import { formatSeatInfoForDisplay } from '../utils/seatNumberFormatter';
+import { translateSeatType, translateTicketType } from '../utils/translationUtils';
+import './OrderSuccessModal.css';
 
 interface TicketInfo {
   passengerName: string;
@@ -102,14 +103,14 @@ const OrderSuccessModal: React.FC<OrderSuccessModalProps> = ({
                   const formattedSeat = formatSeatInfoForDisplay(
                     ticket.seatNo,
                     ticket.carNo,
-                    ticket.seatType
+                    translateSeatType(ticket.seatType)
                   );
                   return (
                     <tr key={index}>
                       <td>{ticket.passengerName}</td>
-                      <td>{ticket.seatType}</td>
+                      <td>{translateSeatType(ticket.seatType)}</td>
                       <td className="seat-no-highlight">{formattedSeat}</td>
-                      <td>{ticket.ticketType}</td>
+                      <td>{translateTicketType(ticket.ticketType)}</td>
                     </tr>
                   );
                 })}

@@ -2,6 +2,29 @@
  * 车次服务 - 封装车次相关的API调用
  */
 
+import { API_BASE_URL } from '../config';
+import { translateSeatType } from '../utils/translationUtils';
+
+/**
+ * 计算历时（分钟）
+ */
+function calculateDuration(startTime: string, endTime: string): number {
+  try {
+    if (!startTime || !endTime) return 0;
+    const [startH, startM] = startTime.split(':').map(Number);
+    const [endH, endM] = endTime.split(':').map(Number);
+    
+    let duration = (endH * 60 + endM) - (startH * 60 + startM);
+    if (duration < 0) {
+      // 跨天，加24小时
+      duration += 24 * 60;
+    }
+    return duration;
+  } catch (e) {
+    return 0;
+  }
+}
+
 /**
  * 搜索车次
  * @param departureStation 出发站
@@ -16,29 +39,72 @@ export async function searchTrains(
   trainTypes?: string[]
 ) {
   try {
-    const response = await fetch('/api/trains/search', {
-      method: 'POST',
+    // 构建查询参数
+    const params = new URLSearchParams({
+      fromStationId: departureStation, // 后端目前支持直接传站点名称
+      toStationId: arrivalStation,
+      date: departureDate
+    });
+
+    const response = await fetch(`${API_BASE_URL}/trains/search?${params.toString()}`, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        departureStation,
-        arrivalStation,
-        departureDate,
-        trainTypes: trainTypes || [],
-      }),
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || '查询失败');
+      // 尝试解析错误信息，如果解析失败则使用默认信息
+      let errorMessage = '查询失败';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorMessage;
+      } catch (e) {
+        // 忽略 JSON 解析错误，使用状态文本
+        errorMessage = response.statusText || errorMessage;
+      }
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
+    // 后端直接返回数组，需要转换为前端期望的格式
+    // 如果没有数据，后端可能返回 null，这里需要处理
+    const trainList = Array.isArray(data) ? data : ((data && data.trains) || []);
+
+    const mappedTrains = trainList.map((t: any) => {
+      // 转换座位信息为 Map 格式，并将英文类型映射为中文
+      const availableSeats: any = {};
+
+      (t.seats || []).forEach((seat: any) => {
+        const zhType = translateSeatType(seat.type);
+        availableSeats[zhType] = seat.left;
+      });
+
+      return {
+        trainNo: t.trainNo,
+        departureStation: t.from,
+        arrivalStation: t.to,
+        departureDate: departureDate, // 使用查询日期
+        departureTime: t.startTime,
+        arrivalTime: t.endTime,
+        duration: calculateDuration(t.startTime, t.endTime),
+        availableSeats: availableSeats,
+        // 其他字段如有需要可以在此添加
+      };
+    });
+
+    // 客户端过滤车次类型
+    const filteredTrains = trainTypes && trainTypes.length > 0 
+      ? mappedTrains.filter((t: any) => {
+          const type = t.trainNo.charAt(0);
+          return trainTypes.includes(type) || (trainTypes.includes('Other') && !['G','D','C'].includes(type));
+        })
+      : mappedTrains;
+
     return {
       success: true,
-      trains: data.trains || [],
-      timestamp: data.timestamp,
+      trains: filteredTrains,
+      timestamp: new Date().toISOString(),
     };
   } catch (error: any) {
     console.error('搜索车次失败:', error);

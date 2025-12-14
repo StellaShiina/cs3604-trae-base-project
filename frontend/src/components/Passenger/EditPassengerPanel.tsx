@@ -15,7 +15,7 @@ const EditPassengerPanel: React.FC<EditPassengerPanelProps> = ({
   onCancel
 }) => {
   const [phone, setPhone] = useState(passenger.phone || '');
-  const [discountType, setDiscountType] = useState(passenger.discountType || passenger.discount_type || '成人');
+  const [discountType, setDiscountType] = useState(passenger.discountType || passenger.discount_type || passenger.passenger_type || '成人');
   const [errors, setErrors] = useState<any>({});
   const [isLoading, setIsLoading] = useState(false);
 
@@ -42,8 +42,8 @@ const EditPassengerPanel: React.FC<EditPassengerPanelProps> = ({
       // 传递所有字段，包括不可编辑的字段，以避免数据丢失
       await onSubmit({ 
         name: passenger.name,
-        idCardType: passenger.idCardType || passenger.id_card_type,
-        idCardNumber: passenger.idCardNumber || passenger.id_card_number,
+        idCardType: passenger.idCardType || passenger.id_card_type || passenger.card_type,
+        idCardNumber: passenger.idCardNumber || passenger.id_card_number || passenger.card_no,
         phone, 
         discountType 
       });
@@ -65,7 +65,7 @@ const EditPassengerPanel: React.FC<EditPassengerPanelProps> = ({
                 <span className="edit-required-mark">* </span>证件类型：
               </span>
               <span className="edit-info-value">
-                {passenger.idCardType || passenger.id_card_type || '居民身份证'}
+                {passenger.idCardType || passenger.id_card_type || passenger.card_type || '居民身份证'}
               </span>
             </div>
 
@@ -81,7 +81,7 @@ const EditPassengerPanel: React.FC<EditPassengerPanelProps> = ({
                 <span className="edit-required-mark">* </span>证件号码：
               </span>
               <span className="edit-info-value">
-                {passenger.idCardNumber || passenger.id_card_number}
+                {passenger.idCardNumber || passenger.id_card_number || passenger.card_no}
               </span>
             </div>
 

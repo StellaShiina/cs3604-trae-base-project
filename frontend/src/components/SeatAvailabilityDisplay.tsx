@@ -1,5 +1,6 @@
 import React from 'react';
 import './SeatAvailabilityDisplay.css';
+import { translateSeatType } from '../utils/translationUtils';
 
 interface SeatAvailabilityDisplayProps {
   availableSeats: any;
@@ -18,7 +19,7 @@ const SeatAvailabilityDisplay: React.FC<SeatAvailabilityDisplayProps> = ({ avail
         {Object.entries(availableSeats).map(([seatType, count], index) => (
           <span key={seatType}>
             {index > 0 && '，'}
-            {seatType}余票 <span className="seat-count">{String(count)}</span> 张
+            {translateSeatType(seatType)}余票 <span className="seat-count">{String(count)}</span> 张
           </span>
         ))}
         。

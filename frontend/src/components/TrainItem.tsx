@@ -21,6 +21,9 @@ const TrainItem: React.FC<TrainItemProps> = ({ train, onReserve, isLoggedIn, que
     secondClass: train.availableSeats?.['二等座'] ?? null,
     softSleeper: train.availableSeats?.['软卧'] ?? null,
     hardSleeper: train.availableSeats?.['硬卧'] ?? null,
+    hardSeat: train.availableSeats?.['硬座'] ?? null,
+    softSeat: train.availableSeats?.['软座'] ?? null,
+    noSeat: train.availableSeats?.['无座'] ?? null,
   };
 
   const formatSeatStatus = (count: number | null | undefined) => {
@@ -159,17 +162,23 @@ const TrainItem: React.FC<TrainItemProps> = ({ train, onReserve, isLoggedIn, que
       
       {/* 软座 */}
       <div className="train-item-cell">
-        <div className="seat-info">--</div>
+        <div className={`seat-info ${getSeatClass(availableSeats.softSeat)}`}>
+          {formatSeatStatus(availableSeats.softSeat)}
+        </div>
       </div>
       
       {/* 硬座 */}
       <div className="train-item-cell">
-        <div className="seat-info">--</div>
+        <div className={`seat-info ${getSeatClass(availableSeats.hardSeat)}`}>
+          {formatSeatStatus(availableSeats.hardSeat)}
+        </div>
       </div>
       
       {/* 无座 */}
       <div className="train-item-cell">
-        <div className="seat-info">--</div>
+        <div className={`seat-info ${getSeatClass(availableSeats.noSeat)}`}>
+          {formatSeatStatus(availableSeats.noSeat)}
+        </div>
       </div>
       
       {/* 其他 */}

@@ -7,6 +7,8 @@ import SeatAvailabilityDisplay from './SeatAvailabilityDisplay';
 import ProcessingModal from './ProcessingModal';
 import OrderSuccessModal from './OrderSuccessModal';
 import BookingFailedModal from './BookingFailedModal';
+import { API_BASE_URL } from '../config';
+import { translateSeatType, translateTicketType } from '../utils/translationUtils';
 
 interface OrderConfirmationModalProps {
   isVisible: boolean;
@@ -58,7 +60,7 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
         }
         
         // 调用API获取订单核对信息
-        const response = await fetch(`/api/orders/${orderId}/confirmation`, {
+        const response = await fetch(`${API_BASE_URL}/orders/${orderId}/confirmation`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -97,10 +99,10 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
         return;
       }
       
-      console.log('🔵 调用确认订单API:', `/api/orders/${orderId}/confirm`);
+      console.log('🔵 调用确认订单API:', `${API_BASE_URL}/orders/${orderId}/confirm`);
       
       // 调用确认订单API
-      const response = await fetch(`/api/orders/${orderId}/confirm`, {
+      const response = await fetch(`${API_BASE_URL}/orders/${orderId}/confirm`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -208,8 +210,8 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
                             {orderInfo.passengers.map((passenger: any, index: number) => (
                               <tr key={index}>
                                 <td>{index + 1}</td>
-                                <td>{passenger.seatType || '二等座'}</td>
-                                <td>{passenger.ticketType || '成人票'}</td>
+                                <td>{translateSeatType(passenger.seatType)}</td>
+                                <td>{translateTicketType(passenger.ticketType)}</td>
                                 <td>
                                   {passenger.name}
                                   {passenger.points > 0 ? (
