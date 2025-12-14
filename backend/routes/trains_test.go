@@ -37,3 +37,16 @@ func TestSearchTrains(t *testing.T) {
 		// assert.Contains(t, body, "VNP") // Actual departure station
 	})
 }
+
+func TestGetStations(t *testing.T) {
+	r := setupTestRouter()
+
+	t.Run("Success_AllStations", func(t *testing.T) {
+		req, _ := http.NewRequest("GET", "/api/v1/stations", nil)
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+		// Check JSON structure: {"stations": [...]}
+	})
+}

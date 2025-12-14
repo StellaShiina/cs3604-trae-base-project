@@ -79,6 +79,11 @@ func SetupRouter() *gin.Engine {
 		protected := v1.Group("/")
 		protected.Use(AuthMiddleware())
 		{
+			users := protected.Group("/users")
+			{
+				users.GET("/info", GetUserInfo)
+			}
+
 			passengers := protected.Group("/passengers")
 			{
 				passengers.GET("", GetPassengers)
@@ -99,9 +104,15 @@ func SetupRouter() *gin.Engine {
 			}
 		}
 
+		// Public Train/Station Routes
 		trains := v1.Group("/trains")
 		{
 			trains.GET("/search", SearchTrains)
+		}
+
+		stations := v1.Group("/stations")
+		{
+			stations.GET("", GetStations)
 		}
 	}
 

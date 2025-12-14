@@ -29,14 +29,14 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 type Passenger struct {
-	ID            uuid.UUID `gorm:"primary_key"`
-	UserID        uuid.UUID `gorm:"not null"`
-	Name          string    `gorm:"not null"`
-	CardType      string    `gorm:"not null;default:'id_card'"`
-	CardNo        string    `gorm:"not null"`
-	PassengerType string    `gorm:"not null;default:'adult'"`
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
+	ID            uuid.UUID `gorm:"primary_key" json:"id"`
+	UserID        uuid.UUID `gorm:"not null" json:"user_id"`
+	Name          string    `gorm:"not null" json:"name"`
+	CardType      string    `gorm:"not null;default:'id_card'" json:"card_type"`
+	CardNo        string    `gorm:"not null" json:"card_no"`
+	PassengerType string    `gorm:"not null;default:'adult'" json:"passenger_type"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
 }
 
 func (p *Passenger) BeforeCreate(tx *gorm.DB) (err error) {

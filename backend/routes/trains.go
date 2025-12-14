@@ -175,3 +175,26 @@ func SearchTrains(c *gin.Context) {
 
     c.JSON(http.StatusOK, response)
 }
+
+// API-GET-Stations
+func GetStations(c *gin.Context) {
+	query := c.Query("q")
+	
+	var stations []models.Station
+	dbQuery := db.GetDB().Model(&models.Station{})
+	
+	if query != "" {
+		// Fuzzy search
+		search := "%" + query + "%"
+		dbQuery = dbQuery.Where("name_zh LIKE ? OR name_en LIKE ? OR code LIKE ?", search, search, search)
+	}
+	
+	if err := dbQuery.Find(&stations).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch stations"})
+		return
+	}
+	
+	c.JSON(http.StatusOK, gin.H{
+		"stations": stations,
+	})
+}

@@ -552,6 +552,52 @@ func TestLogin(t *testing.T) {
 	})
 }
 
+func TestGetUserInfo(t *testing.T) {
+	r := setupTestRouter()
+
+	// 1. Create a user
+	user := models.User{
+		Username:     "user_info_test",
+		Name:         "张三",
+		Mobile:       func() *string { s := "13900000000"; return &s }(),
+		PasswordHash: "hash",
+	}
+	db.GetDB().Create(&user)
+
+	// 2. Test unauthorized access
+	t.Run("Unauthorized", func(t *testing.T) {
+		req, _ := http.NewRequest("GET", "/api/v1/users/info", nil)
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+		assert.Equal(t, http.StatusUnauthorized, w.Code)
+	})
+
+	// 3. Test authorized access
+	t.Run("Authorized", func(t *testing.T) {
+		req, _ := http.NewRequest("GET", "/api/v1/users/info", nil)
+		// Set cookie
+		cookie := &http.Cookie{
+			Name:  "sid",
+			Value: "dummy-session-" + user.ID.String(),
+		}
+		req.AddCookie(cookie)
+		
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+		
+		var response map[string]interface{}
+		json.Unmarshal(w.Body.Bytes(), &response)
+		
+		// Response is now flat
+		assert.Equal(t, "user_info_test", response["username"])
+		assert.Equal(t, "张三", response["name"])
+		assert.Equal(t, "中国CN", response["country"])
+		assert.Equal(t, "13900000000", response["phone"])
+	})
+}
+
 // Scenario: 未登录访问受保护资源 (后端鉴权)
 // Given 用户未登录 (无有效会话 ID)
 // When 调用 "获取用户资料" 或 "获取订单列表" API

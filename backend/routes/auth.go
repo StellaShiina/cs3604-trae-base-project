@@ -723,3 +723,54 @@ func VerifySMS(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Verification successful"})
 }
+
+// API-GET-GetUserInfo
+func GetUserInfo(c *gin.Context) {
+	cookie, err := c.Cookie("sid")
+	if err != nil || cookie == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	// Parse UUID from dummy-session-UUID
+	if !strings.HasPrefix(cookie, "dummy-session-") {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid session format"})
+		return
+	}
+
+	userIDStr := strings.TrimPrefix(cookie, "dummy-session-")
+	userID, err := uuid.Parse(userIDStr)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user ID in session"})
+		return
+	}
+
+	var user models.User
+	if err := db.GetDB().First(&user, "id = ?", userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	// Map to frontend expected format
+	var email string
+	if user.Email != nil {
+		email = *user.Email
+	}
+	
+	var phone string
+	if user.Mobile != nil {
+		phone = *user.Mobile
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"username":           user.Username,
+		"name":               user.Name,
+		"country":            "中国CN", // Mock
+		"idCardType":         user.IDType,
+		"idCardNumber":       user.IDNo,
+		"verificationStatus": "已通过", // Mock
+		"phone":              phone,
+		"email":              email,
+		"discountType":       "成人", // Mock
+	})
+}

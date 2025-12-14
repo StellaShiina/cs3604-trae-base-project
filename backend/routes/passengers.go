@@ -57,6 +57,29 @@ func GetPassengers(c *gin.Context) {
 		return
 	}
 
+	// Map Enums back to Chinese for frontend display
+	for i := range passengers {
+		switch passengers[i].CardType {
+		case "id_card":
+			passengers[i].CardType = "居民身份证"
+		case "passport":
+			passengers[i].CardType = "护照"
+		case "hkm_pass":
+			passengers[i].CardType = "港澳居民来往内地通行证"
+		case "tw_pass":
+			passengers[i].CardType = "台湾居民来往大陆通行证"
+		}
+
+		switch passengers[i].PassengerType {
+		case "adult":
+			passengers[i].PassengerType = "成人"
+		case "student":
+			passengers[i].PassengerType = "学生"
+		case "child":
+			passengers[i].PassengerType = "儿童"
+		}
+	}
+
 	c.JSON(http.StatusOK, passengers)
 }
 
@@ -85,6 +108,28 @@ func AddPassenger(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+
+	// Map CardType from Chinese to Enum
+	switch req.CardType {
+	case "居民身份证":
+		req.CardType = "id_card"
+	case "护照":
+		req.CardType = "passport"
+	case "港澳居民来往内地通行证":
+		req.CardType = "hkm_pass"
+	case "台湾居民来往大陆通行证":
+		req.CardType = "tw_pass"
+	}
+
+	// Map PassengerType from Chinese to Enum
+	switch req.Type {
+	case "成人":
+		req.Type = "adult"
+	case "学生":
+		req.Type = "student"
+	case "儿童":
+		req.Type = "child"
 	}
 
 	var count int64
