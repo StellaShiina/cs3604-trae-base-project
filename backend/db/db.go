@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/glebarez/sqlite"
 	"gorm.io/driver/postgres"
@@ -34,12 +35,19 @@ func Init() {
 // InitTest initializes an in-memory SQLite database for testing
 func InitTest() {
 	var err error
-	DB, err = gorm.Open(sqlite.Open(":memory:"), &gorm.Config{
+	// Use shared cache to ensure all connections in the pool see the same data
+    // Use unique name to ensure isolation between tests
+    dbName := fmt.Sprintf("file:memdb%d?mode=memory&cache=shared", time.Now().UnixNano())
+	DB, err = gorm.Open(sqlite.Open(dbName), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
 	})
 	if err != nil {
 		panic("Failed to connect to test database")
 	}
+	// Set MaxOpenConns to 1 to avoid concurrency locking issues with sqlite shared cache if needed,
+	// but shared cache usually handles it. However, standard practice for sqlite memory:
+	sqlDB, _ := DB.DB()
+	sqlDB.SetMaxOpenConns(1)
 }
 
 func GetDB() *gorm.DB {

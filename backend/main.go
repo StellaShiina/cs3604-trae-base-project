@@ -9,4 +9,7 @@ func main() {
 	db.Init()
 	r := routes.SetupRouter()
 	r.Run(":8081")
+    db.Init()
+    r := routes.SetupRouter()
+    r.Run(":8081")
 }

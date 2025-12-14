@@ -8,18 +8,17 @@ import (
 )
 
 type User struct {
-	ID           uuid.UUID `gorm:"primary_key" json:"id"`
-	Username     string    `gorm:"unique;not null" json:"username"`
-	Email        string    `gorm:"unique" json:"email"`
-	Mobile       string    `gorm:"unique" json:"mobile"`
-	PasswordHash string    `gorm:"not null" json:"-"`
-	Name         string    `json:"name"`
-	IDType       string    `json:"id_type"`
-	IDNo         string    `json:"id_no"`
-	Gender       string    `json:"gender"`
-	Status       string    `gorm:"default:'active'" json:"status"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
+    ID           uuid.UUID `gorm:"primary_key" json:"id"`
+    Username     string    `gorm:"unique;not null" json:"username"`
+    Email        *string   `gorm:"unique" json:"email"`
+    Mobile       *string   `gorm:"unique" json:"mobile"`
+    PasswordHash string    `gorm:"not null" json:"-"`
+    Name         string    `json:"name"`
+    IDType       string    `json:"id_type"`
+    IDNo         string    `json:"id_no"`
+    Status       string    `gorm:"default:'active'" json:"status"`
+    CreatedAt    time.Time `json:"created_at"`
+    UpdatedAt    time.Time `json:"updated_at"`
 }
 
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
@@ -95,4 +94,26 @@ type Ticket struct {
 	Status            string `gorm:"default:'active'"`
 	CreatedAt         time.Time
 	UpdatedAt         time.Time
+}
+
+// New models for missing tables
+
+func (s *Station) BeforeCreate(tx *gorm.DB) (err error) {
+	if s.ID == uuid.Nil {
+		s.ID = uuid.New()
+	}
+	return
+}
+
+type TrainService struct {
+	ID          int64     `gorm:"primary_key"`
+	TrainNo     string    `gorm:"not null"`
+	ServiceDate time.Time `gorm:"type:date;not null"` // In SQLite date might need care, but Gorm handles it
+}
+
+type ServiceSegment struct {
+	ID             int64     `gorm:"primary_key"`
+	TrainServiceID int64     `gorm:"not null"`
+	FromStationID  uuid.UUID `gorm:"not null"`
+	ToStationID    uuid.UUID `gorm:"not null"`
 }

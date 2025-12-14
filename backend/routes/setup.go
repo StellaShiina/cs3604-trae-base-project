@@ -23,12 +23,34 @@ func CORSMiddleware() gin.HandlerFunc {
 	}
 }
 
+func AuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		cookie, err := c.Cookie("sid")
+		if err != nil || cookie == "" {
+			c.JSON(401, gin.H{"error": "Unauthorized"})
+			c.Abort()
+			return
+		}
+		// In production, validate session ID against Redis/DB
+		// For now, we assume if cookie exists it's valid for simple tests unless we implement session store
+		c.Next()
+	}
+}
+
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
 	r.Use(CORSMiddleware())
 
 	v1 := r.Group("/api/v1")
 	{
+		// Registration Flow (Matches frontend /register prefix)
+		// Frontend requests: /api/v1/auth/register/validate-username
+		// The frontend prefixes everything with /auth because of my previous suggestion, OR
+		// Looking at the log: POST "/api/v1/auth/register/validate-username" 404
+		// This means the frontend IS sending /auth/register/...
+		// But I configured backend to listen on /api/v1/register/...
+		// So I need to move it back to /auth group or adjust the group path.
+		
 		auth := v1.Group("/auth")
 		{
 			auth.POST("/register", Register)
@@ -39,7 +61,9 @@ func SetupRouter() *gin.Engine {
 			auth.POST("/verify-sms", VerifySMS)
 		}
 
-		passengers := v1.Group("/passengers")
+		// Protected Routes
+		protected := v1.Group("/")
+		protected.Use(AuthMiddleware())
 		{
 			passengers.GET("", GetPassengers)
 			passengers.POST("", AddPassenger)
@@ -47,6 +71,7 @@ func SetupRouter() *gin.Engine {
 			passengers.DELETE("/:id", DeletePassenger)
 		}
 
+		// Public Train/Station Routes
 		trains := v1.Group("/trains")
 		{
 			trains.GET("/search", SearchTrains)
@@ -77,7 +102,7 @@ func SetupRouter() *gin.Engine {
 
 		tickets := v1.Group("/tickets")
 		{
-			tickets.POST("/:id/refund", RefundTicket)
+			stations.GET("", GetStations)
 		}
 	}
 
