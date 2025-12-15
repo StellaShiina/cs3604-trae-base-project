@@ -14,9 +14,10 @@ import (
 )
 
 type CreateOrderRequest struct {
-	TrainNo    string `json:"trainNo" binding:"required"`
-	SeatType   string `json:"seatType" binding:"required"`
-	Passengers []struct {
+	TrainNo       string `json:"trainNo" binding:"required"`
+	DepartureDate string `json:"departureDate" binding:"required"` // Added departureDate
+	SeatType      string `json:"seatType" binding:"required"`
+	Passengers    []struct {
 		ID     string `json:"id"`
 		Name   string `json:"name"`
 		CardNo string `json:"card_no"`
@@ -38,6 +39,20 @@ func CreateOrder(c *gin.Context) {
 		return
 	}
 
+	// 1.5. Check for existing pending orders
+	var pendingCount int64
+	if err := db.GetDB().Model(&models.Order{}).Where("user_id = ? AND status = ?", userID, "pending_payment").Count(&pendingCount).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check pending orders"})
+		return
+	}
+	if pendingCount > 0 {
+		c.JSON(http.StatusConflict, gin.H{
+			"error": "You have an unpaid order. Please pay or cancel it first.",
+			"hasUnpaidOrder": true, // Frontend check
+		})
+		return
+	}
+
 	var req CreateOrderRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -55,8 +70,8 @@ func CreateOrder(c *gin.Context) {
     var trainService models.TrainService
     // Use raw SQL for date because Gorm date mapping with SQLite/Postgres might differ slightly in format
 	// In production (Postgres), current_date is safe. In testing (SQLite/Postgres), it depends.
-	// We check if service_date equals today.
-    if err := tx.Where("train_no = ? AND service_date = ?", req.TrainNo, time.Now().Format("2006-01-02")).First(&trainService).Error; err != nil {
+	// We check if service_date equals request departure date.
+    if err := tx.Where("train_no = ? AND service_date = ?", req.TrainNo, req.DepartureDate).First(&trainService).Error; err != nil {
         tx.Rollback()
         c.JSON(http.StatusBadRequest, gin.H{"error": "Train service not found"})
         return
@@ -228,15 +243,19 @@ func GetOrders(c *gin.Context) {
 	}
 
 	type OrderView struct {
-		OrderID     uuid.UUID    `json:"orderId"`
-		Status      string       `json:"status"`
-		TrainNo     string       `json:"trainNo"`
-		FromStation string       `json:"fromStation"`
-		ToStation   string       `json:"toStation"`
-		DepartTime  string       `json:"departTime"`
-		ArriveTime  string       `json:"arriveTime"`
-		TotalPrice  int          `json:"totalPrice"` // Cents, frontend divides by 100
-		Tickets     []TicketView `json:"tickets"`
+		OrderID          uuid.UUID    `json:"orderId"` // Backend standard
+		ID               uuid.UUID    `json:"id"`      // Frontend legacy expectation
+		Status           string       `json:"status"`
+		TrainNo          string       `json:"train_no"`          // Mapped for frontend snake_case expectation
+		FromStation      string       `json:"departure_station"` // Mapped
+		ToStation        string       `json:"arrival_station"`   // Mapped
+		DepartureDate    string       `json:"departure_date"`    // Mapped
+		DepartureTime    string       `json:"departure_time"`    // Mapped
+		ArriveTime       string       `json:"arrival_time"`      // Mapped
+		TotalPrice       float64      `json:"total_price"`       // Yuan (float)
+		CreatedAt        string       `json:"created_at"`        // Mapped
+		Tickets          []TicketView `json:"tickets"`           // Usually passengers list
+		Passengers       []TicketView `json:"passengers"`        // Frontend might look for 'passengers'
 	}
 
 	var dbOrders []models.Order
@@ -259,6 +278,11 @@ func GetOrders(c *gin.Context) {
 		if status == "cancelled" {
 			status = "canceled"
 		}
+		// Frontend might request 'pending' or 'confirmed_unpaid' which map to 'pending_payment'
+		if status == "pending" || status == "confirmed_unpaid" {
+			status = "pending_payment"
+		}
+
 		query = query.Where("status = ?", status)
 	}
 
@@ -285,22 +309,24 @@ func GetOrders(c *gin.Context) {
 			})
 		}
 		
-		// If tickets is nil (empty), make it empty array to avoid null in JSON?
-		// But Go marshals nil slice as null. Frontend might expect array.
 		if tickets == nil {
 			tickets = []TicketView{}
 		}
 
 		response = append(response, OrderView{
-			OrderID:     o.ID,
-			Status:      o.Status,
-			TrainNo:     o.TrainService.TrainNo,
-			FromStation: o.FromStation.NameZh,
-			ToStation:   o.ToStation.NameZh,
-			DepartTime:  o.Segment.DepartTime,
-			ArriveTime:  o.Segment.ArriveTime,
-			TotalPrice:  o.TotalPriceCents,
-			Tickets:     tickets,
+			OrderID:          o.ID,
+			ID:               o.ID,
+			Status:           o.Status,
+			TrainNo:          o.TrainService.TrainNo,
+			FromStation:      o.FromStation.NameZh,
+			ToStation:        o.ToStation.NameZh,
+			DepartureDate:    o.TrainService.ServiceDate.Format("2006-01-02"),
+			DepartureTime:    o.Segment.DepartTime,
+			ArriveTime:       o.Segment.ArriveTime,
+			TotalPrice:       float64(o.TotalPriceCents) / 100.0,
+			CreatedAt:        o.CreatedAt.Format("2006-01-02 15:04:05"),
+			Tickets:          tickets,
+			Passengers:       tickets, // Map tickets to passengers for frontend
 		})
 	}
 
@@ -517,6 +543,20 @@ func GetOrderInfo(c *gin.Context) {
 	}
 
 	// 8. Construct Response
+	defaultSeat := "second"
+	if _, ok := availableSeats["second"]; ok {
+		defaultSeat = "second"
+	} else if _, ok := availableSeats["first"]; ok {
+		defaultSeat = "first"
+	} else if _, ok := availableSeats["business"]; ok {
+		defaultSeat = "business"
+	} else if len(availableSeats) > 0 {
+		for k := range availableSeats {
+			defaultSeat = k
+			break
+		}
+	}
+
 	resp := OrderInfoResponse{
 		TrainInfo: TrainInfoView{
 			TrainNo:          result.TrainNo,
@@ -530,7 +570,7 @@ func GetOrderInfo(c *gin.Context) {
 		FareInfo:        fareInfo,
 		AvailableSeats:  availableSeats,
 		Passengers:      passengers,
-		DefaultSeatType: "二等座",
+		DefaultSeatType: defaultSeat,
 	}
 
 	c.JSON(http.StatusOK, resp)
@@ -706,6 +746,8 @@ func GetPayment(c *gin.Context) {
 	if order.Status == "pending_payment" && time.Now().After(order.ExpiresAt) {
 		// Update status if needed or just return error
 		order.Status = "canceled" // Trigger should handle inventory? Or cron job?
+		db.GetDB().Save(&order)   // Persist the cancellation
+		
 		// For now, let's just return error
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Order expired"})
 		return

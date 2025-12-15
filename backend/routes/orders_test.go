@@ -66,8 +66,9 @@ func TestCreateOrder(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		pID := uuid.New().String()
 		payload := map[string]interface{}{
-			"trainNo":  trainNo,
-			"seatType": "second",
+			"trainNo":       trainNo,
+			"departureDate": serviceDate.Format("2006-01-02"), // Added departureDate
+			"seatType":      "second",
 			"passengers": []map[string]string{
 				{"id": pID, "name": "P1", "card_no": "123"},
 			},
@@ -85,6 +86,51 @@ func TestCreateOrder(t *testing.T) {
 		var response map[string]interface{}
 		json.Unmarshal(w.Body.Bytes(), &response)
 		assert.Contains(t, response, "orderId")
+	})
+
+	t.Run("PreventDuplicateOrder", func(t *testing.T) {
+		// 1. Create a pending order
+		orderID := uuid.New()
+		order := models.Order{
+			ID:              orderID,
+			UserID:          userID,
+			TrainServiceID:  trainService.ID,
+			FromStationID:   bjp.ID,
+			ToStationID:     shh.ID,
+			SegmentID:       segment.ID,
+			Status:          "pending_payment",
+			TotalPriceCents: 5000,
+			CreatedAt:       time.Now(),
+		}
+		db.GetDB().Create(&order)
+
+		// 2. Try to create another order
+		pID := uuid.New().String()
+		payload := map[string]interface{}{
+			"trainNo":       trainNo,
+			"departureDate": serviceDate.Format("2006-01-02"), // Added departureDate
+			"seatType":      "second",
+			"passengers": []map[string]string{
+				{"id": pID, "name": "P2", "card_no": "1234"},
+			},
+		}
+		body, _ := json.Marshal(payload)
+		req, _ := http.NewRequest("POST", "/api/v1/orders", bytes.NewBuffer(body))
+		req.AddCookie(&http.Cookie{Name: "sid", Value: "dummy-session-00000000-0000-0000-0000-000000000000"})
+		req.Header.Set("Content-Type", "application/json")
+		
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+
+		// Expect 409 Conflict
+		assert.Equal(t, http.StatusConflict, w.Code)
+		var response map[string]interface{}
+		json.Unmarshal(w.Body.Bytes(), &response)
+		assert.Contains(t, response, "error")
+		assert.True(t, response["hasUnpaidOrder"].(bool))
+
+		// Cleanup
+		db.GetDB().Delete(&order)
 	})
 
 	t.Run("NotEnoughSeats", func(t *testing.T) {
@@ -229,6 +275,23 @@ func TestOrderConfirmationAndPayment(t *testing.T) {
 		assert.Equal(t, http.StatusOK, w.Code)
 	})
 
+	t.Run("PayOrder", func(t *testing.T) {
+		req, _ := http.NewRequest("POST", "/api/v1/orders/"+orderID.String()+"/pay", nil)
+		req.AddCookie(&http.Cookie{Name: "sid", Value: "dummy-session-00000000-0000-0000-0000-000000000000"})
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+		var resp map[string]interface{}
+		json.Unmarshal(w.Body.Bytes(), &resp)
+		assert.Equal(t, "paid", resp["status"])
+		
+		// Verify status in DB
+		var updatedOrder models.Order
+		db.GetDB().First(&updatedOrder, orderID)
+		assert.Equal(t, "paid", updatedOrder.Status)
+	})
+
 	t.Run("GetPayment", func(t *testing.T) {
 		req, _ := http.NewRequest("GET", "/api/v1/orders/"+orderID.String()+"/payment", nil)
 		req.AddCookie(&http.Cookie{Name: "sid", Value: "dummy-session-00000000-0000-0000-0000-000000000000"})
@@ -319,11 +382,13 @@ func TestGetOrders(t *testing.T) {
 		assert.Len(t, resp, 2)
         // Verify sorting (created_at desc) -> Order 2 first
         assert.Equal(t, order2.ID.String(), resp[0]["orderId"])
+		assert.Equal(t, order2.ID.String(), resp[0]["id"])
         // Verify fields
-        assert.Equal(t, "G888", resp[0]["trainNo"])
-        assert.Equal(t, "Beijing Orders", resp[0]["fromStation"])
-        assert.Equal(t, "Shanghai Orders", resp[0]["toStation"])
-        assert.Equal(t, "09:00:00", resp[0]["departTime"])
+        assert.Equal(t, "G888", resp[0]["train_no"])
+        assert.Equal(t, "Beijing Orders", resp[0]["departure_station"])
+        assert.Equal(t, "Shanghai Orders", resp[0]["arrival_station"])
+        assert.Equal(t, "09:00:00", resp[0]["departure_time"])
+		assert.Equal(t, 60.0, resp[0]["total_price"])
         
         // Verify tickets
         tickets := resp[0]["tickets"].([]interface{})
@@ -343,6 +408,7 @@ func TestGetOrders(t *testing.T) {
 		json.Unmarshal(w.Body.Bytes(), &resp)
 		assert.Len(t, resp, 1)
         assert.Equal(t, order1.ID.String(), resp[0]["orderId"])
+		assert.Equal(t, 50.0, resp[0]["total_price"])
     })
     
     t.Run("FilterByCancelled", func(t *testing.T) {
