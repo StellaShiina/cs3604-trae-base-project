@@ -36,11 +36,17 @@ func TestCreateOrder(t *testing.T) {
 	
 	trainNo := "G101_UNIQUE"
 	serviceDate := time.Now() // Today
+	futureDate := serviceDate.Add(5 * 24 * time.Hour) // 5 days later
+
 	// Use raw SQL to ensure date format matches what CreateOrder expects (YYYY-MM-DD string in SQLite)
 	db.GetDB().Exec("INSERT INTO train_services (train_no, service_date) VALUES (?, ?)", trainNo, serviceDate.Format("2006-01-02"))
+	db.GetDB().Exec("INSERT INTO train_services (train_no, service_date) VALUES (?, ?)", trainNo, futureDate.Format("2006-01-02"))
 	
 	var trainService models.TrainService
-	db.GetDB().Where("train_no = ?", trainNo).First(&trainService)
+	db.GetDB().Where("train_no = ? AND service_date = ?", trainNo, serviceDate.Format("2006-01-02")).First(&trainService)
+
+	var futureTrainService models.TrainService
+	db.GetDB().Where("train_no = ? AND service_date = ?", trainNo, futureDate.Format("2006-01-02")).First(&futureTrainService)
 
 	segment := models.ServiceSegment{
 		TrainServiceID: trainService.ID,
@@ -50,6 +56,16 @@ func TestCreateOrder(t *testing.T) {
 		ArriveTime:     "12:00:00",
 	}
 	db.GetDB().Create(&segment)
+
+	// Create segment for future service too
+	futureSegment := models.ServiceSegment{
+		TrainServiceID: futureTrainService.ID,
+		FromStationID:  bjp.ID,
+		ToStationID:    shh.ID,
+		DepartTime:     "08:00:00",
+		ArriveTime:     "12:00:00",
+	}
+	db.GetDB().Create(&futureSegment)
 
 	// Mock v_train_search for price lookup
 	seatsJSON := `[{"type":"second","price":50000,"left":100,"bookable":true}]`
@@ -62,6 +78,23 @@ func TestCreateOrder(t *testing.T) {
 	
 	db.GetDB().Exec("INSERT INTO v_train_search (train_no, depart_time, arrive_time, from_station_id, to_station_id, date, seats) VALUES (?, ?, ?, ?, ?, ?, ?)",
 		trainNo, "08:00", "12:00", bjp.ID.String(), shh.ID.String(), serviceDate.Format("2006-01-02"), seatsJSON)
+	db.GetDB().Exec("INSERT INTO v_train_search (train_no, depart_time, arrive_time, from_station_id, to_station_id, date, seats) VALUES (?, ?, ?, ?, ?, ?, ?)",
+		trainNo, "08:00", "12:00", bjp.ID.String(), shh.ID.String(), futureDate.Format("2006-01-02"), seatsJSON)
+
+	// Use future time for "Success" test to avoid "Train has already departed" error if run late in the day
+	// "08:00:00" might be in the past if running tests at 19:00.
+	// Let's use 23:59:00 for the "Success" test on current day, or just use tomorrow.
+	// But `serviceDate` is set to `time.Now()`.
+	// Let's update the segment time for `serviceDate` to be late today.
+	
+	// Better: Use `serviceDate` as Tomorrow for "Success" test to be safe?
+	// But `serviceDate` is `time.Now()` (Today).
+	// Let's update the segment depart time to be "23:59:59" so it's always in future for "Today".
+	// Or change logic to accept "Today" if time is future.
+	
+	// Update segment time for "Today" service
+	db.GetDB().Model(&segment).Update("depart_time", "23:59:59")
+	db.GetDB().Exec("UPDATE v_train_search SET depart_time = '23:59' WHERE date = ?", serviceDate.Format("2006-01-02"))
 
 	t.Run("Success", func(t *testing.T) {
 		pID := uuid.New().String()
@@ -86,6 +119,54 @@ func TestCreateOrder(t *testing.T) {
 		var response map[string]interface{}
 		json.Unmarshal(w.Body.Bytes(), &response)
 		assert.Contains(t, response, "orderId")
+		
+		// Verify DB order linked to correct service
+		var order models.Order
+		db.GetDB().First(&order, "id = ?", response["orderId"])
+		assert.Equal(t, trainService.ID, order.TrainServiceID)
+	})
+	
+	t.Run("SuccessFutureDate", func(t *testing.T) {
+		// Create a new user to avoid "duplicate unpaid order" conflict with previous test
+		newUserID := uuid.New()
+		db.GetDB().Create(&models.User{
+			ID:           newUserID,
+			Username:     "testuser_future",
+			PasswordHash: "hash",
+		})
+		
+		// Create session cookie for this new user
+		// Session format: "dummy-session-" + userID.String()
+		// But in setupTestRouter or Auth middleware, it might expect specific format or just parse UUID after prefix.
+		// orders.go: uidStr := cookie[14:] -> "dummy-session-UUID" matches.
+		
+		pID := uuid.New().String()
+		payload := map[string]interface{}{
+			"trainNo":       trainNo,
+			"departureDate": futureDate.Format("2006-01-02"), 
+			"seatType":      "second",
+			"passengers": []map[string]string{
+				{"id": pID, "name": "P1", "card_no": "123"},
+			},
+		}
+		body, _ := json.Marshal(payload)
+		req, _ := http.NewRequest("POST", "/api/v1/orders", bytes.NewBuffer(body))
+		req.AddCookie(&http.Cookie{Name: "sid", Value: "dummy-session-" + newUserID.String()})
+		req.Header.Set("Content-Type", "application/json")
+		
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+
+		// Expect 201 Created and Order ID
+		assert.Equal(t, http.StatusCreated, w.Code)
+		var response map[string]interface{}
+		json.Unmarshal(w.Body.Bytes(), &response)
+		assert.Contains(t, response, "orderId")
+		
+		// Verify DB order linked to correct service (Future)
+		var order models.Order
+		db.GetDB().First(&order, "id = ?", response["orderId"])
+		assert.Equal(t, futureTrainService.ID, order.TrainServiceID)
 	})
 
 	t.Run("PreventDuplicateOrder", func(t *testing.T) {

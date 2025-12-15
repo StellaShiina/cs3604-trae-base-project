@@ -5,6 +5,7 @@ import (
 	"12306-backend/models"
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -103,13 +104,18 @@ func SearchTrains(c *gin.Context) {
 	// Gorm handles slice for ? automatically in Where, but in Raw it depends.
 	// Let's use Where clause construction.
 	
-	// Since v_train_search is a view, we can treat it like a model if we define a struct, 
-	// or use Raw with Gorm's clause building.
-	
-	err := db.GetDB().Table("v_train_search").
+	query := db.GetDB().Table("v_train_search").
 		Select("train_no, from_station_id, to_station_id, depart_time, arrive_time, seats").
-		Where("from_station_id IN ? AND to_station_id IN ? AND date = ?", fromStationIDs, toStationIDs, date).
-		Scan(&results).Error
+		Where("from_station_id IN ? AND to_station_id IN ? AND date = ?", fromStationIDs, toStationIDs, date)
+
+	// Filter past trains if querying for today
+	today := time.Now().Format("2006-01-02")
+	if date == today {
+		currentTime := time.Now().Format("15:04")
+		query = query.Where("depart_time > ?", currentTime)
+	}
+
+	err := query.Scan(&results).Error
 
 	if err != nil {
 		// If error (e.g. table not found or query error), return empty list

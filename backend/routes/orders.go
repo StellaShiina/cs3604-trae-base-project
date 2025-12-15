@@ -87,6 +87,37 @@ func CreateOrder(c *gin.Context) {
         c.JSON(http.StatusBadRequest, gin.H{"error": "Segment not found"})
         return
     }
+
+	// Check if departure time is in the past (for today's trains)
+	// We have ServiceDate (YYYY-MM-DD) and DepartTime (HH:MM)
+	// Combine them to compare with Now
+	// Parse DepartTime (HH:MM or HH:MM:SS)
+	departTimeStr := serviceSegment.DepartTime
+	if len(departTimeStr) == 5 {
+		departTimeStr += ":00"
+	}
+	// Note: In some DBs it might be full timestamp or just time.
+	// Assuming HH:MM:SS based on previous code.
+	
+	// Create full departure timestamp
+	// trainService.ServiceDate is time.Time (usually midnight or truncated)
+	// We need to parse time string and add to date.
+	
+	// But `ServiceDate` from DB might already have time component if not careful, 
+	// though we usually treat it as Date.
+	// Let's use string parsing to be safe or time addition.
+	
+	year, month, day := trainService.ServiceDate.Date()
+	dt, err := time.Parse("15:04:05", departTimeStr)
+	if err == nil {
+		departureTimestamp := time.Date(year, month, day, dt.Hour(), dt.Minute(), dt.Second(), 0, trainService.ServiceDate.Location())
+		if time.Now().After(departureTimestamp) {
+			tx.Rollback()
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Train has already departed"})
+			return
+		}
+	}
+
     segmentID = serviceSegment.ID
 	
 	fromID := serviceSegment.FromStationID

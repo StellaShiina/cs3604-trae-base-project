@@ -164,6 +164,13 @@
     Then 系统应返回 HTTP 400 Bad Request
     And 错误消息应指出 "已达到最大乘车人限制"
 
+  Scenario: 乘车人信息本地化映射
+    Given 数据库存储的证件类型为 "id_card"，人员类型为 "adult"
+    When 前端调用 "获取乘车人列表" API
+    Then 返回的 JSON 数据中 `card_type` 应映射为 "居民身份证"
+    And `type` 应映射为 "成人"
+    And 当调用 "添加乘车人" API 时，应支持接收中文类型并映射回枚举值
+
 ### Feature: 车站与车票查询
   作为用户
   我希望查询车站之间的火车票
@@ -202,6 +209,20 @@
     Then 响应结果应包含车次 "G1"
     And 响应中应注明实际出发站为 "北京南"
 
+  Scenario: 跨天车次时长计算
+    Given 车次 "Z1" 出发时间为 "23:00"，到达时间为 "02:00"
+    When 调用 "查询车次" 或 "获取订单详情" API
+    Then 系统应识别到达时间为次日
+    And 计算出的历时应为 "03:00" (3小时) 而非负数
+
+  Scenario: 过滤当日已发车次
+    Given 当前系统时间为 "12:00"
+    And 存在车次 "G1" 出发时间为 "08:00" (已发车)
+    And 存在车次 "G2" 出发时间为 "14:00" (未发车)
+    When 用户查询 "今天" 的车次
+    Then 响应结果应只包含 "G2"
+    And 不应包含 "G1"
+
 ### Feature: 车票预订 (核心交易)
   作为已登录用户
   我希望预订特定车次的车票
@@ -233,6 +254,30 @@
     And 系统应回滚事务
     And API 应返回 HTTP 409 Conflict
 
+  Scenario: 防止重复未支付订单
+    Given 用户已有状态为 `pending_payment` 的未支付订单 "ord-old"
+    When 调用 "提交订单" API 创建新订单
+    Then 系统应拒绝请求
+    And API 应返回 HTTP 409 Conflict
+    And 返回结果应包含 `hasUnpaidOrder: true`
+    And 错误消息应提示 "您有未完成订单，请先支付或取消"
+
+  Scenario: 锁定特定日期的车次
+    Given 存在车次 "G101" 在日期 "2025-12-15" 和 "2025-12-20"
+    When 调用 "提交订单" API，参数为：
+      | 车次 | G101 |
+      | 日期 | 2025-12-20 |
+    Then 系统应锁定 "2025-12-20" 的 "G101" 库存
+    And 订单详情中的出发日期应为 "2025-12-20"
+
+  Scenario: 禁止预订已发车次
+    Given 当前时间为 "10:00"
+    And 车次 "G1" 计划于 "09:00" 发车 (已过)
+    When 用户尝试调用 "提交订单" API 预订该车次
+    Then 系统应拒绝请求
+    And API 应返回 HTTP 400 Bad Request
+    And 错误消息应提示 "列车已发车"
+
   Scenario: 超时自动释放库存
     Given 订单 "ord-001" 创建于 31 分钟前
     And 状态为 `pending_payment`
@@ -246,6 +291,23 @@
   我希望支付订单或取消订单
   以便我完成出行计划
 
+### Feature: 系统维护与调度
+  作为系统管理员/后台服务
+  我希望系统自动维护车次排期
+  以便确保数据实时有效且不过期
+
+  Scenario: 自动排期生成
+    Given 系统启动或每日定时任务触发
+    When 检查未来 14 天的车次数据
+    Then 若某日车次不存在，应自动根据模板生成当日的所有车次服务 (G1, G2, etc.)
+    And 自动生成对应的库存记录
+
+  Scenario: 过期数据清理
+    Given 存在发车日期早于 "昨天" 的历史车次数据
+    When 系统维护任务运行
+    Then 应删除这些过期的车次服务记录
+    And 保留 "今天" 及未来的数据
+
   Scenario: 支付订单
     Given 订单 "ord-001" 状态为 `pending_payment`
     When 调用 "支付订单" API
@@ -258,6 +320,13 @@
     When 调用 "取消订单" API
     Then 订单状态应更新为 `canceled`
     And 库存应立即释放
+
+  Scenario: 订单状态兼容性映射 (前端适配)
+    Given 前端请求订单列表时使用状态参数 `status=cancelled` (双 'l')
+    Or 请求 `status=pending` 或 `status=confirmed_unpaid`
+    When 后端接收到请求
+    Then 应自动将其映射为数据库状态 `canceled` (单 'l') 或 `pending_payment`
+    And 确保不因拼写差异导致查询结果为空
 
   Scenario: 退订已支付车票
     Given 订单 "ord-001" 状态为 `paid`

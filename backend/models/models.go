@@ -126,6 +126,8 @@ type ServiceSegment struct {
 	DepartTime     string    `gorm:"type:time;not null"`
 	ArriveTime     string    `gorm:"type:time;not null"`
 	Duration       string    `gorm:"type:interval;not null"`
+	FromStopSeq    int       `gorm:"not null;default:1"`
+	ToStopSeq      int       `gorm:"not null;default:2"`
 }
 
 type SegmentSeatInventory struct {
@@ -137,4 +139,8 @@ type SegmentSeatInventory struct {
 	LeftSeats      int    `gorm:"not null"`
 	PriceCents     int    `gorm:"not null"`
 	Currency       string `gorm:"default:'CNY'"`
+}
+
+func (SegmentSeatInventory) TableName() string {
+	return "segment_seat_inventory"
 }
