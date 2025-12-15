@@ -77,7 +77,7 @@ const RegisterPage: React.FC = () => {
       
       // 步骤2: 发送验证码
       try {
-        const verifyResponse = await axios.post(`${API_BASE_URL}/auth/send-sms`, {
+        const verifyResponse = await axios.post(`${API_BASE_URL}/auth/register/send-verification-code`, {
           sessionId,
           phone: data.phone
         })
