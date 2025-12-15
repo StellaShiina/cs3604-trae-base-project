@@ -285,6 +285,41 @@
       description: "初始创建。"
 
 - type: Backend
+  id: API-GET-OrderInfo
+  route: GET /api/v1/orders/new
+  description: 获取订单填写页所需信息（车次、余票、票价、常用联系人）。
+  input:
+    type: Query
+    params:
+      trainNo: string
+      departureStation: string
+      arrivalStation: string
+      departureDate: string
+  output:
+    success:
+      statusCode: 200
+      body:
+        trainInfo: object
+        fareInfo: object
+        availableSeats: object
+        passengers: array
+        defaultSeatType: string
+    error:
+      - statusCode: 400
+        body: { error: "Missing parameters" }
+      - statusCode: 404
+        body: { error: "Train service not found" }
+  dependencies:
+    - DB-SearchTrains
+    - DB-FindPassengersByUser
+  acceptanceCriteria:
+    - 返回车次详情、座位库存及价格。
+    - 返回当前用户的常用联系人。
+  changeLog:
+    - date: "2025-12-15"
+      description: "新增接口以支持订单填写页面数据加载。"
+
+- type: Backend
   id: API-POST-Orders
   route: POST /api/v1/orders
   description: 提交订单（占座）。
@@ -329,6 +364,77 @@
   changeLog:
     - date: "2025-11-28"
       description: "初始创建。"
+
+- type: Backend
+  id: API-GET-OrderConfirmation
+  route: GET /api/v1/orders/{id}/confirmation
+  description: 获取订单确认信息（用于支付前核对）。
+  input:
+    type: None
+  output:
+    success:
+      statusCode: 200
+      body:
+        trainInfo: object
+        passengers: array
+    error:
+      - statusCode: 404
+        body: { error: "Order not found" }
+  dependencies:
+    - DB-FindOrderById
+  acceptanceCriteria:
+    - 返回订单关联的车次和乘客信息。
+  changeLog:
+    - date: "2025-12-15"
+      description: "新增接口以支持订单确认弹窗。"
+
+- type: Backend
+  id: API-POST-ConfirmOrder
+  route: POST /api/v1/orders/{id}/confirm
+  description: 确认订单（进入支付流程前）。
+  input:
+    type: None
+  output:
+    success:
+      statusCode: 200
+      body:
+        trainInfo: object
+        passengers: array
+    error:
+      - statusCode: 400
+        body: { error: "Invalid order status" }
+  dependencies:
+    - DB-FindOrderById
+  acceptanceCriteria:
+    - 验证订单状态是否为 pending_payment。
+  changeLog:
+    - date: "2025-12-15"
+      description: "新增接口以支持订单确认操作。"
+
+- type: Backend
+  id: API-GET-Payment
+  route: GET /api/v1/orders/{id}/payment
+  description: 获取支付页面详情。
+  input:
+    type: None
+  output:
+    success:
+      statusCode: 200
+      body:
+        trainInfo: object
+        passengers: array
+        totalPrice: number
+        timeRemaining: integer
+    error:
+      - statusCode: 400
+        body: { error: "Order expired" }
+  dependencies:
+    - DB-FindOrderById
+  acceptanceCriteria:
+    - 返回支付所需的所有订单信息及剩余支付时间。
+  changeLog:
+    - date: "2025-12-15"
+      description: "新增接口以支持支付页面渲染。"
 
 - type: Backend
   id: API-POST-PayOrder

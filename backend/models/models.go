@@ -71,6 +71,13 @@ type Order struct {
 	ExpiresAt       time.Time
 	PaidAt          *time.Time
 	UpdatedAt       time.Time
+
+	// Associations
+	TrainService TrainService   `gorm:"foreignKey:TrainServiceID"`
+	FromStation  Station        `gorm:"foreignKey:FromStationID"`
+	ToStation    Station        `gorm:"foreignKey:ToStationID"`
+	Segment      ServiceSegment `gorm:"foreignKey:SegmentID"`
+	Tickets      []Ticket       `gorm:"foreignKey:OrderID"`
 }
 
 func (o *Order) BeforeCreate(tx *gorm.DB) (err error) {
@@ -116,4 +123,18 @@ type ServiceSegment struct {
 	TrainServiceID int64     `gorm:"not null"`
 	FromStationID  uuid.UUID `gorm:"not null"`
 	ToStationID    uuid.UUID `gorm:"not null"`
+	DepartTime     string    `gorm:"type:time;not null"`
+	ArriveTime     string    `gorm:"type:time;not null"`
+	Duration       string    `gorm:"type:interval;not null"`
+}
+
+type SegmentSeatInventory struct {
+	ID             int64  `gorm:"primary_key"`
+	TrainServiceID int64  `gorm:"not null"`
+	SegmentID      int64  `gorm:"not null"`
+	SeatType       string `gorm:"not null"`
+	TotalSeats     int    `gorm:"not null"`
+	LeftSeats      int    `gorm:"not null"`
+	PriceCents     int    `gorm:"not null"`
+	Currency       string `gorm:"default:'CNY'"`
 }

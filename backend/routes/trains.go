@@ -63,6 +63,8 @@ func SearchTrains(c *gin.Context) {
 		cityMapping := map[string][]string{
 			"BJP": {"BJP", "VNP", "BXP"}, // Beijing, South, West
 			"SHH": {"SHH", "AOH"},        // Shanghai, Hongqiao
+			"北京":  {"BJP", "VNP", "BXP"}, // Beijing Chinese mapping
+			"上海":  {"SHH", "AOH"},        // Shanghai Chinese mapping
 		}
 		
 		if mappedCodes, ok := cityMapping[input]; ok {
@@ -105,7 +107,7 @@ func SearchTrains(c *gin.Context) {
 	// or use Raw with Gorm's clause building.
 	
 	err := db.GetDB().Table("v_train_search").
-		Select("train_no, from_station_id, to_station_id, depart_time, arrive_time, seats::text").
+		Select("train_no, from_station_id, to_station_id, depart_time, arrive_time, seats").
 		Where("from_station_id IN ? AND to_station_id IN ? AND date = ?", fromStationIDs, toStationIDs, date).
 		Scan(&results).Error
 

@@ -92,8 +92,12 @@ func SetupRouter() *gin.Engine {
 
 			orders := protected.Group("/orders")
 			{
+				orders.GET("/new", GetOrderInfo)
 				orders.POST("", CreateOrder)
 				orders.GET("", GetOrders)
+				orders.GET("/:id/confirmation", GetOrderConfirmation)
+				orders.POST("/:id/confirm", ConfirmOrder)
+				orders.GET("/:id/payment", GetPayment)
 				orders.POST("/:id/pay", PayOrder)
 				orders.POST("/:id/cancel", CancelOrder)
 			}
