@@ -26,39 +26,52 @@ const OrderListPanel: React.FC<OrderListPanelProps> = ({
     
     // 辅助函数：构造列车发车时间
     const getDepartureDateTime = (order: any) => {
-      if (!order.departure_date) return null;
+      // 优先使用 departure_date，如果没有则尝试 created_at
+      const dateString = order.departure_date || order.created_at;
+      if (!dateString) return null;
+
+      // 提取日期部分 (YYYY-MM-DD)
+      // 如果是 created_at (YYYY-MM-DD HH:MM:SS)，只取前10位
+      const datePart = dateString.substring(0, 10);
+
+      // 兼容日期格式，将 - 替换为 / 以防部分浏览器解析问题
+      const safeDateStr = datePart.replace(/-/g, '/');
+      const departureDate = new Date(safeDateStr);
       
       // 如果有发车时间，构造完整的日期时间
       if (order.departure_time) {
         const [hours, minutes] = order.departure_time.split(':');
-        const departureDateTime = new Date(order.departure_date);
-        departureDateTime.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
-        return departureDateTime;
+        departureDate.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
+        return departureDate;
       }
       
       // 如果没有发车时间，只使用日期（设为当天23:59:59）
-      const departureDate = new Date(order.departure_date);
       departureDate.setHours(23, 59, 59, 999);
       return departureDate;
     };
     
     if (activeTab === 'pending') {
-      // 未完成订单：仅 confirmed_unpaid（已确认未支付）状态
-      // pending 状态属于系统内部状态，用户不可见
+      // 未完成订单：仅 confirmed_unpaid（已确认未支付）状态或 pending_payment
       return orders.filter(order => order.status === 'confirmed_unpaid' || order.status === 'pending_payment');
     } else if (activeTab === 'upcoming') {
       // 未出行订单：已支付（paid）或已完成（completed）且列车尚未发车（当前时间 < 发车时间）
+      // 调试日志：检查过滤逻辑
+      // console.log('Filtering upcoming orders:', { ... });
+
       return orders.filter(order => {
         if (order.status !== 'paid' && order.status !== 'completed') return false;
         const departureDateTime = getDepartureDateTime(order);
-        if (!departureDateTime) return false;
+        if (!departureDateTime) {
+             // 如果无法解析时间，默认显示（避免数据问题导致订单消失）
+             return true; 
+        }
         return now < departureDateTime; // 当前时间早于发车时间
       });
     } else if (activeTab === 'history') {
       // 历史订单：已完成、已取消、已退票，或已支付且列车已发车
       return orders.filter(order => {
         // 已完成、已取消、已退票的订单直接显示在历史订单中
-        if (order.status === 'completed' || order.status === 'cancelled' || order.status === 'refunded') {
+        if (order.status === 'completed' || order.status === 'cancelled' || order.status === 'canceled' || order.status === 'refunded') {
           return true;
         }
         
