@@ -208,7 +208,6 @@ const handleSubmitOrder = async () => {
         <div class="panel">
           <div class="panel-header">
             <span>选择乘客</span>
-            <span class="header-action">管理乘车人</span>
           </div>
           <div class="panel-body">
              <div v-if="passengers.length === 0" class="no-passengers">
@@ -276,13 +275,6 @@ const handleSubmitOrder = async () => {
     border-bottom: 1px solid #ddd;
     display: flex;
     justify-content: space-between;
-    
-    .header-action {
-      color: #007bff;
-      cursor: pointer;
-      font-weight: normal;
-      font-size: 14px;
-    }
   }
   
   .panel-body {

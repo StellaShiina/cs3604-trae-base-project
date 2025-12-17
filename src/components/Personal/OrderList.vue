@@ -21,6 +21,7 @@ const statusMap: Record<string, string> = {
   confirmed_unpaid: '待支付',
   paid: '已支付',
   cancelled: '已取消',
+  canceled: '已取消',
   completed: '已完成',
   refunded: '已退票'
 }

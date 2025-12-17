@@ -26,9 +26,7 @@ const handleLoginSubmit = async (data: { identifier: string; password: string })
     if (response.data.success) {
       sessionId.value = response.data.sessionId
       
-      // Send SMS code
-      await sendSms({ sessionId: sessionId.value })
-      
+      // Show SMS modal to collect ID card last 4 digits and send SMS
       showSmsModal.value = true
       console.log('Login session:', sessionId.value)
     }

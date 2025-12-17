@@ -135,7 +135,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'reserve', trainNo: string): void;
+  (e: 'reserve', trainNo: string, departureStation: string, arrivalStation: string, departureDate: string): void;
 }>();
 
 type SortField = 'departureTime' | 'arrivalTime' | 'duration' | null;
@@ -197,8 +197,8 @@ const getSortIconClass = (field: SortField) => {
   return sortOrder.value;
 };
 
-const onReserve = (trainNo: string) => {
-  emit('reserve', trainNo);
+const onReserve = (trainNo: string, departureStation: string, arrivalStation: string, departureDate: string) => {
+  emit('reserve', trainNo, departureStation, arrivalStation, departureDate);
 };
 </script>
 

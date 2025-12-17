@@ -51,7 +51,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'reserve', trainNo: string): void;
+  (e: 'reserve', trainNo: string, departureStation: string, arrivalStation: string, departureDate: string): void;
 }>();
 
 const router = useRouter();
@@ -113,7 +113,7 @@ const handleClick = () => {
   }
 
   // 4. 正常预订流程
-  emit('reserve', props.trainNo);
+  emit('reserve', props.trainNo, props.departureStation, props.arrivalStation, props.departureDate);
 };
 </script>
 

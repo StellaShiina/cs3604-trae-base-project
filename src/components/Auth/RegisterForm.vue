@@ -3,7 +3,14 @@ import { ref, computed } from 'vue';
 import axios from 'axios';
 import SelectDropdown from '@/components/Common/SelectDropdown.vue';
 import RegistrationVerificationModal from './RegistrationVerificationModal.vue';
-
+import { 
+  validateUsername as apiValidateUsername, 
+  validatePhone as apiValidatePhone, 
+  validateEmail as apiValidateEmail,
+  startRegistration,
+  sendRegisterSms,
+  completeRegistration
+} from '@/api/auth';
 
 // Props and Emits
 const emit = defineEmits<{
@@ -114,7 +121,16 @@ const validateUsername = async (value: string) => {
   }
 
   // Simulate API check
-  usernameValidation.value = { isValid: true, errorMessage: '', showCheckmark: true };
+  try {
+    const response = await apiValidateUsername(value);
+    if (response.data.valid) {
+      usernameValidation.value = { isValid: true, errorMessage: '', showCheckmark: true };
+    } else {
+      usernameValidation.value = { isValid: false, errorMessage: response.data.error || '用户名不可用', showCheckmark: false };
+    }
+  } catch (error: any) {
+    usernameValidation.value = { isValid: false, errorMessage: error.response?.data?.error || '验证失败', showCheckmark: false };
+  }
 };
 
 const validatePassword = async (value: string) => {
@@ -326,14 +342,15 @@ const handleSubmit = async (e?: Event) => {
       gender: getGenderFromIdCard(idCardNumber.value)
     };
 
-    const registerResponse = await axios.post('/api/v1/auth/register', registrationData);
+    const registerResponse = await startRegistration(registrationData);
     
     if (registerResponse.data.sessionId) {
       sessionId.value = registerResponse.data.sessionId;
       
       // 2. Send SMS code
-      await axios.post('/api/v1/auth/send-sms', {
-        sessionId: sessionId.value
+      await sendRegisterSms({
+        sessionId: sessionId.value,
+        phone: phone.value // Pass phone if needed, though backend has it in session
       });
       
       // 3. Show verification modal

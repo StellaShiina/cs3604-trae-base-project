@@ -220,7 +220,7 @@ const handleFilterChange = (newFilters: any) => {
   filters.value = { ...filters.value, ...newFilters };
 };
 
-const handleReserve = (trainNo: string) => {
+const handleReserve = (trainNo: string, departureStation: string, arrivalStation: string, departureDate: string) => {
   if (!isLoggedIn.value) {
     showLoginModal.value = true;
     return;
@@ -230,9 +230,9 @@ const handleReserve = (trainNo: string) => {
     name: 'Order',
     query: {
       trainNo,
-      departureStation: searchParams.value.departureStation,
-      arrivalStation: searchParams.value.arrivalStation,
-      departureDate: searchParams.value.departureDate
+      departureStation,
+      arrivalStation,
+      departureDate
     }
   });
 };

@@ -31,10 +31,23 @@ const fetchPassengers = async () => {
   loading.value = true
   try {
     const response = await getPassengers()
-    passengers.value = response.data.map((p: any) => ({
-      ...p,
-      type: p.passenger_type // Map backend passenger_type to type
-    }))
+    passengers.value = response.data.map((p: any) => {
+      // Map backend Chinese values to frontend English enums
+      let mappedType = 'adult'
+      if (p.passenger_type === '成人') mappedType = 'adult'
+      else if (p.passenger_type === '学生') mappedType = 'student'
+      else if (p.passenger_type === '儿童') mappedType = 'child'
+      
+      let mappedCardType = 'id_card'
+      if (p.card_type === '居民身份证') mappedCardType = 'id_card'
+      else if (p.card_type === '护照') mappedCardType = 'passport'
+      
+      return {
+        ...p,
+        type: mappedType,
+        card_type: mappedCardType
+      }
+    })
   } catch (err) {
     console.error(err)
   } finally {
