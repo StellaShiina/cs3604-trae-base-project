@@ -22,6 +22,9 @@ func InitTrainSchedule() {
 	// 1. Cleanup old services (older than 1 day ago)
 	cleanupOldServices(dbConn)
 
+	// 1.5. Cleanup expired orders (timeout but not canceled)
+	cleanupExpiredOrders(dbConn)
+
 	// 2. Ensure stations and reference data exist (Prerequisite)
 	ensureReferenceData(dbConn)
 
@@ -30,22 +33,31 @@ func InitTrainSchedule() {
 }
 
 func cleanupOldServices(tx *gorm.DB) {
-	// Cleanup services older than yesterday (Keep today and future)
-	// Actually, requirement says "clean up current time 1 day ago".
-	// So anything before (Now - 24h).
-	cutoff := time.Now().Add(-24 * time.Hour)
+	// Keep services from yesterday onwards. Delete older.
+	// "Yesterday" means today - 1 day.
+	threshold := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
 	
-	// We need to be careful with Foreign Keys.
-	// If cascading is set up in DB, it's fine. If not, we might need manual delete.
-	// GORM usually doesn't cascade unless specified in tags.
-	// Let's try to delete. If it fails due to constraint, we log it.
-	// Note: We should probably only delete if we are sure.
+	// Delete
+	result := tx.Where("service_date < ?", threshold).Delete(&models.TrainService{})
+	if result.RowsAffected > 0 {
+		log.Printf("Cleaned up %d old train services older than %s", result.RowsAffected, threshold)
+	}
+}
+
+func cleanupExpiredOrders(tx *gorm.DB) {
+	// Find orders that are pending_payment and expired
+	// Update status to canceled
+	// Note: Database triggers (trg_order_cancel_release) should handle inventory release
 	
-	result := tx.Where("service_date < ?", cutoff.Format("2006-01-02")).Delete(&models.TrainService{})
+	now := time.Now()
+	result := tx.Model(&models.Order{}).
+		Where("status = ? AND expires_at < ?", "pending_payment", now).
+		Update("status", "canceled")
+		
 	if result.Error != nil {
-		log.Printf("Failed to clean old services: %v", result.Error)
-	} else {
-		log.Printf("Cleaned up %d old train services", result.RowsAffected)
+		log.Printf("Failed to cleanup expired orders: %v", result.Error)
+	} else if result.RowsAffected > 0 {
+		log.Printf("Cleaned up %d expired orders", result.RowsAffected)
 	}
 }
 

@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -149,4 +150,49 @@ func TestInitTrainSchedule(t *testing.T) {
 	db.GetDB().Model(&models.SegmentSeatInventory{}).Count(&invCount)
 	// 70 services * 1 segment * 3 seat types = 210
 	assert.Equal(t, int64(210), invCount)
+}
+
+func TestCleanupExpiredOrders(t *testing.T) {
+	setupTestDB()
+
+	// 1. Create an expired pending order
+	expiredOrder := models.Order{
+		ID:              uuid.New(),
+		Status:          "pending_payment",
+		ExpiresAt:       time.Now().Add(-1 * time.Hour), // Expired 1 hour ago
+		UserID:          uuid.New(),
+		TrainServiceID:  123, // Dummy
+		FromStationID:   uuid.New(),
+		ToStationID:     uuid.New(),
+		SegmentID:       456,
+		TotalPriceCents: 100,
+	}
+	db.GetDB().Create(&expiredOrder)
+
+	// 2. Create a valid pending order (not expired)
+	validOrder := models.Order{
+		ID:              uuid.New(),
+		Status:          "pending_payment",
+		ExpiresAt:       time.Now().Add(1 * time.Hour), // Expires in 1 hour
+		UserID:          uuid.New(),
+		TrainServiceID:  123,
+		FromStationID:   uuid.New(),
+		ToStationID:     uuid.New(),
+		SegmentID:       456,
+		TotalPriceCents: 100,
+	}
+	db.GetDB().Create(&validOrder)
+
+	// 3. Run Scheduler (which runs cleanupExpiredOrders)
+	InitTrainSchedule()
+
+	// 4. Verify Expired Order is Canceled
+	var checkExpired models.Order
+	db.GetDB().First(&checkExpired, expiredOrder.ID)
+	assert.Equal(t, "canceled", checkExpired.Status, "Expired order should be canceled")
+
+	// 5. Verify Valid Order is Still Pending
+	var checkValid models.Order
+	db.GetDB().First(&checkValid, validOrder.ID)
+	assert.Equal(t, "pending_payment", checkValid.Status, "Valid order should remain pending")
 }
