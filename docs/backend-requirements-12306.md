@@ -308,6 +308,14 @@
     Then 应删除这些过期的车次服务记录
     And 保留 "今天" 及未来的数据
 
+  Scenario: 系统启动时自动清理超时订单
+    Given 存在状态为 `pending_payment` 且 `expires_at` 早于当前时间的订单
+    And 系统后端服务重启或启动
+    When "初始化列车排期" (InitTrainSchedule) 任务执行
+    Then 系统应扫描所有过期未支付订单
+    And 将这些订单的状态更新为 `canceled`
+    And 触发器 `trg_order_cancel_release` 应自动释放库存
+
   Scenario: 支付订单
     Given 订单 "ord-001" 状态为 `pending_payment`
     When 调用 "支付订单" API
