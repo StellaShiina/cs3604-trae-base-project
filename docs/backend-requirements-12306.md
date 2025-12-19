@@ -209,6 +209,15 @@
     Then 响应结果应包含车次 "G1"
     And 响应中应注明实际出发站为 "北京南"
 
+  Scenario: 车次始发终到站标识
+    Given 车次 "G1" 的完整路线为 "北京南" -> "济南西" -> "上海虹桥"
+    And 用户查询 "济南西" 到 "上海虹桥" 的车票
+    When 调用 "查询车次" API
+    Then 响应结果应包含车次 "G1"
+    And `initialDepartureStation` 应为 "北京南"
+    And `finalArrivalStation` 应为 "上海虹桥"
+    And 前端应据此显示 "过" 济南西 -> "终" 上海虹桥
+
   Scenario: 跨天车次时长计算
     Given 车次 "Z1" 出发时间为 "23:00"，到达时间为 "02:00"
     When 调用 "查询车次" 或 "获取订单详情" API
@@ -335,6 +344,26 @@
     When 后端接收到请求
     Then 应自动将其映射为数据库状态 `canceled` (单 'l') 或 `pending_payment`
     And 确保不因拼写差异导致查询结果为空
+
+  Scenario: 获取订单填写页详情
+    Given 用户选择车次 "G101" 准备预订
+    When 调用 "获取订单填写页信息" API (/api/v1/orders/new)
+    Then 应返回该车次的实时票价和座位库存
+    And 应返回用户的常用乘车人列表
+    And 应返回车次的完整时刻信息（出发/到达时间、历时）
+
+  Scenario: 获取订单确认页详情
+    Given 用户已提交订单 "ord-001" 但未支付
+    When 调用 "获取订单确认信息" API (/api/v1/orders/{id}/confirmation)
+    Then 应返回订单关联的详细车次信息和乘客信息
+    And 用于前端展示 "订单确认" 弹窗
+
+  Scenario: 获取支付页详情
+    Given 订单 "ord-001" 处于待支付状态
+    When 调用 "获取支付页详情" API (/api/v1/orders/{id}/payment)
+    Then 应返回订单总金额
+    And 应返回剩余支付时间（基于订单创建时间 + 30分钟）
+    And 若订单已过期，应返回错误提示
 
   Scenario: 退订已支付车票
     Given 订单 "ord-001" 状态为 `paid`

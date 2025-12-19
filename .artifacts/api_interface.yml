@@ -274,13 +274,16 @@
   output:
     success:
       statusCode: 200
-      body: [ { trainNo, seats: [ { type, left, bookable } ] } ]
+      body: [ { trainNo, initialDepartureStation, finalArrivalStation, seats: [ { type, left, bookable } ] } ]
   dependencies:
     - DB-SearchTrains
   acceptanceCriteria:
     - 返回符合条件的车次列表。
     - 包含各席别的实时库存。
+    - 返回该车次的真实始发站和终点站信息。
   changeLog:
+    - date: "2025-12-20"
+      description: "新增 initialDepartureStation 和 finalArrivalStation 字段，用于前端正确显示始/终/过标识。"
     - date: "2025-11-28"
       description: "初始创建。"
 
@@ -316,6 +319,8 @@
     - 返回车次详情、座位库存及价格。
     - 返回当前用户的常用联系人。
   changeLog:
+    - date: "2025-12-20"
+      description: "接口实现完善：集成票价查询、座位库存检查及乘车人列表加载。"
     - date: "2025-12-15"
       description: "新增接口以支持订单填写页面数据加载。"
 
@@ -385,6 +390,8 @@
   acceptanceCriteria:
     - 返回订单关联的车次和乘客信息。
   changeLog:
+    - date: "2025-12-20"
+      description: "接口实现完善：返回确认订单所需的完整车次和乘客信息。"
     - date: "2025-12-15"
       description: "新增接口以支持订单确认弹窗。"
 
@@ -433,6 +440,8 @@
   acceptanceCriteria:
     - 返回支付所需的所有订单信息及剩余支付时间。
   changeLog:
+    - date: "2025-12-20"
+      description: "接口实现完善：包含支付倒计时和总价计算逻辑。"
     - date: "2025-12-15"
       description: "新增接口以支持支付页面渲染。"
 
@@ -455,6 +464,8 @@
   acceptanceCriteria:
     - 仅能支付 pending_payment 且未过期的订单。
   changeLog:
+    - date: "2025-12-20"
+      description: "接口实现完善：包含支付状态检查及状态流转逻辑。"
     - date: "2025-11-28"
       description: "初始创建。"
 
@@ -474,6 +485,8 @@
     - 仅能取消 pending_payment 的订单。
     - 触发库存释放。
   changeLog:
+    - date: "2025-12-20"
+      description: "接口实现完善：包含订单状态检查及取消逻辑。"
     - date: "2025-11-28"
       description: "初始创建。"
 
