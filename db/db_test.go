@@ -56,6 +56,68 @@ func TestStationsQuery(t *testing.T) {
 	}
 }
 
+func TestHKGRoute(t *testing.T) {
+	db, err := sql.Open("postgres", dsn())
+	if err != nil {
+		t.Fatalf("open: %v", err)
+	}
+	defer db.Close()
+
+	// 1. Verify HKG->SHH full route
+	rows, err := db.Query(`
+		SELECT t.train_no, seg.depart_time, seg.arrive_time 
+		FROM v_train_search v
+		JOIN trains t ON v.train_no = t.train_no
+		JOIN stations s1 ON v.from_station_id = s1.id
+		JOIN stations s2 ON v.to_station_id = s2.id
+		JOIN service_segments seg ON v.segment_id = seg.id
+		WHERE s1.code='HKG' AND s2.code='SHH' AND v.date=current_date
+		ORDER BY seg.depart_time
+	`)
+	if err != nil {
+		t.Fatalf("query HKG->SHH: %v", err)
+	}
+	defer rows.Close()
+
+	foundG102 := false
+	for rows.Next() {
+		var trainNo string
+		var dep, arr string // scan as string for simplicity or time
+		if err := rows.Scan(&trainNo, &dep, &arr); err != nil {
+			t.Fatalf("scan: %v", err)
+		}
+		if trainNo == "G102" {
+			foundG102 = true
+		}
+		t.Logf("Found Train HKG->SHH: %s %s-%s", trainNo, dep, arr)
+	}
+	if !foundG102 {
+		t.Errorf("Expected G102 for HKG->SHH")
+	}
+
+	// 2. Verify Intermediate Segment HKG->GZQ
+	rows2, err := db.Query(`
+		SELECT t.train_no 
+		FROM v_train_search v
+		JOIN trains t ON v.train_no = t.train_no
+		JOIN stations s1 ON v.from_station_id = s1.id
+		JOIN stations s2 ON v.to_station_id = s2.id
+		WHERE s1.code='HKG' AND s2.code='GZQ' AND v.date=current_date
+	`)
+	if err != nil {
+		t.Fatalf("query HKG->GZQ: %v", err)
+	}
+	defer rows2.Close()
+
+	count := 0
+	for rows2.Next() {
+		count++
+	}
+	if count < 2 {
+		t.Errorf("Expected at least 2 trains for HKG->GZQ (G102, G104), got %d", count)
+	}
+}
+
 func TestTrainSearchView(t *testing.T) {
 	db, err := sql.Open("postgres", dsn())
 	if err != nil {

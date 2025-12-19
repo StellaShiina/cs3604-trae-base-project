@@ -7,7 +7,8 @@ INSERT INTO stations(code,name_en,name_zh,pinyin) VALUES
 ('NJH','Nanjing','南京','nanjing'),
 ('XAY','Xi''an','西安','xian'),
 ('WHN','Wuhan','武汉','wuhan'),
-('CDW','Chengdu','成都','chengdu')
+('CDW','Chengdu','成都','chengdu'),
+('HKG','Hong Kong West Kowloon','香港西九龙','xianggangxijiulong')
 ON CONFLICT (code) DO UPDATE SET name_en=EXCLUDED.name_en,name_zh=EXCLUDED.name_zh,pinyin=EXCLUDED.pinyin;
 
 INSERT INTO trains(train_no,train_type) VALUES
@@ -15,6 +16,10 @@ INSERT INTO trains(train_no,train_type) VALUES
 ('G1','G'),
 ('C1','C'),
 ('G100','G'),
+('G99','G'),
+('G102','G'),
+('G103','G'),
+('G104','G'),
 ('D300','D'),
 ('Z50','Z'),
 ('K80','K'),
@@ -22,7 +27,6 @@ INSERT INTO trains(train_no,train_type) VALUES
 ('D6','D'),
 ('C2','C'),
 ('G201','G'),
-('G101','G'),
 ('D301','D'),
 ('D302','D'),
 ('Z51','Z'),
@@ -33,8 +37,8 @@ INSERT INTO trains(train_no,train_type) VALUES
 ('Z151','Z')
 ON CONFLICT (train_no) DO UPDATE SET train_type=EXCLUDED.train_type;
 
-INSERT INTO users(username,email,password_hash,gender,name)
-VALUES ('demo','demo@site.com','Passw0rdHash','male','Demo User')
+INSERT INTO users(username,email,password_hash,name)
+VALUES ('demo','demo@site.com','Passw0rdHash','Demo User')
 ON CONFLICT (username) DO NOTHING;
 
 INSERT INTO passengers(user_id,name,card_type,card_no,passenger_type)
