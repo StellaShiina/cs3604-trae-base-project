@@ -3,6 +3,7 @@ package routes
 import (
 	"12306-backend/db"
 	"12306-backend/models"
+	"fmt"
 	"net/http"
 	"regexp"
 
@@ -89,7 +90,8 @@ type AddPassengerRequest struct {
 	CardType string `json:"card_type" binding:"required"`
 	CardNo   string `json:"card_no" binding:"required"`
 	Type     string `json:"type" binding:"required"`
-	Mobile   string `json:"mobile"` // Optional or Required? User said "check mobile format", implying input.
+	Phone    string `json:"phone"`  // Frontend sends 'phone'
+	Mobile   string `json:"mobile"` // Backend compat
 }
 
 // API-POST-Passengers
@@ -110,6 +112,13 @@ func AddPassenger(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+
+	fmt.Printf("DEBUG: AddPassenger req: %+v\n", req)
+
+	// Resolve Phone/Mobile
+	if req.Phone != "" {
+		req.Mobile = req.Phone
 	}
 
 	// Map CardType from Chinese to Enum
@@ -256,6 +265,11 @@ func EditPassenger(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+
+	// Resolve Phone/Mobile
+	if req.Phone != "" {
+		req.Mobile = req.Phone
 	}
 
 	// Map CardType from Chinese to Enum

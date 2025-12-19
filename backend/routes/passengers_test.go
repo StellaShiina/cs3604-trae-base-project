@@ -53,6 +53,7 @@ func TestAddPassenger(t *testing.T) {
 			"card_type": "居民身份证",
 			"card_no":   "110101200001015678",
 			"type":      "成人",
+			"phone":     "13800000009", // Test phone mapping
 		}
 		body, _ := json.Marshal(payload)
 		req, _ := http.NewRequest("POST", "/api/v1/passengers", bytes.NewBuffer(body))
@@ -69,6 +70,7 @@ func TestAddPassenger(t *testing.T) {
 		db.GetDB().Last(&p)
 		assert.Equal(t, "id_card", p.CardType)
 		assert.Equal(t, "adult", p.PassengerType)
+		assert.Equal(t, "13800000009", p.Mobile)
 	})
 
 	t.Run("LimitReached", func(t *testing.T) {
@@ -181,7 +183,7 @@ func TestEditPassenger(t *testing.T) {
 			"card_type": "居民身份证",
 			"card_no":   "110101200001010000",
 			"type":      "学生",
-			"mobile":    "13800000000",
+			"phone":     "13800000000", // Use phone instead of mobile
 		}
 		body, _ := json.Marshal(payload)
 		req, _ := http.NewRequest("PUT", "/api/v1/passengers/"+p.ID.String(), bytes.NewBuffer(body))
