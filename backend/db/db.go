@@ -23,12 +23,23 @@ func Init() {
 	var err error
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
+		// DisableForeignKeyConstraintWhenMigrating: true, // Workaround for constraint issues during dev
 	})
 
 	if err != nil {
 		log.Fatal("Failed to connect to database: ", err)
 	}
 
+	// AutoMigrate
+	// Note: In a real production app, use migration tools like golang-migrate or atlas.
+	// For this project, we use AutoMigrate for convenience.
+	// Avoid circular dependency: We cannot import models here if models imports db.
+	// Check models imports. models imports gorm.io/gorm and google/uuid. It does NOT import db.
+	// So we can import models here? No, models package is `12306-backend/models`.
+	// db package is `12306-backend/db`.
+	// We need to be careful.
+	// If I add `12306-backend/models` to imports, it should be fine.
+	
 	fmt.Println("Database connected successfully")
 }
 

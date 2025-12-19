@@ -103,7 +103,7 @@ func TestCreateOrder(t *testing.T) {
 			"departureDate": serviceDate.Format("2006-01-02"), // Added departureDate
 			"seatType":      "second",
 			"passengers": []map[string]string{
-				{"id": pID, "name": "P1", "card_no": "123"},
+				{"id": pID, "name": "P1", "card_no": "110101200001011234"},
 			},
 		}
 		body, _ := json.Marshal(payload)
@@ -146,7 +146,7 @@ func TestCreateOrder(t *testing.T) {
 			"departureDate": futureDate.Format("2006-01-02"), 
 			"seatType":      "second",
 			"passengers": []map[string]string{
-				{"id": pID, "name": "P1", "card_no": "123"},
+				{"id": pID, "name": "P1", "card_no": "110101200001011234"},
 			},
 		}
 		body, _ := json.Marshal(payload)
@@ -192,7 +192,7 @@ func TestCreateOrder(t *testing.T) {
 			"departureDate": serviceDate.Format("2006-01-02"), // Added departureDate
 			"seatType":      "second",
 			"passengers": []map[string]string{
-				{"id": pID, "name": "P2", "card_no": "1234"},
+				{"id": pID, "name": "P2", "card_no": "110101200001011234"},
 			},
 		}
 		body, _ := json.Marshal(payload)
@@ -325,7 +325,7 @@ func TestOrderConfirmationAndPayment(t *testing.T) {
 	ticket := models.Ticket{
 		OrderID:           orderID,
 		PassengerName:     "ConfirmPassenger",
-		PassengerCardNo:   "123456",
+		PassengerCardNo:   "110101200001011234",
 		PassengerCardType: "id_card",
 		SeatType:          "second",
 		TicketType:        "adult",

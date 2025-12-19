@@ -88,6 +88,8 @@ func SetupRouter() *gin.Engine {
 			{
 				passengers.GET("", GetPassengers)
 				passengers.POST("", AddPassenger)
+				passengers.PUT("/:id", EditPassenger)
+				passengers.DELETE("/:id", DeletePassenger)
 			}
 
 			orders := protected.Group("/orders")

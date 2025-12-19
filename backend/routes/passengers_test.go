@@ -74,6 +74,132 @@ func TestAddPassenger(t *testing.T) {
 	t.Run("LimitReached", func(t *testing.T) {
 		// Expect 400
 	})
+
+	t.Run("Validation_InvalidID", func(t *testing.T) {
+		payload := map[string]string{
+			"name":      "Invalid ID",
+			"card_type": "id_card",
+			"card_no":   "123", // Too short
+			"type":      "adult",
+		}
+		body, _ := json.Marshal(payload)
+		req, _ := http.NewRequest("POST", "/api/v1/passengers", bytes.NewBuffer(body))
+		req.AddCookie(&http.Cookie{Name: "sid", Value: "dummy-session-00000000-0000-0000-0000-000000000000"})
+		req.Header.Set("Content-Type", "application/json")
+		
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+		var response map[string]interface{}
+		json.Unmarshal(w.Body.Bytes(), &response)
+		assert.Equal(t, "身份证号格式不正确", response["error"])
+	})
+
+	t.Run("Validation_InvalidMobile", func(t *testing.T) {
+		payload := map[string]string{
+			"name":      "Invalid Mobile",
+			"card_type": "id_card",
+			"card_no":   "110101200001011234",
+			"type":      "adult",
+			"mobile":    "123", // Invalid
+		}
+		body, _ := json.Marshal(payload)
+		req, _ := http.NewRequest("POST", "/api/v1/passengers", bytes.NewBuffer(body))
+		req.AddCookie(&http.Cookie{Name: "sid", Value: "dummy-session-00000000-0000-0000-0000-000000000000"})
+		req.Header.Set("Content-Type", "application/json")
+		
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+		var response map[string]interface{}
+		json.Unmarshal(w.Body.Bytes(), &response)
+		assert.Equal(t, "手机号格式不正确", response["error"])
+	})
+}
+
+func TestDeletePassenger(t *testing.T) {
+	r := setupTestRouter()
+
+	userID := uuid.MustParse("00000000-0000-0000-0000-000000000000")
+	db.GetDB().FirstOrCreate(&models.User{ID: userID, Username: "testuser_del", PasswordHash: "hash"})
+
+	p := models.Passenger{
+		UserID:        userID,
+		Name:          "To Delete",
+		CardType:      "id_card",
+		CardNo:        "110101200001019999",
+		PassengerType: "adult",
+	}
+	db.GetDB().Create(&p)
+
+	t.Run("Success", func(t *testing.T) {
+		req, _ := http.NewRequest("DELETE", "/api/v1/passengers/"+p.ID.String(), nil)
+		req.AddCookie(&http.Cookie{Name: "sid", Value: "dummy-session-00000000-0000-0000-0000-000000000000"})
+		
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+		
+		// Verify deleted
+		var count int64
+		db.GetDB().Model(&models.Passenger{}).Where("id = ?", p.ID).Count(&count)
+		assert.Equal(t, int64(0), count)
+	})
+
+	t.Run("NotFound", func(t *testing.T) {
+		req, _ := http.NewRequest("DELETE", "/api/v1/passengers/"+uuid.New().String(), nil)
+		req.AddCookie(&http.Cookie{Name: "sid", Value: "dummy-session-00000000-0000-0000-0000-000000000000"})
+		
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusNotFound, w.Code)
+	})
+}
+
+func TestEditPassenger(t *testing.T) {
+	r := setupTestRouter()
+
+	userID := uuid.MustParse("00000000-0000-0000-0000-000000000000")
+	db.GetDB().FirstOrCreate(&models.User{ID: userID, Username: "testuser_edit", PasswordHash: "hash"})
+
+	p := models.Passenger{
+		UserID:        userID,
+		Name:          "Original Name",
+		CardType:      "id_card",
+		CardNo:        "110101200001010000",
+		PassengerType: "adult",
+	}
+	db.GetDB().Create(&p)
+
+	t.Run("Success", func(t *testing.T) {
+		payload := map[string]string{
+			"name":      "Updated Name",
+			"card_type": "居民身份证",
+			"card_no":   "110101200001010000",
+			"type":      "学生",
+			"mobile":    "13800000000",
+		}
+		body, _ := json.Marshal(payload)
+		req, _ := http.NewRequest("PUT", "/api/v1/passengers/"+p.ID.String(), bytes.NewBuffer(body))
+		req.AddCookie(&http.Cookie{Name: "sid", Value: "dummy-session-00000000-0000-0000-0000-000000000000"})
+		req.Header.Set("Content-Type", "application/json")
+		
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+		
+		// Verify DB
+		var updatedP models.Passenger
+		db.GetDB().First(&updatedP, p.ID)
+		assert.Equal(t, "Updated Name", updatedP.Name)
+		assert.Equal(t, "student", updatedP.PassengerType)
+		assert.Equal(t, "13800000000", updatedP.Mobile)
+	})
 }
 
 func TestGetPassengers(t *testing.T) {
