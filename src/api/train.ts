@@ -62,7 +62,9 @@ export async function searchTrains(
         departureTime: t.startTime,
         arrivalTime: t.endTime,
         duration: calculateDuration(t.startTime, t.endTime),
-        availableSeats: availableSeats
+        availableSeats: availableSeats,
+        initialDepartureStation: t.initialDepartureStation, // New field
+        finalArrivalStation: t.finalArrivalStation          // New field
       }
     })
 

@@ -19,11 +19,21 @@
     <div class="train-item-cell">
       <div class="train-stations-vertical">
         <div class="station-name-with-badge">
-          <span class="station-badge station-badge-start">始</span>
+          <span 
+            class="station-badge"
+            :class="isOriginStation ? 'station-badge-start' : 'station-badge-pass'"
+          >
+            {{ isOriginStation ? '始' : '过' }}
+          </span>
           <span class="station-name">{{ train.departureStation || '--' }}</span>
         </div>
         <div class="station-name-with-badge">
-          <span class="station-badge station-badge-end">终</span>
+          <span 
+            class="station-badge"
+            :class="isTerminalStation ? 'station-badge-end' : 'station-badge-pass'"
+          >
+            {{ isTerminalStation ? '终' : '过' }}
+          </span>
           <span class="station-name">{{ train.arrivalStation || '--' }}</span>
         </div>
       </div>
@@ -201,6 +211,18 @@ const isNextDay = computed(() => {
   return arrMinutes < depMinutes;
 });
 
+const isOriginStation = computed(() => {
+  if (!props.train.initialDepartureStation) return true
+  const currentStation = props.train.departureStation || props.train.from
+  return currentStation === props.train.initialDepartureStation
+})
+
+const isTerminalStation = computed(() => {
+  if (!props.train.finalArrivalStation) return true
+  const currentStation = props.train.arrivalStation || props.train.to
+  return currentStation === props.train.finalArrivalStation
+})
+
 const onReserve = (trainNo: string, departureStation: string, arrivalStation: string, departureDate: string) => {
   emit('reserve', trainNo, departureStation, arrivalStation, departureDate);
 };
@@ -368,6 +390,10 @@ const onReserve = (trainNo: string, departureStation: string, arrivalStation: st
 
 .station-badge-end {
   background-color: #3f6901;
+}
+
+.station-badge-pass {
+  background-color: #2196f3;
 }
 
 /* 时间信息 - 垂直布局 */
