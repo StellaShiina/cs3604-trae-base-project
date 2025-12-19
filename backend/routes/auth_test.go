@@ -52,6 +52,7 @@ func setupTestRouter() *gin.Engine {
 	// Create mock view/table for search
 	db.GetDB().Exec(`DROP TABLE IF EXISTS v_train_search`)
 	db.GetDB().Exec(`CREATE TABLE v_train_search (
+		train_service_id TEXT,
 		train_no TEXT,
 		depart_time TEXT,
 		arrive_time TEXT,
@@ -63,8 +64,8 @@ func setupTestRouter() *gin.Engine {
 	
 	// Seed data for search
 	seatsJSON := `[{"type":"second","price":100,"left":100,"bookable":true}]`
-	db.GetDB().Exec("INSERT INTO v_train_search (train_no, depart_time, arrive_time, from_station_id, to_station_id, date, seats) VALUES (?, ?, ?, ?, ?, ?, ?)", 
-		"G1", "08:00", "12:00", "uuid1", "uuid2", "2025-11-28", seatsJSON)
+	db.GetDB().Exec("INSERT INTO v_train_search (train_service_id, train_no, depart_time, arrive_time, from_station_id, to_station_id, date, seats) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", 
+		"1", "G1", "08:00", "12:00", "uuid1", "uuid2", "2025-11-28", seatsJSON)
 
 	gin.SetMode(gin.TestMode)
 	return SetupRouter()

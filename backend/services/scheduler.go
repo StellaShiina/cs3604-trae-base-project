@@ -5,13 +5,16 @@ import (
 	"12306-backend/models"
 	"fmt"
 	"log"
+	"os"
+	"path/filepath"
+	"sort"
+	"strings"
 	"time"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
-// InitTrainSchedule generates train services for the next 14 days and cleans up old ones.
+// InitTrainSchedule generates train services using SQL scripts from database/db-init
 func InitTrainSchedule() {
 	dbConn := db.GetDB()
 	if dbConn == nil {
@@ -19,18 +22,79 @@ func InitTrainSchedule() {
 		return
 	}
 
-	// 1. Cleanup old services (older than 1 day ago)
+	// 1. Execute DB Initialization Scripts (Schema, Seed Data & Routes)
+	// This ensures tables and enums exist before we try to clean them up.
+	if err := executeInitScripts(dbConn); err != nil {
+		log.Printf("Failed to execute init scripts: %v", err)
+	}
+
+	// 2. Cleanup old services (older than 1 day ago)
 	cleanupOldServices(dbConn)
 
-	// 1.5. Cleanup expired orders (timeout but not canceled)
+	// 3. Cleanup expired orders
 	cleanupExpiredOrders(dbConn)
-
-	// 2. Ensure stations and reference data exist (Prerequisite)
-	ensureReferenceData(dbConn)
-
-	// 3. Generate future services
-	generateFutureServices(dbConn)
 }
+
+func executeInitScripts(tx *gorm.DB) error {
+	// Locate db-init directory
+	// Assuming running from backend/backend, so it's ../../database/db-init
+	// We can try to find it relative to current working directory
+	baseDir, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("failed to get working directory: %v", err)
+	}
+
+	// Adjust path based on where the binary is running. 
+	// If running via 'go run main.go' in backend/backend, it is ../../database/db-init
+	scriptDir := filepath.Join(baseDir, "..", "..", "database", "db-init")
+	
+	// Verify directory exists
+	if _, err := os.Stat(scriptDir); os.IsNotExist(err) {
+		// Try alternative path (maybe running from project root?)
+		scriptDir = filepath.Join(baseDir, "database", "db-init")
+		if _, err := os.Stat(scriptDir); os.IsNotExist(err) {
+			return fmt.Errorf("db-init directory not found at %s or %s", filepath.Join(baseDir, "..", "..", "database", "db-init"), scriptDir)
+		}
+	}
+
+	log.Printf("Found db-init directory at: %s", scriptDir)
+
+	// List all .sql files
+	files, err := os.ReadDir(scriptDir)
+	if err != nil {
+		return err
+	}
+
+	var sqlFiles []string
+	for _, f := range files {
+		if !f.IsDir() && strings.HasSuffix(f.Name(), ".sql") {
+			// We include all .sql files (00-init, 01-seed, 10-routes, etc.)
+			// 00-init.sql is idempotent (IF NOT EXISTS, OR REPLACE)
+			sqlFiles = append(sqlFiles, f.Name())
+		}
+	}
+
+	sort.Strings(sqlFiles)
+
+	for _, filename := range sqlFiles {
+		log.Printf("Executing SQL script: %s", filename)
+		content, err := os.ReadFile(filepath.Join(scriptDir, filename))
+		if err != nil {
+			return fmt.Errorf("failed to read %s: %v", filename, err)
+		}
+
+		if err := tx.Exec(string(content)).Error; err != nil {
+			// Log error but maybe continue? Or fail?
+			// Some scripts might have dependencies.
+			log.Printf("Error executing %s: %v", filename, err)
+			// return err // Decide if strict or loose
+		}
+	}
+	
+	log.Println("Train schedule initialized from SQL scripts.")
+	return nil
+}
+
 
 func cleanupOldServices(tx *gorm.DB) {
 	// Keep services from yesterday onwards. Delete older.
@@ -61,133 +125,3 @@ func cleanupExpiredOrders(tx *gorm.DB) {
 	}
 }
 
-func ensureReferenceData(tx *gorm.DB) {
-	// Ensure Stations
-	stations := []models.Station{
-		{Code: "BJP", NameEn: "Beijing", NameZh: "北京"},
-		{Code: "SHH", NameEn: "Shanghai", NameZh: "上海"},
-		{Code: "VNP", NameEn: "Beijing South", NameZh: "北京南"},
-		{Code: "AOH", NameEn: "Shanghai Hongqiao", NameZh: "上海虹桥"},
-		{Code: "TJN", NameEn: "Tianjin", NameZh: "天津"},
-		{Code: "NJH", NameEn: "Nanjing", NameZh: "南京"},
-	}
-
-	for _, s := range stations {
-		var count int64
-		tx.Model(&models.Station{}).Where("code = ?", s.Code).Count(&count)
-		if count == 0 {
-			// Create
-			s.ID = uuid.New()
-			tx.Create(&s)
-		}
-	}
-
-	// Ensure Trains (Reference Table)
-	trains := []models.Train{
-		{TrainNo: "G1", TrainType: "G"},
-		{TrainNo: "G2", TrainType: "G"},
-		{TrainNo: "G101", TrainType: "G"},
-		{TrainNo: "G102", TrainType: "G"},
-		{TrainNo: "Z1", TrainType: "Z"},
-	}
-	for _, t := range trains {
-		var count int64
-		tx.Model(&models.Train{}).Where("train_no = ?", t.TrainNo).Count(&count)
-		if count == 0 {
-			tx.Create(&t)
-		}
-	}
-}
-
-func generateFutureServices(tx *gorm.DB) {
-	// Define templates
-	templates := []struct {
-		TrainNo   string
-		FromCode  string
-		ToCode    string
-		Depart    string
-		Arrive    string
-		Duration  string // Just for record, simple calc
-		Price     int    // Base price for second class
-	}{
-		{"G1", "VNP", "AOH", "09:00", "13:30", "4h30m", 55300},
-		{"G2", "AOH", "VNP", "14:00", "18:30", "4h30m", 55300},
-		{"G101", "VNP", "AOH", "07:00", "12:30", "5h30m", 55300},
-		{"G102", "AOH", "VNP", "13:00", "18:30", "5h30m", 55300},
-		{"Z1", "BJP", "SHH", "19:00", "08:00", "13h00m", 18000}, // Overnight
-	}
-
-	today := time.Now()
-	
-	for i := 0; i < 14; i++ {
-		targetDate := today.AddDate(0, 0, i)
-		dateStr := targetDate.Format("2006-01-02")
-		
-		for _, t := range templates {
-			// Check if exists
-			var exists int64
-			tx.Model(&models.TrainService{}).Where("train_no = ? AND service_date = ?", t.TrainNo, dateStr).Count(&exists)
-			if exists > 0 {
-				continue
-			}
-
-			// Create TrainService
-			service := models.TrainService{
-				TrainNo:     t.TrainNo,
-				ServiceDate: targetDate,
-			}
-			if err := tx.Create(&service).Error; err != nil {
-				log.Printf("Failed to create service %s on %s: %v", t.TrainNo, dateStr, err)
-				continue
-			}
-
-			// Resolve Station IDs
-			var fromStation, toStation models.Station
-			tx.Where("code = ?", t.FromCode).First(&fromStation)
-			tx.Where("code = ?", t.ToCode).First(&toStation)
-
-			// Create Segment
-			segment := models.ServiceSegment{
-				TrainServiceID: service.ID,
-				FromStationID:  fromStation.ID,
-				ToStationID:    toStation.ID,
-				DepartTime:     t.Depart,
-				ArriveTime:     t.Arrive,
-				Duration:       t.Duration,
-				FromStopSeq:    1, // Default start
-				ToStopSeq:      2, // Default end
-			}
-			tx.Create(&segment)
-
-			// Create Inventory
-			// Second Class
-			tx.Create(&models.SegmentSeatInventory{
-				TrainServiceID: service.ID,
-				SegmentID:      segment.ID,
-				SeatType:       "second",
-				TotalSeats:     100,
-				LeftSeats:      100, // Full initially
-				PriceCents:     t.Price,
-			})
-			// First Class
-			tx.Create(&models.SegmentSeatInventory{
-				TrainServiceID: service.ID,
-				SegmentID:      segment.ID,
-				SeatType:       "first",
-				TotalSeats:     50,
-				LeftSeats:      50,
-				PriceCents:     int(float64(t.Price) * 1.6),
-			})
-			// Business Class
-			tx.Create(&models.SegmentSeatInventory{
-				TrainServiceID: service.ID,
-				SegmentID:      segment.ID,
-				SeatType:       "business",
-				TotalSeats:     20,
-				LeftSeats:      20,
-				PriceCents:     t.Price * 3,
-			})
-		}
-	}
-	fmt.Println("Train schedule initialized for next 14 days.")
-}

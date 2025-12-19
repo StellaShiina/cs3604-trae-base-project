@@ -12,12 +12,14 @@ import (
 )
 
 type TrainSearchResult struct {
-	TrainNo   string `json:"trainNo"`
-	From      string `json:"from"`
-	To        string `json:"to"`
-	StartTime string `json:"startTime"`
-	EndTime   string `json:"endTime"`
-	Seats     []struct {
+	TrainNo                 string `json:"trainNo"`
+	From                    string `json:"from"`
+	To                      string `json:"to"`
+	StartTime               string `json:"startTime"`
+	EndTime                 string `json:"endTime"`
+	InitialDepartureStation string `json:"initialDepartureStation"` // New field
+	FinalArrivalStation     string `json:"finalArrivalStation"`     // New field
+	Seats                   []struct {
 		Type     string `json:"type"`
 		Left     int    `json:"left"`
 		Bookable bool   `json:"bookable"`
@@ -92,6 +94,7 @@ func SearchTrains(c *gin.Context) {
 
 	// Query v_train_search view with IN clause
 	var results []struct {
+		TrainServiceID string `gorm:"column:train_service_id"` // Needed to lookup origin/terminal
 		TrainNo       string
 		FromStationID string `gorm:"column:from_station_id"` // To map back to station name if needed
 		ToStationID   string `gorm:"column:to_station_id"`
@@ -105,7 +108,7 @@ func SearchTrains(c *gin.Context) {
 	// Let's use Where clause construction.
 	
 	query := db.GetDB().Table("v_train_search").
-		Select("train_no, from_station_id, to_station_id, depart_time, arrive_time, seats").
+		Select("train_service_id, train_no, from_station_id, to_station_id, depart_time, arrive_time, seats").
 		Where("from_station_id IN ? AND to_station_id IN ? AND date = ?", fromStationIDs, toStationIDs, date)
 
 	// Filter past trains if querying for today
@@ -131,10 +134,98 @@ func SearchTrains(c *gin.Context) {
 	// Collect all unique station IDs from results
 	stationIDMap := make(map[string]models.Station)
 	var allStationIDs []string
+	var serviceIDs []string
+
 	for _, r := range results {
 		allStationIDs = append(allStationIDs, r.FromStationID, r.ToStationID)
+		serviceIDs = append(serviceIDs, r.TrainServiceID)
 	}
 	
+	// Lookup Origin/Terminal Stations for each Service
+	// We need station_id for stop_seq=1 (Origin) and stop_seq=MAX (Terminal)
+	// Map serviceID -> {OriginStationID, TerminalStationID}
+	type EndpointInfo struct {
+		OriginID   string
+		TerminalID string
+	}
+	endpointMap := make(map[string]EndpointInfo)
+
+	if len(serviceIDs) > 0 {
+		type EndpointRow struct {
+			TrainServiceID string
+			StationID      string
+			StopSeq        int
+		}
+		var endpoints []EndpointRow
+		
+		// Query for first stop (Origin)
+		db.GetDB().Table("service_stops").
+			Select("train_service_id, station_id, stop_seq").
+			Where("train_service_id IN ? AND stop_seq = 1", serviceIDs).
+			Scan(&endpoints)
+		
+		// Map origins
+		for _, e := range endpoints {
+			info := endpointMap[e.TrainServiceID]
+			info.OriginID = e.StationID
+			endpointMap[e.TrainServiceID] = info
+			allStationIDs = append(allStationIDs, e.StationID)
+		}
+
+		// Query for last stop (Terminal)
+		// This is tricky with multiple services. We can use a subquery or window function.
+		// Or just query all stops for these services and process in Go (might be heavy if many stops).
+		// Or use a correlated subquery for each service.
+		// Given limit (usually pagination or reasonably small result set), fetching all stops might be okay?
+		// Or assume max stop_seq?
+		// Let's use a query that gets the MAX stop_seq for each service ID.
+		
+		var terminalEndpoints []EndpointRow
+		// Postgres specific: DISTINCT ON (train_service_id) ORDER BY train_service_id, stop_seq DESC
+		// But let's try standard SQL or just query MAX stop seq first.
+		
+		// Subquery to get max stop seq
+		// SELECT train_service_id, MAX(stop_seq) as max_seq FROM service_stops WHERE train_service_id IN ? GROUP BY train_service_id
+		
+		var maxStops []struct {
+			TrainServiceID string
+			MaxSeq         int
+		}
+		db.GetDB().Table("service_stops").
+			Select("train_service_id, MAX(stop_seq) as max_seq").
+			Where("train_service_id IN ?", serviceIDs).
+			Group("train_service_id").
+			Scan(&maxStops)
+			
+		// Now query the station IDs for these max stops
+		// We can iterate or build a query.
+		// Construct conditions: (train_service_id = ? AND stop_seq = ?) OR ...
+		// A bit verbose.
+		
+		// Alternatively, just fetch the station_id where (train_service_id, stop_seq) IN ...
+		// Gorm supports tuples in Where?
+		// Where("(train_service_id, stop_seq) IN ?", tuples)
+		
+		if len(maxStops) > 0 {
+			var tuples [][]interface{}
+			for _, m := range maxStops {
+				tuples = append(tuples, []interface{}{m.TrainServiceID, m.MaxSeq})
+			}
+			
+			db.GetDB().Table("service_stops").
+				Select("train_service_id, station_id, stop_seq").
+				Where("(train_service_id, stop_seq) IN ?", tuples).
+				Scan(&terminalEndpoints)
+				
+			for _, e := range terminalEndpoints {
+				info := endpointMap[e.TrainServiceID]
+				info.TerminalID = e.StationID
+				endpointMap[e.TrainServiceID] = info
+				allStationIDs = append(allStationIDs, e.StationID)
+			}
+		}
+	}
+
 	if len(allStationIDs) > 0 {
 		var stations []models.Station
 		db.GetDB().Where("id IN ?", allStationIDs).Find(&stations)
@@ -171,13 +262,26 @@ func SearchTrains(c *gin.Context) {
 			toStationName = s.NameZh
 		}
 
+		// Resolve Initial/Final Names
+		endpoints := endpointMap[r.TrainServiceID]
+		initialStationName := ""
+		if s, ok := stationIDMap[endpoints.OriginID]; ok {
+			initialStationName = s.NameZh
+		}
+		finalStationName := ""
+		if s, ok := stationIDMap[endpoints.TerminalID]; ok {
+			finalStationName = s.NameZh
+		}
+
 		response = append(response, TrainSearchResult{
-			TrainNo:   r.TrainNo,
-			From:      fromStationName, // Actual Station Name
-			To:        toStationName,   // Actual Station Name
-			StartTime: r.DepartTime, 
-			EndTime:   r.ArriveTime, 
-			Seats:     seats,
+			TrainNo:                 r.TrainNo,
+			From:                    fromStationName, // Actual Station Name
+			To:                      toStationName,   // Actual Station Name
+			StartTime:               r.DepartTime, 
+			EndTime:                 r.ArriveTime, 
+			InitialDepartureStation: initialStationName,
+			FinalArrivalStation:     finalStationName,
+			Seats:                   seats,
 		})
 	}
 

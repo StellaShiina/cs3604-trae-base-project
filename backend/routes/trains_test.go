@@ -47,12 +47,12 @@ func TestSearchTrains(t *testing.T) {
 		db.GetDB().Exec("INSERT INTO stations (id, code, name_en, name_zh) VALUES (?, ?, ?, ?)", id2, "CODE2", "Station2", "StationZh2")
 		
 		// Insert Past Train (00:00)
-		db.GetDB().Exec("INSERT INTO v_train_search (train_no, depart_time, arrive_time, from_station_id, to_station_id, date, seats) VALUES (?, ?, ?, ?, ?, ?, ?)",
-			"G_PAST", "00:00", "01:00", id1, id2, today, `[]`)
+		db.GetDB().Exec("INSERT INTO v_train_search (train_service_id, train_no, depart_time, arrive_time, from_station_id, to_station_id, date, seats) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+			"100", "G_PAST", "00:00", "01:00", id1, id2, today, `[]`)
 			
 		// Insert Future Train (23:59)
-		db.GetDB().Exec("INSERT INTO v_train_search (train_no, depart_time, arrive_time, from_station_id, to_station_id, date, seats) VALUES (?, ?, ?, ?, ?, ?, ?)",
-			"G_FUTURE", "23:59", "23:59", id1, id2, today, `[]`)
+		db.GetDB().Exec("INSERT INTO v_train_search (train_service_id, train_no, depart_time, arrive_time, from_station_id, to_station_id, date, seats) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+			"101", "G_FUTURE", "23:59", "23:59", id1, id2, today, `[]`)
 			
 		req, _ := http.NewRequest("GET", "/api/v1/trains/search?fromStationId="+id1+"&toStationId="+id2+"&date="+today, nil)
 		w := httptest.NewRecorder()
