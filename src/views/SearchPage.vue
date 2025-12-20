@@ -222,6 +222,7 @@ const handleFilterChange = (newFilters: any) => {
 
 const handleReserve = (trainNo: string, departureStation: string, arrivalStation: string, departureDate: string) => {
   if (!isLoggedIn.value) {
+    pendingReserve.value = { trainNo, departureStation, arrivalStation, departureDate };
     showLoginModal.value = true;
     return;
   }
@@ -237,9 +238,21 @@ const handleReserve = (trainNo: string, departureStation: string, arrivalStation
   });
 };
 
-const goToLogin = () => {
+const handleLoginSuccess = () => {
   showLoginModal.value = false;
-  router.push('/login');
+  if (pendingReserve.value) {
+    const { trainNo, departureStation, arrivalStation, departureDate } = pendingReserve.value;
+    router.push({
+      name: 'Order',
+      query: {
+        trainNo,
+        departureStation,
+        arrivalStation,
+        departureDate
+      }
+    });
+    pendingReserve.value = null;
+  }
 };
 
 // 初始化
