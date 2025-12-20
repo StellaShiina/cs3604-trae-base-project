@@ -17,9 +17,7 @@ const searchText = ref('')
 
 const handleLogoClick = () => {
   emit('logoClick')
-  if (!props.showWelcomeLogin) {
-    router.push('/')
-  }
+  router.push('/')
 }
 
 const handleLogout = () => {
