@@ -8,20 +8,6 @@
     预订
   </button>
 
-  <!-- 登录提示弹窗 -->
-  <ConfirmModal
-    :is-visible="showLoginModal"
-    title="提示"
-    message="请先登录！"
-    confirm-text="确认"
-    cancel-text="取消"
-    @confirm="() => {
-      showLoginModal = false;
-      router.push('/login');
-    }"
-    @cancel="() => showLoginModal = false"
-  />
-
   <!-- 其他确认弹窗 -->
   <ConfirmModal
     :is-visible="showConfirmModal"
@@ -36,7 +22,6 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
 import ConfirmModal from './ConfirmModal.vue';
 
 const props = defineProps<{
@@ -54,19 +39,11 @@ const emit = defineEmits<{
   (e: 'reserve', trainNo: string, departureStation: string, arrivalStation: string, departureDate: string): void;
 }>();
 
-const router = useRouter();
 const showConfirmModal = ref(false);
-const showLoginModal = ref(false);
 const modalConfig = ref<any>({});
 
 const handleClick = () => {
-  // 1. 检查用户登录状态
-  if (!props.isLoggedIn) {
-    showLoginModal.value = true;
-    return;
-  }
-
-  // 2. 检查查询时间是否超过5分钟
+  // 1. 检查查询时间是否超过5分钟
   const now = new Date();
   const queryTime = new Date(props.queryTimestamp);
   const timeDiff = now.getTime() - queryTime.getTime();
@@ -105,7 +82,7 @@ const handleClick = () => {
       onConfirm: () => {
         showConfirmModal.value = false;
         // 继续预订
-        emit('reserve', props.trainNo);
+        emit('reserve', props.trainNo, props.departureStation, props.arrivalStation, props.departureDate);
       },
     };
     showConfirmModal.value = true;

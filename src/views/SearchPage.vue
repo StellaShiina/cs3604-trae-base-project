@@ -46,16 +46,11 @@
       </div>
     </div>
 
-    <ConfirmModal
+    <LoginModal
       :is-visible="showLoginModal"
-      title="提示"
-      confirm-text="登录"
-      cancel-text="取消"
-      :on-confirm="goToLogin"
-      :on-cancel="() => showLoginModal = false"
-    >
-      您尚未登录，请先登录后再进行预订。
-    </ConfirmModal>
+      @close="showLoginModal = false"
+      @success="handleLoginSuccess"
+    />
 
     <BottomFooter />
   </div>
@@ -71,6 +66,7 @@ import TrainSearchBar from '@/components/Train/TrainSearchBar.vue';
 import TrainFilterPanel from '@/components/Train/TrainFilterPanel.vue';
 import TrainList from '@/components/Train/TrainList.vue';
 import ConfirmModal from '@/components/Train/ConfirmModal.vue';
+import LoginModal from '@/components/Auth/LoginModal.vue';
 import { searchTrains } from '@/api/train';
 import { getTodayString } from '@/utils/date';
 
@@ -86,6 +82,12 @@ const trains = ref<any[]>([]);
 const isLoggedIn = computed(() => authStore.isAuthenticated);
 const showLoginModal = ref(false);
 const queryTimestamp = ref(new Date().toISOString());
+const pendingReserve = ref<{
+  trainNo: string;
+  departureStation: string;
+  arrivalStation: string;
+  departureDate: string;
+} | null>(null);
 
 const searchParams = ref({
   departureStation: (route.query.departureStation as string) || (route.query.from as string) || '北京',
