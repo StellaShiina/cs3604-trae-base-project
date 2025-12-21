@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { getUserInfo } from '@/api/user'
@@ -13,14 +13,80 @@ const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 
-const activeMenu = ref('userInfo')
+const activeMenu = ref('orders') // Default to orders as per screenshot requirement? Or keep logic.
 
-const menuItems = [
-  { id: 'userInfo', label: '个人信息' },
-  { id: 'orders', label: '我的订单' },
-  { id: 'passengers', label: '乘车人管理' },
-  { id: 'security', label: '账号安全' }
-]
+// Define menu structure
+const menuGroups = ref([
+  {
+    id: 'center',
+    label: '个人中心',
+    type: 'header', // clickable header acting as a link
+    path: '/personal',
+    items: []
+  },
+  {
+    id: 'order_center',
+    label: '订单中心',
+    type: 'group',
+    expanded: true,
+    items: [
+      { id: 'orders', label: '火车票订单' },
+      { id: 'waitlist', label: '候补订单', disabled: true },
+      { id: 'card_ticket', label: '计次·定期票', disabled: true },
+      { id: 'appointment', label: '约号订单', disabled: true },
+      { id: 'snow_gear', label: '雪具快运订单', disabled: true },
+      { id: 'food', label: '餐饮·特产', disabled: true },
+      { id: 'insurance', label: '保险订单', disabled: true },
+      { id: 'invoice', label: '电子发票', disabled: true }
+    ]
+  },
+  {
+    id: 'my_tickets',
+    label: '本人车票',
+    type: 'header',
+    items: []
+  },
+  {
+    id: 'member_center',
+    label: '会员中心',
+    type: 'header',
+    items: []
+  },
+  {
+    id: 'personal_info_group',
+    label: '个人信息',
+    type: 'group',
+    expanded: true,
+    items: [
+      { id: 'userInfo', label: '查看个人信息' },
+      { id: 'security', label: '账号安全' },
+      { id: 'phone_verify', label: '手机核验', disabled: true },
+      { id: 'account_delete', label: '账号注销', disabled: true }
+    ]
+  },
+  {
+    id: 'common_info_group',
+    label: '常用信息管理',
+    type: 'group',
+    expanded: true,
+    items: [
+       { id: 'passengers', label: '乘车人管理' },
+       { id: 'address', label: '地址管理', disabled: true }
+    ]
+  }
+])
+
+// Helper to find label
+const currentLabel = computed(() => {
+  for (const group of menuGroups.value) {
+    if (group.id === activeMenu.value) return group.label
+    if (group.items) {
+      const item = group.items.find(i => i.id === activeMenu.value)
+      if (item) return item.label
+    }
+  }
+  return ''
+})
 
 onMounted(async () => {
   if (!authStore.isAuthenticated) {
@@ -36,7 +102,6 @@ onMounted(async () => {
     const response = await getUserInfo()
     if (response.data) {
       authStore.user = { ...authStore.user, ...response.data }
-      // Update local storage to keep it in sync
       localStorage.setItem('userInfo', JSON.stringify(authStore.user))
     }
   } catch (error: any) {
@@ -65,31 +130,41 @@ const handleLogout = () => {
     
     <div class="main-container">
       <div class="breadcrumb">
-        首页 > 个人中心 > {{ menuItems.find(item => item.id === activeMenu)?.label }}
+        当前位置：个人中心 > {{ currentLabel }}
       </div>
       
       <div class="content-wrapper">
         <!-- Sidebar -->
         <div class="sidebar">
-          <div class="sidebar-title">我的12306</div>
-          <ul class="sidebar-menu">
-            <li 
-              v-for="item in menuItems" 
-              :key="item.id"
-              :class="{ active: activeMenu === item.id }"
-              @click="activeMenu = item.id"
+          <div v-for="group in menuGroups" :key="group.id" class="menu-group">
+            <div 
+              class="group-header" 
+              :class="{ 'clickable': group.type === 'header' }"
             >
-              {{ item.label }}
-            </li>
-          </ul>
+              <span class="group-title">{{ group.label }}</span>
+              <span v-if="group.type === 'group'" class="expand-icon">▼</span>
+            </div>
+            
+            <ul v-if="group.items.length > 0 && group.expanded" class="menu-list">
+              <li 
+                v-for="item in group.items" 
+                :key="item.id"
+                :class="{ active: activeMenu === item.id, disabled: item.disabled }"
+                @click="!item.disabled && (activeMenu = item.id)"
+              >
+                {{ item.label }}
+              </li>
+            </ul>
+          </div>
         </div>
         
         <!-- Main Content Area -->
         <div class="main-content">
           <!-- User Info Panel -->
           <div v-if="activeMenu === 'userInfo'" class="panel user-info-panel">
+            <!-- Content remains same -->
             <div class="panel-header">
-              <h3>个人信息</h3>
+              <h3>查看个人信息</h3>
             </div>
             <div class="panel-body">
               <div class="info-group">
@@ -131,10 +206,9 @@ const handleLogout = () => {
           
           <!-- Orders Panel -->
           <div v-if="activeMenu === 'orders'" class="panel">
-            <div class="panel-header">
-              <h3>我的订单</h3>
-            </div>
-            <div class="panel-body">
+            <!-- OrderList component handles tabs internally now -->
+             <!-- We remove the header "我的订单" because tabs in OrderList will serve as header/nav -->
+            <div class="panel-body no-padding">
               <OrderList />
             </div>
           </div>
@@ -149,8 +223,8 @@ const handleLogout = () => {
             </div>
           </div>
           
-          <!-- Security Panel (Placeholder) -->
-          <div v-else class="panel">
+          <!-- Security Panel -->
+          <div v-if="activeMenu === 'security'" class="panel">
             <div class="panel-header">
               <h3>账号安全</h3>
             </div>
@@ -197,48 +271,67 @@ const handleLogout = () => {
 .breadcrumb {
   padding: 15px 0;
   color: #666;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .content-wrapper {
   display: flex;
-  gap: 20px;
+  gap: 15px;
   align-items: flex-start;
 }
 
 .sidebar {
-  width: 200px;
-  background: #fff;
-  border: 1px solid #ddd;
+  width: 180px;
+  background: transparent;
   
-  .sidebar-title {
-    background: #3b99fc;
-    color: #fff;
-    padding: 15px;
-    font-size: 16px;
-    font-weight: bold;
-  }
-  
-  .sidebar-menu {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  .menu-group {
+    margin-bottom: 10px;
     
-    li {
-      padding: 12px 20px;
-      cursor: pointer;
-      border-bottom: 1px solid #eee;
+    .group-header {
+      padding: 8px 10px;
+      font-weight: bold;
       color: #333;
       font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       
-      &:hover {
-        background-color: #f9f9f9;
-        color: #3b99fc;
+      &.clickable {
+        cursor: pointer;
+        &:hover { color: #3b99fc; }
       }
       
-      &.active {
-        background-color: #3b99fc;
-        color: #fff;
+      .expand-icon {
+        font-size: 10px;
+        color: #999;
+      }
+    }
+    
+    .menu-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      
+      li {
+        padding: 8px 10px 8px 25px;
+        cursor: pointer;
+        color: #666;
+        font-size: 12px;
+        
+        &:hover {
+          color: #3b99fc;
+        }
+        
+        &.active {
+          background-color: #3b99fc;
+          color: #fff;
+        }
+        
+        &.disabled {
+          color: #ccc;
+          cursor: not-allowed;
+          &:hover { color: #ccc; background: none; }
+        }
       }
     }
   }
@@ -247,22 +340,31 @@ const handleLogout = () => {
 .main-content {
   flex: 1;
   background: #fff;
-  border: 1px solid #ddd;
-  min-height: 500px;
+  border: 1px solid #e0e0e0;
+  min-height: 600px;
   padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   
   .panel-header {
-    border-bottom: 2px solid #3b99fc;
-    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
     margin-bottom: 20px;
     
     h3 {
       margin: 0;
-      color: #3b99fc;
-      font-size: 18px;
+      color: #333;
+      font-size: 16px;
+      font-weight: bold;
     }
   }
   
+  .panel-body {
+    &.no-padding {
+      padding: 0;
+    }
+  }
+  
+  // Reused styles
   .info-group {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -278,22 +380,14 @@ const handleLogout = () => {
         color: #666;
         text-align: right;
         margin-right: 15px;
+        font-size: 14px;
       }
       
       .value {
         color: #333;
         font-weight: 500;
+        font-size: 14px;
       }
-    }
-  }
-  
-  .empty-state {
-    text-align: center;
-    padding: 50px 0;
-    color: #999;
-    
-    p {
-      margin-bottom: 20px;
     }
   }
   
@@ -304,10 +398,11 @@ const handleLogout = () => {
     padding: 15px 0;
     border-bottom: 1px solid #eee;
     
+    .label { font-size: 14px; }
+    
     .status {
-      &.secure {
-        color: #28a745;
-      }
+      font-size: 14px;
+      &.secure { color: #28a745; }
     }
   }
   
@@ -323,7 +418,7 @@ const handleLogout = () => {
   background-color: #ff9a00;
   color: #fff;
   border: none;
-  padding: 8px 20px;
+  padding: 6px 20px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
@@ -337,7 +432,7 @@ const handleLogout = () => {
   background-color: #dc3545;
   color: #fff;
   border: none;
-  padding: 8px 20px;
+  padding: 6px 20px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
@@ -352,6 +447,7 @@ const handleLogout = () => {
   border: none;
   color: #3b99fc;
   cursor: pointer;
+  font-size: 14px;
   
   &:hover {
     text-decoration: underline;

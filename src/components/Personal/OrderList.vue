@@ -7,13 +7,12 @@ const router = useRouter()
 const orders = ref<any[]>([])
 const loading = ref(false)
 const error = ref('')
-const activeTab = ref('all') // all, unpaid, paid
+const activeTab = ref('incomplete') // incomplete, upcoming, history
 
 const tabs = [
-  { id: 'all', label: '全部订单' },
-  { id: 'unpaid', label: '未支付' },
-  { id: 'paid', label: '已支付' },
-  { id: 'completed', label: '已完成' } // backend might not distinguish paid vs completed well yet
+  { id: 'incomplete', label: '未完成订单' },
+  { id: 'upcoming', label: '未出行订单' },
+  { id: 'history', label: '历史订单' }
 ]
 
 const statusMap: Record<string, string> = {
@@ -26,18 +25,33 @@ const statusMap: Record<string, string> = {
   refunded: '已退票'
 }
 
+const isFuture = (dateStr: string, timeStr: string) => {
+  if (!dateStr || !timeStr) return false
+  const now = new Date()
+  const trainDate = new Date(`${dateStr} ${timeStr}`)
+  return trainDate > now
+}
+
 const filteredOrders = computed(() => {
-  if (activeTab.value === 'all') return orders.value
-  if (activeTab.value === 'unpaid') {
-    return orders.value.filter(o => ['pending_payment', 'confirmed_unpaid'].includes(o.status))
-  }
-  if (activeTab.value === 'paid') {
-    return orders.value.filter(o => ['paid', 'completed'].includes(o.status))
-  }
-  if (activeTab.value === 'completed') {
-    return orders.value.filter(o => o.status === 'completed')
-  }
-  return orders.value
+  return orders.value.filter(o => {
+    if (activeTab.value === 'incomplete') {
+      return ['pending_payment', 'confirmed_unpaid'].includes(o.status)
+    }
+    
+    if (activeTab.value === 'upcoming') {
+      // 已支付且未发车
+      return ['paid', 'completed'].includes(o.status) && isFuture(o.departure_date, o.departure_time)
+    }
+    
+    if (activeTab.value === 'history') {
+      // 已支付且已发车，或者已取消/已退票
+      const isPaidAndDeparted = ['paid', 'completed'].includes(o.status) && !isFuture(o.departure_date, o.departure_time)
+      const isCancelledOrRefunded = ['cancelled', 'canceled', 'refunded'].includes(o.status)
+      return isPaidAndDeparted || isCancelledOrRefunded
+    }
+    
+    return true
+  })
 })
 
 const fetchOrders = async () => {
