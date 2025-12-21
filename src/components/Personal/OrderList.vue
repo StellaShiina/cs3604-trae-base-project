@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
+import DatePicker from '@/components/Train/DatePicker.vue'
 import { useRouter } from 'vue-router'
 import { getOrders, cancelOrder, payOrder } from '@/api/order'
 
@@ -14,6 +15,13 @@ const tabs = [
   { id: 'upcoming', label: '未出行订单' },
   { id: 'history', label: '历史订单' }
 ]
+
+const searchForm = ref({
+  dateType: '1', // 1: 订票日期, 2: 乘车日期
+  startDate: '',
+  endDate: '',
+  keyword: ''
+})
 
 const statusMap: Record<string, string> = {
   pending_payment: '待支付',
@@ -47,7 +55,8 @@ const isFuture = (dateStr: string, timeStr: string) => {
 }
 
 const filteredOrders = computed(() => {
-  return orders.value.filter(o => {
+  // 1. Tab Filtering
+  let result = orders.value.filter(o => {
     if (activeTab.value === 'incomplete') {
       return ['pending_payment', 'confirmed_unpaid'].includes(o.status)
     }
@@ -66,6 +75,48 @@ const filteredOrders = computed(() => {
     
     return true
   })
+
+  // 2. Search Form Filtering
+  if (['upcoming', 'history'].includes(activeTab.value)) {
+    const { dateType, startDate, endDate, keyword } = searchForm.value
+    
+    // Filter by date range
+    if (startDate || endDate) {
+      result = result.filter(o => {
+        let dateToCheck = ''
+        if (dateType === '1') {
+          // Booking date (created_at)
+          dateToCheck = o.created_at ? o.created_at.substring(0, 10) : ''
+        } else {
+          // Departure date
+          dateToCheck = o.departure_date || ''
+        }
+        
+        if (!dateToCheck) return false
+        
+        const startOk = startDate ? dateToCheck >= startDate : true
+        const endOk = endDate ? dateToCheck <= endDate : true
+        
+        return startOk && endOk
+      })
+    }
+    
+    // Filter by keyword
+    if (keyword && keyword.trim()) {
+      const k = keyword.trim().toLowerCase()
+      result = result.filter(o => {
+        const trainMatch = o.train_no && o.train_no.toLowerCase().includes(k)
+        const passengerMatch = o.passengers && Array.isArray(o.passengers) && o.passengers.some((p: any) => 
+          p.passenger_name && p.passenger_name.toLowerCase().includes(k)
+        )
+        const orderIdMatch = (o.id && String(o.id).toLowerCase().includes(k))
+        
+        return trainMatch || passengerMatch || orderIdMatch
+      })
+    }
+  }
+
+  return result
 })
 
 const fetchOrders = async () => {
@@ -122,9 +173,57 @@ onMounted(() => {
       </button>
     </div>
 
+    <!-- 查询表单 - 仅在未出行订单和历史订单显示 -->
+    <div class="search-panel" v-if="['upcoming', 'history'].includes(activeTab)">
+      <div class="search-row">
+        <select v-model="searchForm.dateType" class="form-select">
+          <option value="1">按订票日期查询</option>
+          <option value="2">按乘车日期查询</option>
+        </select>
+        
+        <div class="date-range">
+          <div class="date-picker-wrapper">
+            <DatePicker 
+              :value="searchForm.startDate" 
+              @update:value="val => searchForm.startDate = val"
+              min-date="2000-01-01"
+              max-date="2030-12-31"
+            />
+          </div>
+          <span class="separator">-</span>
+          <div class="date-picker-wrapper">
+            <DatePicker 
+              :value="searchForm.endDate" 
+              @update:value="val => searchForm.endDate = val"
+              min-date="2000-01-01"
+              max-date="2030-12-31"
+            />
+          </div>
+        </div>
+        
+        <div class="keyword-search">
+          <input type="text" v-model="searchForm.keyword" placeholder="订单号/车次/姓名" class="form-input keyword-input" />
+          <button class="btn-clear" v-if="searchForm.keyword" @click="searchForm.keyword = ''">×</button>
+        </div>
+        
+        <button class="btn-search" @click="fetchOrders">查询</button>
+      </div>
+    </div>
+
     <div v-if="loading" class="loading">加载中...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
-    <div v-else-if="filteredOrders.length === 0" class="empty">暂无订单</div>
+    
+    <!-- 空状态 -->
+    <div v-else-if="filteredOrders.length === 0" class="empty-state">
+      <img src="/images/order.jpg" alt="No Orders" class="empty-img" />
+      <div class="empty-text">
+        <p v-if="activeTab === 'incomplete'">您没有未完成的订单哦~</p>
+        <p v-else>您没有对应的订单内容哦~</p>
+        <p class="sub-text">
+          您可以通过<router-link to="/search" class="link">车票预订</router-link>功能，来制定出行计划。
+        </p>
+      </div>
+    </div>
     
     <div v-else class="order-items">
       <div v-for="order in filteredOrders" :key="order.id" class="order-card">
@@ -293,7 +392,120 @@ onMounted(() => {
   }
 }
 
-.loading, .error, .empty {
+.search-panel {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 4px;
+
+  .search-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .form-select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-width: 140px;
+    outline: none;
+    
+    &:focus { border-color: #007bff; }
+  }
+
+  .date-range {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      
+      .date-picker-wrapper {
+        width: 160px;
+      }
+      
+      .separator { color: #999; }
+    }
+
+  .keyword-search {
+    position: relative;
+    
+    .keyword-input {
+      padding: 8px 30px 8px 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      width: 200px;
+      outline: none;
+      
+      &:focus { border-color: #007bff; }
+    }
+    
+    .btn-clear {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #999;
+      cursor: pointer;
+      font-size: 16px;
+      
+      &:hover { color: #666; }
+    }
+  }
+
+  .btn-search {
+    padding: 8px 20px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    
+    &:hover {
+      background: #f5f5f5;
+      color: #007bff;
+      border-color: #007bff;
+    }
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0;
+  text-align: center;
+  
+  .empty-img {
+    width: 200px;
+    margin-bottom: 20px;
+    opacity: 0.8;
+  }
+  
+  .empty-text {
+    color: #666;
+    font-size: 14px;
+    line-height: 1.8;
+    
+    .sub-text {
+      margin-top: 5px;
+    }
+    
+    .link {
+      color: #007bff;
+      text-decoration: underline;
+      cursor: pointer;
+      margin: 0 4px;
+      
+      &:hover { color: #0056b3; }
+    }
+  }
+}
+
+.loading, .error {
   text-align: center;
   padding: 40px;
   color: #999;
