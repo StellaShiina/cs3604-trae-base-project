@@ -46,6 +46,33 @@ const maskIdCard = (idCard: string) => {
   const middle = '*'.repeat(idCard.length - 7)
   return `${start}${middle}${end}`
 }
+
+const idCardTypeMap: Record<string, string> = {
+  id_card: '中国居民身份证',
+  passport: '护照',
+  travel_permit: '港澳台通行证'
+}
+
+const ticketTypeMap: Record<string, string> = {
+  adult: '成人票',
+  child: '儿童票',
+  student: '学生票',
+  disability: '残军票'
+}
+
+const seatTypeMap: Record<string, string> = {
+  business: '商务座',
+  first: '一等座',
+  second: '二等座',
+  hard_seat: '硬座',
+  hard_sleeper: '硬卧',
+  soft_sleeper: '软卧',
+  no_seat: '无座'
+}
+
+const getLabel = (map: Record<string, string>, key: string) => {
+  return map[key] || key
+}
 </script>
 
 <template>
@@ -82,10 +109,10 @@ const maskIdCard = (idCard: string) => {
           <tr v-for="p in passengers" :key="p.sequence">
             <td>{{ p.sequence }}</td>
             <td>{{ p.name }}</td>
-            <td>{{ p.idCardType }}</td>
+            <td>{{ getLabel(idCardTypeMap, p.idCardType) }}</td>
             <td>{{ maskIdCard(p.idCardNumber) }}</td>
-            <td>{{ p.ticketType }}</td>
-            <td>{{ p.seatType }}</td>
+            <td>{{ getLabel(ticketTypeMap, p.ticketType) }}</td>
+            <td>{{ getLabel(seatTypeMap, p.seatType) }}</td>
             <td>{{ p.carNumber || '--' }}</td>
             <td>{{ p.seatNumber || '--' }}</td>
             <td class="price">¥{{ p.price }}</td>

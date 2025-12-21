@@ -25,6 +25,20 @@ const statusMap: Record<string, string> = {
   refunded: '已退票'
 }
 
+const seatTypeMap: Record<string, string> = {
+  business: '商务座',
+  first: '一等座',
+  second: '二等座',
+  hard_seat: '硬座',
+  hard_sleeper: '硬卧',
+  soft_sleeper: '软卧',
+  no_seat: '无座'
+}
+
+const getSeatLabel = (type: string) => {
+  return seatTypeMap[type] || type
+}
+
 const isFuture = (dateStr: string, timeStr: string) => {
   if (!dateStr || !timeStr) return false
   const now = new Date()
@@ -133,7 +147,7 @@ onMounted(() => {
           
           <div class="passengers">
              <div v-for="(p, idx) in order.passengers" :key="idx" class="p-item">
-               {{ p.passenger_name }} ({{ p.seat_type === 'second' ? '二等座' : p.seat_type }}) 
+               {{ p.passenger_name }} ({{ getSeatLabel(p.seat_type) }}) 
                <span v-if="p.seat_number">{{ p.car_number }}车 {{ p.seat_number }}</span>
              </div>
           </div>
