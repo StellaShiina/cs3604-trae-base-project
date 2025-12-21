@@ -14,109 +14,117 @@
     </div>
 
     <!-- 筛选条件面板 -->
-    <div class="filter-panel-container">
+    <div class="filter-panel-container" :class="{ collapsed: isCollapsed }">
       <!-- 车次类型行 -->
       <div class="filter-row">
         <div class="filter-label">车次类型：</div>
-        <button 
-          :class="getSelectAllButtonClass(selectedTrainTypes.length, totalTrainTypesCount)" 
-          @click="handleTrainTypesSelectAll"
-        >
-          全部
-        </button>
-        <div class="filter-options">
-          <label v-for="option in trainTypeOptions" :key="option.key" class="filter-checkbox">
-            <input
-              type="checkbox"
-              :checked="isTrainTypeSelected(option.types)"
-              @change="handleTrainTypeToggle(option.types)"
-            />
-            <span class="checkbox-label">{{ option.label }}</span>
-          </label>
-        </div>
-        <div class="filter-time-select">
-          <span class="time-label">发车时间：</span>
-          <select
-            v-model="departureTimeRange"
-            @change="handleTimeRangeChange"
-            class="time-dropdown"
+        <div class="filter-content">
+          <button 
+            :class="getSelectAllButtonClass(selectedTrainTypes.length, totalTrainTypesCount)" 
+            @click="handleTrainTypesSelectAll"
           >
-            <option value="00:00--24:00">00:00--24:00</option>
-            <option value="00:00--06:00">00:00--06:00</option>
-            <option value="06:00--12:00">06:00--12:00</option>
-            <option value="12:00--18:00">12:00--18:00</option>
-            <option value="18:00--24:00">18:00--24:00</option>
-          </select>
+            全部
+          </button>
+          <div class="filter-options">
+            <label v-for="option in trainTypeOptions" :key="option.key" class="filter-checkbox">
+              <input
+                type="checkbox"
+                :checked="isTrainTypeSelected(option.types)"
+                @change="handleTrainTypeToggle(option.types)"
+              />
+              <span class="checkbox-label">{{ option.label }}</span>
+            </label>
+          </div>
+          <div class="filter-time-select">
+            <span class="time-label">发车时间：</span>
+            <select
+              v-model="departureTimeRange"
+              @change="handleTimeRangeChange"
+              class="time-dropdown"
+            >
+              <option value="00:00--24:00">00:00--24:00</option>
+              <option value="00:00--06:00">00:00--06:00</option>
+              <option value="06:00--12:00">06:00--12:00</option>
+              <option value="12:00--18:00">12:00--18:00</option>
+              <option value="18:00--24:00">18:00--24:00</option>
+            </select>
+          </div>
         </div>
       </div>
 
       <!-- 出发车站行 -->
       <div v-if="departureStations.length > 0" class="filter-row">
         <div class="filter-label">出发车站：</div>
-        <button 
-          :class="getSelectAllButtonClass(selectedDepartureStations.length, departureStations.length)" 
-          @click="handleDepartureStationsSelectAll"
-        >
-          全部
-        </button>
-        <div class="filter-options">
-          <label v-for="station in departureStations" :key="station" class="filter-checkbox">
-            <input
-              type="checkbox"
-              :checked="selectedDepartureStations.includes(station)"
-              @change="handleDepartureStationToggle(station)"
-            />
-            <span class="checkbox-label">{{ station }}</span>
-          </label>
+        <div class="filter-content">
+          <button 
+            :class="getSelectAllButtonClass(selectedDepartureStations.length, departureStations.length)" 
+            @click="handleDepartureStationsSelectAll"
+          >
+            全部
+          </button>
+          <div class="filter-options">
+            <label v-for="station in departureStations" :key="station" class="filter-checkbox">
+              <input
+                type="checkbox"
+                :checked="selectedDepartureStations.includes(station)"
+                @change="handleDepartureStationToggle(station)"
+              />
+              <span class="checkbox-label">{{ station }}</span>
+            </label>
+          </div>
         </div>
       </div>
 
       <!-- 到达车站行 -->
       <div v-if="arrivalStations.length > 0" class="filter-row">
         <div class="filter-label">到达车站：</div>
-        <button 
-          :class="getSelectAllButtonClass(selectedArrivalStations.length, arrivalStations.length)" 
-          @click="handleArrivalStationsSelectAll"
-        >
-          全部
-        </button>
-        <div class="filter-options">
-          <label v-for="station in arrivalStations" :key="station" class="filter-checkbox">
-            <input
-              type="checkbox"
-              :checked="selectedArrivalStations.includes(station)"
-              @change="handleArrivalStationToggle(station)"
-            />
-            <span class="checkbox-label">{{ station }}</span>
-          </label>
+        <div class="filter-content">
+          <button 
+            :class="getSelectAllButtonClass(selectedArrivalStations.length, arrivalStations.length)" 
+            @click="handleArrivalStationsSelectAll"
+          >
+            全部
+          </button>
+          <div class="filter-options">
+            <label v-for="station in arrivalStations" :key="station" class="filter-checkbox">
+              <input
+                type="checkbox"
+                :checked="selectedArrivalStations.includes(station)"
+                @change="handleArrivalStationToggle(station)"
+              />
+              <span class="checkbox-label">{{ station }}</span>
+            </label>
+          </div>
         </div>
       </div>
 
       <!-- 车次席别行 -->
       <div class="filter-row">
         <div class="filter-label">车次席别：</div>
-        <button 
-          :class="getSelectAllButtonClass(selectedSeatTypes.length, seatTypeOptions.length)" 
-          @click="handleSeatTypesSelectAll"
-        >
-          全部
-        </button>
-        <div class="filter-options">
-          <label v-for="type in seatTypeOptions" :key="type" class="filter-checkbox">
-            <input
-              type="checkbox"
-              :checked="selectedSeatTypes.includes(type)"
-              @change="handleSeatTypeToggle(type)"
-            />
-            <span class="checkbox-label">{{ type }}</span>
-          </label>
+        <div class="filter-content">
+          <button 
+            :class="getSelectAllButtonClass(selectedSeatTypes.length, seatTypeOptions.length)" 
+            @click="handleSeatTypesSelectAll"
+          >
+            全部
+          </button>
+          <div class="filter-options">
+            <label v-for="type in seatTypeOptions" :key="type" class="filter-checkbox">
+              <input
+                type="checkbox"
+                :checked="selectedSeatTypes.includes(type)"
+                @change="handleSeatTypeToggle(type)"
+              />
+              <span class="checkbox-label">{{ type }}</span>
+            </label>
+          </div>
         </div>
       </div>
 
-      <!-- 筛选清除按钮 -->
-      <div class="filter-summary">
-        <button class="clear-filters-btn" @click="clearFilters">
-          <span class="clear-icon">↻</span> 筛选
+      <!-- 筛选按钮 -->
+      <div class="filter-action">
+        <button class="filter-toggle-btn" @click="toggleCollapse">
+          筛选 <span class="arrow-icon" :class="{ up: !isCollapsed, down: isCollapsed }">▲</span>
         </button>
       </div>
     </div>
@@ -148,6 +156,7 @@ const selectedArrivalStations = ref<string[]>([]);
 const selectedSeatTypes = ref<string[]>([]);
 const departureTimeRange = ref('00:00--24:00');
 const isInitialized = ref(false);
+const isCollapsed = ref(false);
 
 // Constants
 const trainTypeOptions = [
@@ -325,6 +334,10 @@ const clearFilters = () => {
     arrivalStations: [], 
     seatTypes: [] 
   });
+};
+
+const toggleCollapse = () => {
+  isCollapsed.value = !isCollapsed.value;
 };
 
 const getSelectAllButtonClass = (selectedCount: number, totalCount: number) => {
@@ -615,6 +628,56 @@ watch(() => props.isHighSpeed, (newVal) => {
 .clear-icon {
   font-size: 14px;
   font-weight: normal;
+}
+
+/* 筛选折叠/展开按钮 */
+.filter-action {
+  display: flex;
+  justify-content: center;
+  padding-top: 5px;
+}
+
+.filter-toggle-btn {
+  border: 1px solid #dedede;
+  background: #f7f7f7;
+  color: #333;
+  padding: 2px 15px;
+  cursor: pointer;
+  border-radius: 12px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
+}
+
+.filter-toggle-btn:hover {
+  background: #ffffff;
+  color: #0077ff;
+  border-color: #0077ff;
+}
+
+.arrow-icon {
+  display: inline-block;
+  font-size: 10px;
+  transform-origin: center;
+  transition: transform 0.3s;
+}
+
+.arrow-icon.up {
+  transform: rotate(0deg);
+}
+
+.arrow-icon.down {
+  transform: rotate(180deg);
+}
+
+.filter-panel-container.collapsed .filter-row {
+  display: none;
+}
+
+.filter-panel-container.collapsed {
+  padding-bottom: 10px;
 }
 
 /* 响应式设计 */
