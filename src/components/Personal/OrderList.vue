@@ -215,13 +215,14 @@ onMounted(() => {
     
     <!-- 空状态 -->
     <div v-else-if="filteredOrders.length === 0" class="empty-state">
-      <img src="/images/order.jpg" alt="No Orders" class="empty-img" />
-      <div class="empty-text">
-        <p v-if="activeTab === 'incomplete'">您没有未完成的订单哦~</p>
-        <p v-else>您没有对应的订单内容哦~</p>
-        <p class="sub-text">
-          您可以通过<router-link to="/search" class="link">车票预订</router-link>功能，来制定出行计划。
-        </p>
+      <div class="empty-content">
+        <img src="/images/车票预订提示.png" alt="No Orders" class="empty-img" />
+        <div class="empty-text">
+          <p class="main-msg">您没有对应的订单内容哦 ～</p>
+          <p class="sub-msg">
+            您可以通过<router-link to="/search" class="link">车票预订</router-link>功能，来制定出行计划。
+          </p>
+        </div>
       </div>
     </div>
     
@@ -472,32 +473,38 @@ onMounted(() => {
 }
 
 .empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   padding: 60px 0;
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  
+  .empty-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
   
   .empty-img {
-    width: 200px;
-    margin-bottom: 20px;
-    opacity: 0.8;
+    width: 80px; /* Adjusted for icon size */
+    height: auto;
   }
   
   .empty-text {
-    color: #666;
-    font-size: 14px;
-    line-height: 1.8;
+    text-align: left;
     
-    .sub-text {
-      margin-top: 5px;
+    .main-msg {
+      font-size: 16px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    
+    .sub-msg {
+      font-size: 16px;
+      color: #666;
     }
     
     .link {
       color: #007bff;
       text-decoration: underline;
-      cursor: pointer;
       margin: 0 4px;
       
       &:hover { color: #0056b3; }
