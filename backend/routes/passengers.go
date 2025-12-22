@@ -1,0 +1,343 @@
+package routes
+
+import (
+	"12306-backend/db"
+	"12306-backend/models"
+	"fmt"
+	"net/http"
+	"regexp"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+)
+
+// Helper to get user ID from session/context (Mocked for now)
+func getUserID(c *gin.Context) uuid.UUID {
+	// In real app, extract from context set by middleware
+	// For demo/test, we might need a way to inject this.
+	// Assume middleware sets "userID"
+	val, exists := c.Get("userID")
+	if exists {
+		return val.(uuid.UUID)
+	}
+	// Fallback or panic in dev
+	return uuid.Nil
+}
+
+// API-GET-Passengers
+func GetPassengers(c *gin.Context) {
+	// userID := getUserID(c) // Use when middleware is ready
+	// For simplicity in this turn, we assume the user is authenticated
+	// and we might need to rely on cookie parsing if middleware isn't there.
+	
+	// Mock: If no user found, return 401. 
+	// But let's assume middleware handles 401.
+
+	// Since we don't have the auth middleware yet, let's just query all passengers
+	// for a hardcoded user or try to parse the cookie dummy session.
+	
+	cookie, err := c.Cookie("sid")
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	// "dummy-session-UUID"
+	if len(cookie) < 14 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid session"})
+		return
+	}
+	uidStr := cookie[14:]
+	userID, err := uuid.Parse(uidStr)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid session user"})
+		return
+	}
+
+	var passengers []models.Passenger
+	if err := db.GetDB().Where("user_id = ?", userID).Find(&passengers).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch passengers"})
+		return
+	}
+
+	// Map Enums back to Chinese for frontend display
+	for i := range passengers {
+		switch passengers[i].CardType {
+		case "id_card":
+			passengers[i].CardType = "居民身份证"
+		case "passport":
+			passengers[i].CardType = "护照"
+		case "hkm_pass":
+			passengers[i].CardType = "港澳居民来往内地通行证"
+		case "tw_pass":
+			passengers[i].CardType = "台湾居民来往大陆通行证"
+		}
+
+		switch passengers[i].PassengerType {
+		case "adult":
+			passengers[i].PassengerType = "成人"
+		case "student":
+			passengers[i].PassengerType = "学生"
+		case "child":
+			passengers[i].PassengerType = "儿童"
+		}
+	}
+
+	c.JSON(http.StatusOK, passengers)
+}
+
+type AddPassengerRequest struct {
+	Name     string `json:"name" binding:"required"`
+	CardType string `json:"card_type" binding:"required"`
+	CardNo   string `json:"card_no" binding:"required"`
+	Type     string `json:"type" binding:"required"`
+	Phone    string `json:"phone"`  // Frontend sends 'phone'
+	Mobile   string `json:"mobile"` // Backend compat
+}
+
+// API-POST-Passengers
+func AddPassenger(c *gin.Context) {
+	cookie, err := c.Cookie("sid")
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	uidStr := cookie[14:]
+	userID, err := uuid.Parse(uidStr)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid session user"})
+		return
+	}
+
+	var req AddPassengerRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("DEBUG: AddPassenger req: %+v\n", req)
+
+	// Resolve Phone/Mobile
+	if req.Phone != "" {
+		req.Mobile = req.Phone
+	}
+
+	// Map CardType from Chinese to Enum
+	switch req.CardType {
+	case "居民身份证":
+		req.CardType = "id_card"
+	case "护照":
+		req.CardType = "passport"
+	case "港澳居民来往内地通行证":
+		req.CardType = "hkm_pass"
+	case "台湾居民来往大陆通行证":
+		req.CardType = "tw_pass"
+	}
+
+	// Map PassengerType from Chinese to Enum
+	switch req.Type {
+	case "成人":
+		req.Type = "adult"
+	case "学生":
+		req.Type = "student"
+	case "儿童":
+		req.Type = "child"
+	}
+
+	// Validate Formats (ID Card and Mobile)
+	// 1. ID Card (if type is id_card)
+	if req.CardType == "id_card" {
+		// Simple Regex for 18-digit ID
+		match, _ := regexp.MatchString(`^\d{17}[\dXx]$`, req.CardNo)
+		if !match {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "身份证号格式不正确"})
+			return
+		}
+	}
+	
+	// 2. Mobile (if provided, or if required?)
+	// User said "check mobile phone number format". 
+	// If mobile is empty, should we fail? 
+	// If the frontend sends it, we check. If not, maybe skip?
+	// But usually creating a passenger doesn't REQUIRE mobile unless for notification.
+	// However, if the user explicitly mentioned it, let's assume if it is provided, check it.
+	// OR if the user implied it SHOULD be provided.
+	// Let's check if provided.
+	if req.Mobile != "" {
+		match, _ := regexp.MatchString(`^1[3-9]\d{9}$`, req.Mobile)
+		if !match {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "手机号格式不正确"})
+			return
+		}
+	}
+
+	var count int64
+	db.GetDB().Model(&models.Passenger{}).Where("user_id = ?", userID).Count(&count)
+	if count >= 15 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Limit reached (15)"})
+		return
+	}
+
+	// Check duplicate
+	var exists int64
+	db.GetDB().Model(&models.Passenger{}).Where("user_id = ? AND card_no = ?", userID, req.CardNo).Count(&exists)
+	if exists > 0 {
+		c.JSON(http.StatusConflict, gin.H{"error": "Passenger already exists"})
+		return
+	}
+
+	p := models.Passenger{
+		UserID:        userID,
+		Name:          req.Name,
+		CardType:      req.CardType,
+		CardNo:        req.CardNo,
+		Mobile:        req.Mobile,
+		PassengerType: req.Type,
+	}
+
+	if err := db.GetDB().Create(&p).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create passenger"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"id": p.ID})
+}
+
+// API-DELETE-Passenger
+func DeletePassenger(c *gin.Context) {
+	id := c.Param("id")
+	pID, err := uuid.Parse(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid passenger ID"})
+		return
+	}
+
+	// Auth check
+	cookie, err := c.Cookie("sid")
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	uidStr := cookie[14:]
+	userID, err := uuid.Parse(uidStr)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid session user"})
+		return
+	}
+
+	// Find and Delete
+	// Ensure the passenger belongs to the user
+	result := db.GetDB().Where("id = ? AND user_id = ?", pID, userID).Delete(&models.Passenger{})
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete passenger"})
+		return
+	}
+	if result.RowsAffected == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Passenger not found or not authorized"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Passenger deleted"})
+}
+
+// API-PUT-Passenger
+func EditPassenger(c *gin.Context) {
+	id := c.Param("id")
+	pID, err := uuid.Parse(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid passenger ID"})
+		return
+	}
+
+	// Auth check
+	cookie, err := c.Cookie("sid")
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	uidStr := cookie[14:]
+	userID, err := uuid.Parse(uidStr)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid session user"})
+		return
+	}
+
+	var req AddPassengerRequest // Reuse Add request struct as fields are same
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Resolve Phone/Mobile
+	if req.Phone != "" {
+		req.Mobile = req.Phone
+	}
+
+	// Map CardType from Chinese to Enum
+	switch req.CardType {
+	case "居民身份证":
+		req.CardType = "id_card"
+	case "护照":
+		req.CardType = "passport"
+	case "港澳居民来往内地通行证":
+		req.CardType = "hkm_pass"
+	case "台湾居民来往大陆通行证":
+		req.CardType = "tw_pass"
+	}
+
+	// Map PassengerType from Chinese to Enum
+	switch req.Type {
+	case "成人":
+		req.Type = "adult"
+	case "学生":
+		req.Type = "student"
+	case "儿童":
+		req.Type = "child"
+	}
+
+	// Validate Formats
+	if req.CardType == "id_card" {
+		match, _ := regexp.MatchString(`^\d{17}[\dXx]$`, req.CardNo)
+		if !match {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "身份证号格式不正确"})
+			return
+		}
+	}
+	if req.Mobile != "" {
+		match, _ := regexp.MatchString(`^1[3-9]\d{9}$`, req.Mobile)
+		if !match {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "手机号格式不正确"})
+			return
+		}
+	}
+
+	// Find existing passenger
+	var passenger models.Passenger
+	if err := db.GetDB().Where("id = ? AND user_id = ?", pID, userID).First(&passenger).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Passenger not found"})
+		return
+	}
+
+	// Check for duplicates if card number changed
+	if passenger.CardNo != req.CardNo {
+		var exists int64
+		db.GetDB().Model(&models.Passenger{}).Where("user_id = ? AND card_no = ?", userID, req.CardNo).Count(&exists)
+		if exists > 0 {
+			c.JSON(http.StatusConflict, gin.H{"error": "Passenger already exists"})
+			return
+		}
+	}
+
+	// Update fields
+	passenger.Name = req.Name
+	passenger.CardType = req.CardType
+	passenger.CardNo = req.CardNo
+	passenger.Mobile = req.Mobile
+	passenger.PassengerType = req.Type
+
+	if err := db.GetDB().Save(&passenger).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update passenger"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Passenger updated", "id": passenger.ID})
+}
