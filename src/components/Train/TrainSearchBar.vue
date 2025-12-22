@@ -7,6 +7,7 @@ const props = defineProps<{
   initialDepartureStation: string
   initialArrivalStation: string
   initialDepartureDate: string
+  initialTripType?: 'single' | 'round'
 }>()
 
 const emit = defineEmits<{
@@ -14,7 +15,7 @@ const emit = defineEmits<{
   (e: 'date-update', date: string): void
 }>()
 
-const tripType = ref<'single' | 'round'>('single')
+const tripType = ref<'single' | 'round'>(props.initialTripType || 'single')
 const ticketType = ref<'normal' | 'student'>('normal')
 const departureStation = ref(props.initialDepartureStation)
 const arrivalStation = ref(props.initialArrivalStation)
@@ -33,6 +34,10 @@ watch(() => props.initialArrivalStation, (val) => {
 
 watch(() => props.initialDepartureDate, (val) => {
   if (val) departureDate.value = val
+})
+
+watch(() => props.initialTripType, (val) => {
+  if (val) tripType.value = val
 })
 
 const handleSwapStations = () => {

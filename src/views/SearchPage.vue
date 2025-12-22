@@ -1,6 +1,7 @@
 <template>
   <div class="search-page">
     <TopHeader />
+    <MainNavigation />
     
     <div class="search-content">
       <!-- 搜索栏 -->
@@ -8,6 +9,7 @@
         :initial-departure-station="searchParams.departureStation"
         :initial-arrival-station="searchParams.arrivalStation"
         :initial-departure-date="searchParams.departureDate"
+        :initial-trip-type="searchParams.tripType"
         @search="handleSearch"
         @date-update="handleDateUpdate"
       />
@@ -61,6 +63,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import TopHeader from '@/components/Common/TopHeader.vue';
+import MainNavigation from '@/components/Common/MainNavigation.vue';
 import BottomFooter from '@/components/Common/BottomFooter.vue';
 import TrainSearchBar from '@/components/Train/TrainSearchBar.vue';
 import TrainFilterPanel from '@/components/Train/TrainFilterPanel.vue';
@@ -93,7 +96,7 @@ const searchParams = ref({
   departureStation: (route.query.departureStation as string) || (route.query.from as string) || '北京',
   arrivalStation: (route.query.arrivalStation as string) || (route.query.to as string) || '上海',
   departureDate: (route.query.departureDate as string) || (route.query.date as string) || getTodayString(),
-  tripType: 'single',
+  tripType: (route.query.tripType as string) || 'single',
   ticketType: 'normal'
 });
 
@@ -272,9 +275,18 @@ watch(
       searchParams.value.departureStation = newQuery.from as string;
       searchParams.value.arrivalStation = newQuery.to as string;
       searchParams.value.departureDate = newQuery.date as string;
-      // 只有当参数真正改变时才重新查询，避免重复查询（handleSearch 已经调用了 fetchTrainsData）
-      // 这里简化处理，可以加判断
+    } else if (newQuery.departureStation && newQuery.arrivalStation && newQuery.departureDate) {
+      searchParams.value.departureStation = newQuery.departureStation as string;
+      searchParams.value.arrivalStation = newQuery.arrivalStation as string;
+      searchParams.value.departureDate = newQuery.departureDate as string;
     }
+    
+    if (newQuery.tripType) {
+      searchParams.value.tripType = newQuery.tripType as string;
+    }
+
+    // Trigger search
+    handleSearch(searchParams.value);
   }
 );
 </script>
