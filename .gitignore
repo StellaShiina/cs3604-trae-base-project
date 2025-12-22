@@ -12,4 +12,4 @@
 *.out
 
 # Specific binary in subfolder
-backend/12306-backend.exe
+./backend/12306-backend.exe
