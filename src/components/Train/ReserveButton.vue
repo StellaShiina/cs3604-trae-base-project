@@ -40,7 +40,15 @@ const emit = defineEmits<{
 }>();
 
 const showConfirmModal = ref(false);
-const modalConfig = ref<any>({});
+const modalConfig = ref<{
+  title?: string;
+  message?: string;
+  confirmText?: string;
+  cancelText?: string;
+  onConfirm: () => void;
+}>({
+  onConfirm: () => {}
+});
 
 const handleClick = () => {
   // 1. 检查查询时间是否超过5分钟
