@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -53,8 +54,82 @@ func GetPassengers(c *gin.Context) {
 		return
 	}
 
+	name := strings.TrimSpace(c.Query("name"))
+	if name == "" {
+		name = strings.TrimSpace(c.Query("keyword"))
+	}
+
+	var totalCount int64
+	if err := db.GetDB().Model(&models.Passenger{}).Where("user_id = ?", userID).Count(&totalCount).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch passengers"})
+		return
+	}
+
+	var defaultCandidate models.Passenger
+	hasDefaultCandidate := false
+
+	{
+		var existingDefault models.Passenger
+		if err := db.GetDB().Where("user_id = ? AND is_default = ?", userID, true).Order("created_at asc").First(&existingDefault).Error; err == nil {
+			defaultCandidate = existingDefault
+			hasDefaultCandidate = true
+		}
+	}
+
+	var user models.User
+	if err := db.GetDB().Where("id = ?", userID).First(&user).Error; err == nil {
+		if user.IDNo != "" && user.IDType != "" {
+			var byCardNo models.Passenger
+			if err := db.GetDB().Where("user_id = ? AND card_no = ?", userID, user.IDNo).First(&byCardNo).Error; err == nil {
+				defaultCandidate = byCardNo
+				hasDefaultCandidate = true
+			} else if totalCount < 15 {
+				mobile := ""
+				if user.Mobile != nil {
+					mobile = *user.Mobile
+				}
+
+				passengerName := user.Name
+				if passengerName == "" {
+					passengerName = user.Username
+				}
+
+				created := models.Passenger{
+					UserID:        user.ID,
+					Name:          passengerName,
+					CardType:      user.IDType,
+					CardNo:        user.IDNo,
+					Mobile:        mobile,
+					PassengerType: "adult",
+					IsDefault:     true,
+				}
+				if err := db.GetDB().Create(&created).Error; err == nil {
+					defaultCandidate = created
+					hasDefaultCandidate = true
+				}
+			}
+		}
+	}
+
+	if !hasDefaultCandidate && totalCount > 0 {
+		var first models.Passenger
+		if err := db.GetDB().Where("user_id = ?", userID).Order("created_at asc").First(&first).Error; err == nil {
+			defaultCandidate = first
+			hasDefaultCandidate = true
+		}
+	}
+
+	if hasDefaultCandidate {
+		db.GetDB().Model(&models.Passenger{}).Where("user_id = ?", userID).Update("is_default", false)
+		db.GetDB().Model(&models.Passenger{}).Where("id = ?", defaultCandidate.ID).Update("is_default", true)
+	}
+
 	var passengers []models.Passenger
-	if err := db.GetDB().Where("user_id = ?", userID).Find(&passengers).Error; err != nil {
+	query := db.GetDB().Where("user_id = ?", userID)
+	if name != "" {
+		query = query.Where("name LIKE ?", "%"+name+"%")
+	}
+	if err := query.Find(&passengers).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch passengers"})
 		return
 	}
@@ -224,15 +299,20 @@ func DeletePassenger(c *gin.Context) {
 		return
 	}
 
-	// Find and Delete
-	// Ensure the passenger belongs to the user
+	var passenger models.Passenger
+	if err := db.GetDB().Where("id = ? AND user_id = ?", pID, userID).First(&passenger).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Passenger not found or not authorized"})
+		return
+	}
+
+	if passenger.IsDefault {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Cannot delete default passenger"})
+		return
+	}
+
 	result := db.GetDB().Where("id = ? AND user_id = ?", pID, userID).Delete(&models.Passenger{})
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete passenger"})
-		return
-	}
-	if result.RowsAffected == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Passenger not found or not authorized"})
 		return
 	}
 

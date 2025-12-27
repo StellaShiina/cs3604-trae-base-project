@@ -308,8 +308,15 @@ func CompleteRegistration(c *gin.Context) {
 		IDNo:         data.IDNo,
 	}
 
-	if result := db.GetDB().Create(&user); result.Error != nil {
-		errStr := result.Error.Error()
+	tx := db.GetDB().Begin()
+	if tx.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to start transaction"})
+		return
+	}
+
+	if err := tx.Create(&user).Error; err != nil {
+		tx.Rollback()
+		errStr := err.Error()
 		if strings.Contains(errStr, "duplicate key") || strings.Contains(errStr, "UNIQUE constraint failed") {
 			if strings.Contains(errStr, "username") {
 				c.JSON(http.StatusConflict, gin.H{"error": "该用户名已经占用，请重新选择用户名！"})
@@ -319,6 +326,32 @@ func CompleteRegistration(c *gin.Context) {
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user: " + errStr})
 		}
+		return
+	}
+
+	mobile := ""
+	if user.Mobile != nil {
+		mobile = *user.Mobile
+	}
+
+	defaultPassenger := models.Passenger{
+		UserID:        user.ID,
+		Name:          user.Name,
+		CardType:      user.IDType,
+		CardNo:        user.IDNo,
+		Mobile:        mobile,
+		PassengerType: "adult",
+		IsDefault:     true,
+	}
+
+	if err := tx.Create(&defaultPassenger).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create default passenger: " + err.Error()})
+		return
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to commit transaction: " + err.Error()})
 		return
 	}
 
@@ -336,6 +369,24 @@ func Register(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+
+	if req.IDType == "" && req.IDCardType != "" {
+		req.IDType = req.IDCardType
+	}
+	if req.IDNo == "" && req.IDCardNumber != "" {
+		req.IDNo = req.IDCardNumber
+	}
+
+	switch req.IDType {
+	case "居民身份证":
+		req.IDType = "id_card"
+	case "护照":
+		req.IDType = "passport"
+	case "港澳居民来往内地通行证":
+		req.IDType = "hkm_pass"
+	case "台湾居民来往大陆通行证":
+		req.IDType = "tw_pass"
 	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
@@ -357,21 +408,28 @@ func Register(c *gin.Context) {
 		gender = "male"
 	}
 
-    user := models.User{
-        Username:     req.Username,
-        Email:        func() *string { if req.Email == "" { return nil }; v := req.Email; return &v }(),
-        Mobile:       func() *string { if req.Mobile == "" { return nil }; v := req.Mobile; return &v }(),
-        PasswordHash: string(hash),
-        Name:         req.Name,
-        IDType:       req.IDType,
-        IDNo:         req.IDNo,
-    }
+	user := models.User{
+		Username:     req.Username,
+		Email:        func() *string { if req.Email == "" { return nil }; v := req.Email; return &v }(),
+		Mobile:       func() *string { if req.Mobile == "" { return nil }; v := req.Mobile; return &v }(),
+		PasswordHash: string(hash),
+		Name:         req.Name,
+		IDType:       req.IDType,
+		IDNo:         req.IDNo,
+	}
 
-	if result := db.GetDB().Create(&user); result.Error != nil {
+	tx := db.GetDB().Begin()
+	if tx.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to start transaction"})
+		return
+	}
+
+	if err := tx.Create(&user).Error; err != nil {
+		tx.Rollback()
 		// Check for duplicate key error
 		// Postgres error 23505 is unique_violation
 		// We can check error message string for now
-		errStr := result.Error.Error()
+		errStr := err.Error()
 		if strings.Contains(errStr, "duplicate key") || strings.Contains(errStr, "UNIQUE constraint failed") {
 			// Check if it's specifically the username that is duplicated
 			// This depends on the DB driver's error message format.
@@ -385,6 +443,32 @@ func Register(c *gin.Context) {
 			// Log the actual error for debugging
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user: " + errStr})
 		}
+		return
+	}
+
+	mobile := ""
+	if user.Mobile != nil {
+		mobile = *user.Mobile
+	}
+
+	defaultPassenger := models.Passenger{
+		UserID:        user.ID,
+		Name:          user.Name,
+		CardType:      user.IDType,
+		CardNo:        user.IDNo,
+		Mobile:        mobile,
+		PassengerType: "adult",
+		IsDefault:     true,
+	}
+
+	if err := tx.Create(&defaultPassenger).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create default passenger: " + err.Error()})
+		return
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to commit transaction: " + err.Error()})
 		return
 	}
 
