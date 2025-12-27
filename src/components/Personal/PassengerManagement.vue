@@ -8,6 +8,8 @@ const showForm = ref(false)
 const isEdit = ref(false)
 const formError = ref('')
 const searchName = ref('')
+const showSuccess = ref(false)
+const successMessage = ref('')
 
 const formData = ref<Passenger>({
   name: '',
@@ -61,6 +63,11 @@ const fetchPassengers = async (name?: string) => {
         type: mappedType,
         card_type: mappedCardType
       }
+    }).sort((a: Passenger, b: Passenger) => {
+      const aDefault = a.is_default ? 1 : 0
+      const bDefault = b.is_default ? 1 : 0
+      if (aDefault !== bDefault) return bDefault - aDefault
+      return (a.name || '').localeCompare(b.name || '')
     })
   } catch (err) {
     console.error(err)
@@ -119,14 +126,22 @@ const handleSubmit = async () => {
   try {
     if (isEdit.value && formData.value.id) {
       await updatePassenger(formData.value.id, formData.value)
+      successMessage.value = '修改成功!'
     } else {
       await addPassenger(formData.value)
+      successMessage.value = '保存成功!'
     }
     showForm.value = false
     fetchPassengers(searchName.value)
+    showSuccess.value = true
   } catch (err: any) {
     formError.value = err.response?.data?.error || '保存失败'
   }
+}
+
+const handleCloseSuccess = () => {
+  showSuccess.value = false
+  successMessage.value = ''
 }
 
 onMounted(() => {
@@ -230,6 +245,24 @@ onMounted(() => {
         <div class="modal-footer">
           <button @click="showForm = false" class="btn-cancel">取消</button>
           <button @click="handleSubmit" class="btn-save">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="showSuccess" class="modal-overlay">
+      <div class="modal-content success-modal">
+        <div class="modal-header success-header">
+          <h4>{{ isEdit ? '修改乘车人' : '新增乘车人' }}</h4>
+          <span class="close" @click="handleCloseSuccess">&times;</span>
+        </div>
+        <div class="modal-body success-body">
+          <div class="success-row">
+            <span class="success-icon">✓</span>
+            <span class="success-text">{{ successMessage }}</span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button @click="handleCloseSuccess" class="btn-save">确定</button>
         </div>
       </div>
     </div>
@@ -355,6 +388,43 @@ onMounted(() => {
   border-radius: 8px;
   width: 500px;
   max-width: 90%;
+}
+
+.success-modal {
+  width: 520px;
+}
+
+.success-header {
+  background: #4fd3dd;
+  color: #fff;
+  border-bottom: none;
+}
+
+.success-body {
+  padding: 26px 20px;
+}
+
+.success-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.success-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #2ecc71;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.success-text {
+  font-size: 16px;
+  color: #333;
 }
 
 .modal-header {
