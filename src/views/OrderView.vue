@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { getNewOrderInfo, createOrder } from '@/api/order'
@@ -24,7 +24,7 @@ const seatTypes = computed(() => {
   return Object.keys(fareInfo.value).map(type => ({
     type,
     label: getSeatTypeLabel(type),
-    price: fareInfo.value[type],
+    price: fareInfo.value[type] ?? 0,
     count: availableSeats.value[type] || 0
   }))
 })

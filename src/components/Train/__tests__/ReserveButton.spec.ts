@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import ReserveButton from '../ReserveButton.vue'
 import ConfirmModal from '../ConfirmModal.vue'
 
@@ -79,7 +79,7 @@ describe('ReserveButton', () => {
     const twoHoursLater = new Date(now.getTime() + 2 * 60 * 60 * 1000)
     
     // Format to match props (YYYY-MM-DD and HH:mm)
-    const dateStr = twoHoursLater.toISOString().split('T')[0]
+    const dateStr = twoHoursLater.toISOString().slice(0, 10)
     const timeStr = `${String(twoHoursLater.getHours()).padStart(2, '0')}:${String(twoHoursLater.getMinutes()).padStart(2, '0')}`
 
     const wrapper = mount(ReserveButton, {

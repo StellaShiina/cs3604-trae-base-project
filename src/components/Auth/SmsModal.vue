@@ -134,7 +134,7 @@ const handleSubmit = () => {
               :disabled="countdown > 0 || isLoading"
               @click="handleSendCode"
             >
-              {{ countdown > 0 ? `${countdown}秒后重发` : '获取验证码' }}
+              {{ countdown > 0 ? `重新发送(${countdown})` : '获取验证码' }}
             </button>
           </div>
           

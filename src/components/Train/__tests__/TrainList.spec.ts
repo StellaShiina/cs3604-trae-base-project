@@ -45,24 +45,26 @@ describe('TrainList', () => {
     // Find sort header for departure time
     const headers = wrapper.findAll('.sortable-line')
     const departureHeader = headers.find(h => h.text().includes('出发时间'))
+    expect(departureHeader).toBeTruthy()
     
     // Initial state: default order (G1, G2)
     let items = wrapper.findAllComponents(TrainListItem)
-    expect(items[0].props('train').trainNo).toBe('G1')
+    expect(items.length).toBeGreaterThan(0)
+    expect(items[0]!.props('train').trainNo).toBe('G1')
 
     // Click to sort (First click: ASC)
-    await departureHeader?.trigger('click')
+    await (departureHeader as any).trigger('click')
     
     items = wrapper.findAllComponents(TrainListItem)
-    expect(items[0].props('train').trainNo).toBe('G2') // 09:00
-    expect(items[1].props('train').trainNo).toBe('G1') // 10:00
+    expect(items[0]!.props('train').trainNo).toBe('G2') // 09:00
+    expect(items[1]!.props('train').trainNo).toBe('G1') // 10:00
     
     // Click again (DESC)
-    await departureHeader?.trigger('click')
+    await (departureHeader as any).trigger('click')
     
     items = wrapper.findAllComponents(TrainListItem)
-    expect(items[0].props('train').trainNo).toBe('G1')
-    expect(items[1].props('train').trainNo).toBe('G2')
+    expect(items[0]!.props('train').trainNo).toBe('G1')
+    expect(items[1]!.props('train').trainNo).toBe('G2')
   })
 
   it('shows empty state when no trains', () => {

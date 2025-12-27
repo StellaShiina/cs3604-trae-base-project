@@ -28,17 +28,17 @@ describe('TrainFilterPanel', () => {
     // Find the checkbox for '北京南'
     const labels = wrapper.findAll('label.filter-checkbox')
     const targetLabel = labels.find(label => label.text().includes('北京南'))
-    const checkbox = targetLabel?.find('input[type="checkbox"]')
-    
-    expect(checkbox?.exists()).toBe(true)
-    
-    // Simulate check
-    await checkbox?.setValue(true)
+    expect(targetLabel).toBeTruthy()
+
+    const checkbox = (targetLabel as any).find('input[type="checkbox"]')
+    expect(checkbox.exists()).toBe(true)
+
+    await checkbox.setValue(true)
     
     // Check emitted events
-    const emitted = wrapper.emitted('filter-change')
+    const emitted = wrapper.emitted('filter-change') as any
     expect(emitted).toBeTruthy()
-    expect(emitted?.[0][0].departureStations).toContain('北京南')
+    expect(emitted[0][0].departureStations).toContain('北京南')
   })
 
   it('handles "Select All" functionality', async () => {

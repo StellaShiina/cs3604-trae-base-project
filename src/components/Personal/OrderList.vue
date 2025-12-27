@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import DatePicker from '@/components/Train/DatePicker.vue'
 import { useRouter } from 'vue-router'
-import { getOrders, cancelOrder, payOrder } from '@/api/order'
+import { getOrders, cancelOrder } from '@/api/order'
 
 const router = useRouter()
 const orders = ref<any[]>([])

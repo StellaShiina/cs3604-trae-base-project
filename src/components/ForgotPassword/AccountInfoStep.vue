@@ -147,18 +147,20 @@ const handleIdCardTypeChange = () => {
 const validateIdCardCheckCode = (idCard: string): boolean => {
   if (idCard.length !== 18) return false;
   
-  const weights = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2];
-  const checkCodes = ['1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2'];
+  const weights = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2] as const;
+  const checkCodes = ['1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2'] as const;
   
   let sum = 0;
   for (let i = 0; i < 17; i++) {
-    const char = idCard[i];
+    const char = idCard.charAt(i);
     if (!/^\d$/.test(char)) return false;
-    sum += parseInt(char) * weights[i];
+    const weight = weights[i];
+    if (weight === undefined) return false;
+    sum += parseInt(char, 10) * weight;
   }
   
   const expectedCheckCode = checkCodes[sum % 11];
-  const checkCode = idCard[17].toUpperCase();
+  const checkCode = idCard.charAt(17).toUpperCase();
   
   return checkCode === expectedCheckCode;
 };

@@ -68,7 +68,6 @@ import BottomFooter from '@/components/Common/BottomFooter.vue';
 import TrainSearchBar from '@/components/Train/TrainSearchBar.vue';
 import TrainFilterPanel from '@/components/Train/TrainFilterPanel.vue';
 import TrainList from '@/components/Train/TrainList.vue';
-import ConfirmModal from '@/components/Train/ConfirmModal.vue';
 import LoginModal from '@/components/Auth/LoginModal.vue';
 import { searchTrains } from '@/api/train';
 import { getTodayString } from '@/utils/date';
@@ -92,11 +91,15 @@ const pendingReserve = ref<{
   departureDate: string;
 } | null>(null);
 
+const normalizeTripType = (value: unknown): 'single' | 'round' => {
+  return value === 'round' ? 'round' : 'single'
+}
+
 const searchParams = ref({
   departureStation: (route.query.departureStation as string) || (route.query.from as string) || '北京',
   arrivalStation: (route.query.arrivalStation as string) || (route.query.to as string) || '上海',
   departureDate: (route.query.departureDate as string) || (route.query.date as string) || getTodayString(),
-  tripType: (route.query.tripType as string) || 'single',
+  tripType: normalizeTripType(route.query.tripType),
   ticketType: 'normal'
 });
 
@@ -282,7 +285,7 @@ watch(
     }
     
     if (newQuery.tripType) {
-      searchParams.value.tripType = newQuery.tripType as string;
+      searchParams.value.tripType = normalizeTripType(newQuery.tripType);
     }
 
     // Trigger search

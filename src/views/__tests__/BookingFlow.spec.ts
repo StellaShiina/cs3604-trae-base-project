@@ -3,7 +3,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { createTestingPinia } from '@pinia/testing'
 import SearchPage from '../SearchPage.vue'
 import { searchTrains } from '@/api/train'
-import { login, verifyLogin } from '@/api/auth'
 
 // Mock APIs
 vi.mock('@/api/train', () => ({
