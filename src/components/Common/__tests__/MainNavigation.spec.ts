@@ -38,10 +38,9 @@ describe('MainNavigation', () => {
     // Check if the home link has 'active' class
     // We need to find the RouterLink that wraps "首页"
     // RouterLinkStub renders as <a> by default or we check the stub
-    const links = wrapper.findAllComponents(RouterLinkStub)
-    const homeLink = links.find(link => link.text().includes('首页'))
-    
-    expect(homeLink?.classes()).toContain('active')
+    const items = wrapper.findAll('.nav-item')
+    const homeItem = items.find(item => item.text().includes('首页'))
+    expect(homeItem?.classes()).toContain('active')
   })
 
   it('highlights "Ticket" when path is /search', async () => {
@@ -55,10 +54,9 @@ describe('MainNavigation', () => {
       }
     })
     
-    const links = wrapper.findAllComponents(RouterLinkStub)
-    const ticketLink = links.find(link => link.text().includes('车票'))
-    
-    expect(ticketLink?.classes()).toContain('active')
+    const items = wrapper.findAll('.nav-item')
+    const ticketItem = items.find(item => item.text().includes('车票'))
+    expect(ticketItem?.classes()).toContain('active')
   })
 
   it('renders dropdown menu', () => {

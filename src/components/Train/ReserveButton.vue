@@ -74,11 +74,25 @@ const handleClick = () => {
   }
 
   // 3. 检查距离发车时间（如果小于3小时，显示提示）
-  // 注意：这里假设 departureDate 是 YYYY-MM-DD 格式，departureTime 是 HH:mm 格式
-  // 如果 dateUtils 返回的是其他格式，可能需要调整
-  const departureDateTimeStr = `${props.departureDate} ${props.departureTime}`;
-  const departureDateTime = new Date(departureDateTimeStr);
-  const timeUntilDeparture = departureDateTime.getTime() - now.getTime();
+  const [yearStr, monthStr, dayStr] = props.departureDate.split('-');
+  const [hourStr, minuteStr] = props.departureTime.split(':');
+  const year = Number(yearStr);
+  const monthIndex = Number(monthStr) - 1;
+  const day = Number(dayStr);
+  const hour = Number(hourStr);
+  const minute = Number(minuteStr);
+
+  let departureDateTime = new Date(year, monthIndex, day, hour, minute, 0, 0);
+  let timeUntilDeparture = departureDateTime.getTime() - now.getTime();
+  const twelveHoursInMs = 12 * 60 * 60 * 1000;
+  if (timeUntilDeparture < 0 && Math.abs(timeUntilDeparture) > twelveHoursInMs) {
+    const nextDayDeparture = new Date(year, monthIndex, day + 1, hour, minute, 0, 0);
+    const nextDayDiff = nextDayDeparture.getTime() - now.getTime();
+    if (nextDayDiff > 0) {
+      departureDateTime = nextDayDeparture;
+      timeUntilDeparture = nextDayDiff;
+    }
+  }
   const threeHoursInMs = 3 * 60 * 60 * 1000;
 
   if (timeUntilDeparture < threeHoursInMs && timeUntilDeparture > 0) {

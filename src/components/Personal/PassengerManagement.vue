@@ -10,6 +10,8 @@ const formError = ref('')
 const searchName = ref('')
 const showSuccess = ref(false)
 const successMessage = ref('')
+const showError = ref(false)
+const errorMessage = ref('')
 
 const formData = ref<Passenger>({
   name: '',
@@ -135,13 +137,25 @@ const handleSubmit = async () => {
     fetchPassengers(searchName.value)
     showSuccess.value = true
   } catch (err: any) {
-    formError.value = err.response?.data?.error || '保存失败'
+    const status = err.response?.status
+    const backendError = err.response?.data?.error
+    if (status === 409 || backendError === 'Passenger already exists') {
+      errorMessage.value = '该联系人已存在，请使用不同的姓名和证件'
+      showError.value = true
+      return
+    }
+    formError.value = backendError || '保存失败'
   }
 }
 
 const handleCloseSuccess = () => {
   showSuccess.value = false
   successMessage.value = ''
+}
+
+const handleCloseError = () => {
+  showError.value = false
+  errorMessage.value = ''
 }
 
 onMounted(() => {
@@ -263,6 +277,24 @@ onMounted(() => {
         </div>
         <div class="modal-footer">
           <button @click="handleCloseSuccess" class="btn-save">确定</button>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="showError" class="modal-overlay">
+      <div class="modal-content error-modal">
+        <div class="modal-header error-header">
+          <h4>{{ isEdit ? '修改乘车人' : '添加乘车人' }}</h4>
+          <span class="close" @click="handleCloseError">&times;</span>
+        </div>
+        <div class="modal-body error-body">
+          <div class="error-row">
+            <span class="error-icon">×</span>
+            <span class="error-text">{{ errorMessage }}</span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button @click="handleCloseError" class="btn-save">确定</button>
         </div>
       </div>
     </div>
@@ -423,6 +455,43 @@ onMounted(() => {
 }
 
 .success-text {
+  font-size: 16px;
+  color: #333;
+}
+
+.error-modal {
+  width: 520px;
+}
+
+.error-header {
+  background: #3f8efc;
+  color: #fff;
+  border-bottom: none;
+}
+
+.error-body {
+  padding: 26px 20px;
+}
+
+.error-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.error-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #e74c3c;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.error-text {
   font-size: 16px;
   color: #333;
 }

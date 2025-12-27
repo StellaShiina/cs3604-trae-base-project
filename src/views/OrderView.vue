@@ -108,6 +108,14 @@ onMounted(async () => {
     }
   } catch (err: any) {
     console.error('Failed to fetch order info', err)
+    if (err.response?.status === 401) {
+      authStore.logout()
+      router.push({
+        path: '/login',
+        query: { redirect: route.fullPath }
+      })
+      return
+    }
     error.value = err.response?.data?.error || '获取订单信息失败'
   } finally {
     loading.value = false
@@ -146,6 +154,14 @@ const handleSubmitOrder = async () => {
     router.push(`/payment/${orderId}`)
   } catch (err: any) {
     console.error('Failed to create order', err)
+    if (err.response?.status === 401) {
+      authStore.logout()
+      router.push({
+        path: '/login',
+        query: { redirect: route.fullPath }
+      })
+      return
+    }
     alert(err.response?.data?.error || '订单提交失败')
   }
 }

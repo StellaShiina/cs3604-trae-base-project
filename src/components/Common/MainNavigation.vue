@@ -5,9 +5,9 @@
       
       <!-- 车票 Dropdown -->
       <div class="nav-item-container">
-        <router-link to="/search" class="nav-item" :class="{ active: isTrainsPage }">
+        <a href="#" class="nav-item" :class="{ active: isTrainsPage }" @click.prevent>
           车票 <span class="nav-arrow">▼</span>
-        </router-link>
+        </a>
         
         <div class="dropdown-menu">
           <div class="dropdown-content">

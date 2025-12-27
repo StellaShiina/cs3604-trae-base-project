@@ -29,6 +29,14 @@ const loadPaymentData = async () => {
     const res = await getPaymentInfo(orderId)
     paymentData.value = res.data
   } catch (err: any) {
+    if (err.response?.status === 401) {
+      authStore.logout()
+      router.push({
+        path: '/login',
+        query: { redirect: route.fullPath }
+      })
+      return
+    }
     if (err.response?.status === 400 && err.response?.data?.error?.includes('过期')) {
       showTimeoutModal.value = true
     } else {
@@ -55,6 +63,14 @@ const handleCancelOrder = async () => {
     await cancelOrder(orderId)
     router.push('/train-list')
   } catch (err: any) {
+    if (err.response?.status === 401) {
+      authStore.logout()
+      router.push({
+        path: '/login',
+        query: { redirect: route.fullPath }
+      })
+      return
+    }
     alert(err.response?.data?.error || '取消订单失败')
   } finally {
     isProcessing.value = false
@@ -69,6 +85,14 @@ const handleConfirmPayment = async () => {
     await payOrder(orderId)
     router.push(`/purchase-success/${orderId}`)
   } catch (err: any) {
+    if (err.response?.status === 401) {
+      authStore.logout()
+      router.push({
+        path: '/login',
+        query: { redirect: route.fullPath }
+      })
+      return
+    }
     if (err.response?.status === 400 && err.response?.data?.error?.includes('过期')) {
       showTimeoutModal.value = true
     } else {
