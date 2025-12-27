@@ -70,7 +70,7 @@ const menuGroups = ref([
     type: 'group',
     expanded: true,
     items: [
-       { id: 'passengers', label: '乘车人管理' },
+       { id: 'passengers', label: '乘车人' },
        { id: 'address', label: '地址管理', disabled: true }
     ]
   }
