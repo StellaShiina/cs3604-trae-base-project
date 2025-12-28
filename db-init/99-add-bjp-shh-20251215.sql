@@ -6,7 +6,8 @@ INSERT INTO trains(train_no, train_type) VALUES ('G3', 'G') ON CONFLICT (train_n
 -- 2. Insert Train Service
 INSERT INTO train_services(train_no, service_date)
 SELECT 'G3', '2025-12-15'
-WHERE NOT EXISTS (
+WHERE '2025-12-15'::date BETWEEN current_date AND (current_date + INTERVAL '15 days')::date
+AND NOT EXISTS (
     SELECT 1 FROM train_services WHERE train_no = 'G3' AND service_date = '2025-12-15'
 );
 

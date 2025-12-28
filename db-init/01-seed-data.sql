@@ -22,6 +22,7 @@ INSERT INTO trains(train_no,train_type) VALUES
 ('G104','G'),
 ('D300','D'),
 ('Z50','Z'),
+('K1','K'),
 ('K80','K'),
 ('G2','G'),
 ('D6','D'),

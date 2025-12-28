@@ -17,7 +17,7 @@ DO $$ BEGIN
     CREATE TYPE train_type_enum AS ENUM ('G','D','C','Z','T','K');
   END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'seat_type_enum') THEN
-    CREATE TYPE seat_type_enum AS ENUM ('business','first','second','softSleeper','hardSleeper','hardSeat');
+    CREATE TYPE seat_type_enum AS ENUM ('business','first','preferredFirst','second','softSleeper','hardSleeper','hardSeat');
   END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'ticket_type_enum') THEN
     CREATE TYPE ticket_type_enum AS ENUM ('adult','child','student');
@@ -35,6 +35,8 @@ DO $$ BEGIN
     CREATE TYPE ticket_status_enum AS ENUM ('active', 'refunded', 'changed');
   END IF;
 END $$;
+
+ALTER TYPE seat_type_enum ADD VALUE IF NOT EXISTS 'preferredFirst';
 
 -- Tables
 CREATE TABLE IF NOT EXISTS users (
