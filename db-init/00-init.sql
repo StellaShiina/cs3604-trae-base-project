@@ -159,10 +159,10 @@ CREATE TABLE IF NOT EXISTS preorders (
 
 CREATE INDEX IF NOT EXISTS idx_preorders_active ON preorders(status, expires_at);
 
--- Triggers: 14-day range enforcement for service_date
+-- Triggers: 15-day range enforcement for service_date
 CREATE OR REPLACE FUNCTION enforce_service_date_range() RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
-  IF NEW.service_date < current_date OR NEW.service_date > (current_date + INTERVAL '14 days')::date THEN
+  IF NEW.service_date < current_date OR NEW.service_date > (current_date + INTERVAL '15 days')::date THEN
     RAISE EXCEPTION 'service_date out of range';
   END IF;
   RETURN NEW;
@@ -407,7 +407,7 @@ DECLARE
 BEGIN
   DELETE FROM train_services WHERE service_date < current_date;
   FOR tr IN SELECT DISTINCT train_no FROM train_services WHERE service_date = current_date LOOP
-    FOR i IN 1..13 LOOP
+    FOR i IN 1..15 LOOP
       PERFORM clone_train_service_for_date(tr.train_no, current_date, (current_date + i));
     END LOOP;
   END LOOP;

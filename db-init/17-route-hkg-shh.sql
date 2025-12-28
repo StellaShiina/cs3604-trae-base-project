@@ -2,11 +2,11 @@
 -- Trains: G99 (SHH->HKG), G102 (HKG->SHH), G103 (SHH->HKG), G104 (HKG->SHH)
 -- Route: HKG <-> SZH <-> GZQ <-> HZH <-> SHH
 
--- 1. Insert Train Services (14 days rolling)
+-- 1. Insert Train Services (16 days rolling)
 INSERT INTO train_services(train_no, service_date)
 SELECT t.train_no, d::date
 FROM trains t
-JOIN generate_series(current_date, current_date + INTERVAL '13 days', INTERVAL '1 day') AS d ON true
+JOIN generate_series(current_date, current_date + INTERVAL '15 days', INTERVAL '1 day') AS d ON true
 WHERE t.train_no IN ('G99', 'G102', 'G103', 'G104')
 AND NOT EXISTS (
   SELECT 1 FROM train_services ts WHERE ts.train_no = t.train_no AND ts.service_date = d::date
