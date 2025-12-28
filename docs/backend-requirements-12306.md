@@ -316,6 +316,19 @@
   我希望支付订单或取消订单
   以便我完成出行计划
 
+  Scenario: 支付订单
+    Given 订单 "ord-001" 状态为 `pending_payment`
+    When 调用 "支付订单" API
+    Then 支付应被处理
+    And 订单状态应更新为 `paid`
+    And 应在 `payments` 表中添加一条记录
+
+  Scenario: 取消未支付订单
+    Given 订单 "ord-001" 状态为 `pending_payment`
+    When 调用 "取消订单" API
+    Then 订单状态应更新为 `canceled`
+    And 库存应立即释放
+
 ### Feature: 系统维护与调度
   作为系统管理员/后台服务
   我希望系统自动维护车次排期
@@ -340,19 +353,6 @@
     Then 系统应扫描所有过期未支付订单
     And 将这些订单的状态更新为 `canceled`
     And 触发器 `trg_order_cancel_release` 应自动释放库存
-
-  Scenario: 支付订单
-    Given 订单 "ord-001" 状态为 `pending_payment`
-    When 调用 "支付订单" API
-    Then 支付应被处理
-    And 订单状态应更新为 `paid`
-    And 应在 `payments` 表中添加一条记录
-
-  Scenario: 取消未支付订单
-    Given 订单 "ord-001" 状态为 `pending_payment`
-    When 调用 "取消订单" API
-    Then 订单状态应更新为 `canceled`
-    And 库存应立即释放
 
   Scenario: 订单状态兼容性映射 (前端适配)
     Given 前端请求订单列表时使用状态参数 `status=cancelled` (双 'l')
