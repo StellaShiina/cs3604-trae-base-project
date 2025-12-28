@@ -1,55 +1,100 @@
-# cs3604 · 12306 演示站点
+# 12306 购票系统复刻 (Backend)
 
-[![cdtool](https://img.shields.io/badge/Related_REPO-cdtool-blue)](https://github.com/StellaShiina/cdtool)
+这是 CS3604 12306 复刻项目的后端服务模块，基于 Go + Gin + GORM 实现，提供认证、乘车人管理、车次查询、下单与支付等核心接口。
 
-一个涵盖后端（Go + PostgreSQL）与前端（Vue 3 + TypeScript）的完整示例，提供 12306 常用流程：站点查询、车次搜索、余票展示、下单占位等。已配置 CI 与简易 CD，可在服务器上自动部署至预览站点。
-
-
-## 主要功能
-- 站点字典与模糊搜索：按英文名或拼音查询站点列表（`/api/v1/stations`）。
-- 车次搜索与过滤：按出发/到达站、日期、时间段筛选，并支持仅高铁（`G/D/C`）过滤（`/api/v1/trains/search`）。
-- 余票与票价：统一视图 `v_train_search` 聚合区间与座席价格与余票；页面按座席类型展示。
-- 预订占位：登录后对可订座席创建占位（`/api/v1/preorders`），触发器自动扣减库存；取消/过期释放库存。
-- 数据滚动与初始化：
-  - 初始化脚本插入“从今天起 14 天”的在售车次与库存（`init-scripts/*`）。
-  - 每日 0 点定时清理过期车次，并补齐第 14 天，保证持续 14 天在售（`ensure_rolling_14_days()`）。
+后端接口规范（用于对齐前端与测试用例）位于 `backend/.artifacts/`；更详细的需求与对接说明位于 `backend/docs/`。
 
 ## 技术栈
-- 后端：Go 1.23、Gin、GORM
-- 数据库：PostgreSQL，扩展 `citext`、`pg_trgm`、`pgcrypto`
-- 前端：Vue 3（Composition API）、TypeScript、Vite、Vitest
-- 样式：Tailwind CSS 4
-- 容器/编排：Docker Compose
 
-## 亮点（CI/CD）
-- GitHub Actions（CI）：
-  - 后端工作流：启动数据库、执行 Go 单元测试（`/root/cs3604/.github/workflows/ci.yml:10-26`）。
-  - 前端工作流：安装依赖并运行单元测试（`/root/cs3604/.github/workflows/ci.yml:27-41`）。
-- 简易 CD：
-  - CI 成功后调用部署通知接口（含令牌 `CD_TOKEN`），在自有服务器上触发自动部署（`/root/cs3604/.github/workflows/ci.yml:43-51`）。
-  - 预览站点：`https://12306.vozn.dpdns.org`。
+- Go（Gin）
+- GORM（PostgreSQL 驱动）
+- PostgreSQL（本地或通过本仓库 `database/` 模块启动）
+- 单元测试：Go `testing`（测试默认使用内存 SQLite）
 
-## 本地开发
-- 前端：`cd frontend && npm install && npm run dev`
-- 后端：`cd backend && go run main.go`
-- 数据库：`docker compose up -d`（服务与数据库）
+## 功能范围
 
-## 实现状态 (Current Progress)
-- **后端 (Backend)**:
-  - ✅ **用户认证 (Auth)**: 注册、登录 (Bcrypt + Session Cookie)。
-  - ✅ **乘客管理 (Passengers)**: 增删改查，支持 15 人上限与重复校验。
-  - ✅ **车次查询 (Trains)**: 基于视图 `v_train_search` 的查询接口。
-  - ✅ **订单处理 (Orders)**: 事务性订单创建，集成库存扣减触发器逻辑 (Mock)。
-  - ✅ **测试覆盖**: 核心业务逻辑单元测试通过 (SQLite 内存数据库)。
-  - ✅ **CORS**: 已配置跨域支持，允许前端本地调试。
+- 用户认证：注册、登录（两步验证流程）与会话 Cookie（`sid`）
+- 乘车人管理：增删改查、数量上限、重复校验、默认乘车人保护
+- 车次查询：按出发/到达站与日期查询
+- 订单流转：订单填写页数据加载、下单、支付、取消、订单确认信息
+
+## 本地运行
+
+### 1. 准备数据库
+
+后端默认使用 PostgreSQL。你可以直接使用本仓库的数据库模块启动：
+
+```bash
+cd database
+docker compose up -d
+```
+
+### 2. 启动后端
+
+在项目根目录执行：
+
+```bash
+cd backend/backend
+go run .
+```
+
+默认监听端口：`http://localhost:8081`
+
+## 环境变量
+
+- `DATABASE_URL`：PostgreSQL DSN。
+  - 未设置时，默认值为：
+    - `host=localhost user=postgres password=postgres dbname=railway12306 port=5432 sslmode=disable TimeZone=Asia/Shanghai`
+
+## 接口说明
+
+后端统一前缀为 `/api/v1`，端口默认 `8081`。
+
+- 认证：`/api/v1/auth/*`
+  - 登录：`POST /api/v1/auth/login`
+  - 发送登录验证码：`POST /api/v1/auth/send-sms`
+  - 校验验证码并登录：`POST /api/v1/auth/verify-login`
+  - 分步注册：`POST /api/v1/auth/register/*`
+- 站点：`GET /api/v1/stations`
+- 车次：`GET /api/v1/trains/search`
+- 乘车人：`/api/v1/passengers`（需要登录，会校验 `sid` Cookie）
+- 订单：`/api/v1/orders/*`（需要登录，会校验 `sid` Cookie）
+
+接口规格文件：`backend/.artifacts/api_interface.yml`
 
 ## 测试
-- 前端单测：`npm run test:unit -- --run`
-- 后端单测：`go test ./...`
+
+在项目根目录执行：
+
+```bash
+cd backend/backend
+go test ./...
+```
+
+说明：单测默认使用内存 SQLite（见 `db.InitTest()`），因此运行测试不强依赖本地 PostgreSQL。
 
 ## 目录结构
-- `backend/` 后端代码（Gin 路由、服务、测试）
-- `frontend/` 前端代码（Vue 页与组件、测试）
-- `init-scripts/` 数据库初始化与滚动逻辑（14 天数据与库存）
-- `.github/workflows/ci.yml` GitHub Actions 工作流（CI 与部署通知）
 
+```
+backend/
+├── .artifacts/            # 接口与数据描述（测试/对接依据）
+├── backend/               # 后端服务代码（Go module: 12306-backend）
+│   ├── db/                # 数据库连接与测试 DB 初始化
+│   ├── models/            # GORM 模型定义
+│   ├── routes/            # Gin 路由与处理函数
+│   ├── services/          # 业务服务（例如车次初始化/调度）
+│   └── main.go            # 入口
+├── docs/                  # 需求/对接/测试说明文档
+└── README.md              # 本文件
+```
+
+## 文档索引
+
+- 后端需求与说明：`backend/docs/backend-requirements-12306.md`
+- 后端与数据库对接：`backend/docs/backend-tech-guide-12306.md`
+- 后端测试说明：`backend/docs/backend-tests-description.md`
+- 前端接口对接指南：`backend/docs/frontend-api-guide-12306.md`
+
+## CI
+
+后端 CI 配置位于：`backend/.github/workflows/ci.yml`
