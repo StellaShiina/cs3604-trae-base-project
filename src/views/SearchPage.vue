@@ -141,6 +141,8 @@ const filteredTrains = computed(() => {
       const isMatch = filters.value.trainTypes.some(type => {
         if (type === 'OTHER') return !['G', 'D', 'C', 'Z', 'T', 'K'].includes(typeCode);
         if (type === 'GC') return ['G', 'C'].includes(typeCode);
+        if (type === 'FUXING') return ['G', 'C'].includes(typeCode);
+        if (type === 'SMART') return ['G', 'C'].includes(typeCode);
         return typeCode === type; // D, Z, T, K
       });
       if (!isMatch) return false;

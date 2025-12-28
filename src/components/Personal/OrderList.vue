@@ -2,13 +2,14 @@
 import { ref, onMounted, computed } from 'vue'
 import DatePicker from '@/components/Train/DatePicker.vue'
 import { useRouter } from 'vue-router'
-import { getOrders, cancelOrder } from '@/api/order'
+import { getOrders, cancelOrder, refundTicket } from '@/api/order'
 
 const router = useRouter()
 const orders = ref<any[]>([])
 const loading = ref(false)
 const error = ref('')
 const activeTab = ref('incomplete') // incomplete, upcoming, history
+const refunding = ref<Record<string, boolean>>({})
 
 const tabs = [
   { id: 'incomplete', label: '未完成订单' },
@@ -54,6 +55,26 @@ const isFuture = (dateStr: string, timeStr: string) => {
   return trainDate > now
 }
 
+const getOrderTickets = (order: any) => {
+  if (Array.isArray(order?.tickets)) return order.tickets
+  if (Array.isArray(order?.passengers)) return order.passengers
+  return []
+}
+
+const getDerivedStatus = (order: any) => {
+  const tickets = getOrderTickets(order)
+  if (tickets.length > 0 && tickets.every((t: any) => t?.status === 'refunded')) return 'refunded'
+  return order?.status
+}
+
+const hasRefundableTickets = (order: any) => {
+  const tickets = getOrderTickets(order)
+  return tickets.some((t: any) => {
+    const status = t?.status
+    return !status || status === 'active'
+  })
+}
+
 const filteredOrders = computed(() => {
   // 1. Tab Filtering
   let result = orders.value.filter(o => {
@@ -63,13 +84,14 @@ const filteredOrders = computed(() => {
     
     if (activeTab.value === 'upcoming') {
       // 已支付且未发车
-      return ['paid', 'completed'].includes(o.status) && isFuture(o.departure_date, o.departure_time)
+      return ['paid', 'completed'].includes(o.status) && isFuture(o.departure_date, o.departure_time) && getDerivedStatus(o) !== 'refunded'
     }
     
     if (activeTab.value === 'history') {
       // 已支付且已发车，或者已取消/已退票
       const isPaidAndDeparted = ['paid', 'completed'].includes(o.status) && !isFuture(o.departure_date, o.departure_time)
-      const isCancelledOrRefunded = ['cancelled', 'canceled', 'refunded'].includes(o.status)
+      const derivedStatus = getDerivedStatus(o)
+      const isCancelledOrRefunded = ['cancelled', 'canceled', 'refunded'].includes(derivedStatus)
       return isPaidAndDeparted || isCancelledOrRefunded
     }
     
@@ -147,6 +169,35 @@ const handleCancel = async (orderId: string) => {
     fetchOrders()
   } catch (err: any) {
     alert(err.response?.data?.error || '取消失败')
+  }
+}
+
+const handleRefund = async (order: any) => {
+  const orderId = String(order?.id ?? order?.order_id ?? '')
+  if (!orderId) return
+  if (!confirm('确定要为该订单退票吗？')) return
+  if (!hasRefundableTickets(order)) {
+    alert('当前订单没有可退票的车票')
+    return
+  }
+
+  refunding.value = { ...refunding.value, [orderId]: true }
+  try {
+    const tickets = getOrderTickets(order)
+    for (const t of tickets) {
+      const status = t?.status
+      if (status && status !== 'active') continue
+      const ticketId = t?.ticket_id ?? t?.id
+      if (ticketId == null || ticketId === '') continue
+      await refundTicket(ticketId)
+    }
+    alert('退票成功')
+    fetchOrders()
+  } catch (err: any) {
+    alert(err.response?.data?.error || '退票失败')
+  } finally {
+    const { [orderId]: _ignored, ...rest } = refunding.value
+    refunding.value = rest
   }
 }
 
@@ -230,7 +281,7 @@ onMounted(() => {
       <div v-for="order in filteredOrders" :key="order.id" class="order-card">
         <div class="card-header">
           <span class="order-date">订票日期: {{ order.created_at?.substring(0, 10) }}</span>
-          <span class="order-status" :class="order.status">{{ getStatusLabel(order.status) }}</span>
+          <span class="order-status" :class="getDerivedStatus(order)">{{ getStatusLabel(getDerivedStatus(order)) }}</span>
         </div>
         <div class="card-body">
           <div class="train-info">
@@ -248,7 +299,7 @@ onMounted(() => {
           <div class="passengers">
              <div v-for="(p, idx) in order.passengers" :key="idx" class="p-item">
                {{ p.passenger_name }} ({{ getSeatLabel(p.seat_type) }}) 
-               <span v-if="p.seat_number">{{ p.car_number }}车 {{ p.seat_number }}</span>
+               <span v-if="p.seat_number || p.seat_no">{{ p.car_number ? `${p.car_number}车 ` : '' }}{{ p.seat_number || p.seat_no }}</span>
              </div>
           </div>
           
@@ -257,7 +308,14 @@ onMounted(() => {
              <div class="actions">
                <button v-if="order.status === 'confirmed_unpaid' || order.status === 'pending_payment'" @click="handlePay(order.id)" class="btn-pay">去支付</button>
                <button v-if="order.status === 'confirmed_unpaid' || order.status === 'pending_payment'" @click="handleCancel(order.id)" class="btn-cancel">取消订单</button>
-               <!-- Add refund button for paid orders if needed -->
+               <button
+                 v-if="activeTab === 'upcoming' && ['paid', 'completed'].includes(order.status) && hasRefundableTickets(order)"
+                 @click="handleRefund(order)"
+                 class="btn-refund"
+                 :disabled="refunding[String(order.id)]"
+               >
+                 {{ refunding[String(order.id)] ? '处理中...' : '退票' }}
+               </button>
              </div>
           </div>
         </div>
@@ -310,6 +368,8 @@ onMounted(() => {
       &.confirmed_unpaid, &.pending_payment { color: #ff9a00; }
       &.paid, &.completed { color: #28a745; }
       &.cancelled { color: #999; }
+      &.canceled { color: #999; }
+      &.refunded { color: #999; }
     }
   }
   
@@ -389,6 +449,19 @@ onMounted(() => {
       color: #666;
       
       &:hover { background: #f5f5f5; }
+    }
+
+    .btn-refund {
+      background: #fff;
+      border: 1px solid #dc3545;
+      color: #dc3545;
+
+      &:hover { background: #fff5f5; }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
     }
   }
 }

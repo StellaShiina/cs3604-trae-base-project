@@ -27,6 +27,10 @@ export const cancelOrder = async (orderId: string) => {
   return axios.post(`${API_BASE_URL}/orders/${orderId}/cancel`)
 }
 
+export const refundTicket = async (ticketId: string | number) => {
+  return axios.post(`${API_BASE_URL}/tickets/${ticketId}/refund`)
+}
+
 export const payOrder = async (orderId: string) => {
   return axios.post(`${API_BASE_URL}/orders/${orderId}/pay`)
 }
