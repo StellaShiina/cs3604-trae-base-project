@@ -1,6 +1,7 @@
 export const seatTypeMap: Record<string, string> = {
   business: '商务座',
   first: '一等座',
+  preferredFirst: '优选一等座',
   second: '二等座',
   softSleeper: '软卧',
   hardSleeper: '硬卧',
@@ -16,6 +17,7 @@ export const seatTypeMap: Record<string, string> = {
   // Case insensitive fallbacks
   Business: '商务座',
   First: '一等座',
+  PreferredFirst: '优选一等座',
   Second: '二等座',
   SoftSleeper: '软卧',
   HardSleeper: '硬卧',
