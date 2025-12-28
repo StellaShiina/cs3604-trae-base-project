@@ -397,6 +397,11 @@ func EditPassenger(c *gin.Context) {
 		return
 	}
 
+	if passenger.IsDefault {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Cannot edit default passenger"})
+		return
+	}
+
 	// Check for duplicates if card number changed
 	if passenger.CardNo != req.CardNo {
 		var exists int64

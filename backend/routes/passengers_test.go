@@ -198,6 +198,16 @@ func TestEditPassenger(t *testing.T) {
 	}
 	db.GetDB().Create(&p)
 
+	defaultP := models.Passenger{
+		UserID:        userID,
+		Name:          "Default",
+		CardType:      "id_card",
+		CardNo:        "110101200001018888",
+		PassengerType: "adult",
+		IsDefault:     true,
+	}
+	db.GetDB().Create(&defaultP)
+
 	t.Run("Success", func(t *testing.T) {
 		payload := map[string]string{
 			"name":      "Updated Name",
@@ -222,6 +232,28 @@ func TestEditPassenger(t *testing.T) {
 		assert.Equal(t, "Updated Name", updatedP.Name)
 		assert.Equal(t, "student", updatedP.PassengerType)
 		assert.Equal(t, "13800000000", updatedP.Mobile)
+	})
+
+	t.Run("Forbidden_DefaultPassenger", func(t *testing.T) {
+		payload := map[string]string{
+			"name":      "Should Not Update",
+			"card_type": "居民身份证",
+			"card_no":   "110101200001018888",
+			"type":      "学生",
+			"phone":     "13800000000",
+		}
+		body, _ := json.Marshal(payload)
+		req, _ := http.NewRequest("PUT", "/api/v1/passengers/"+defaultP.ID.String(), bytes.NewBuffer(body))
+		req.AddCookie(&http.Cookie{Name: "sid", Value: "dummy-session-00000000-0000-0000-0000-000000000000"})
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+		assert.Equal(t, http.StatusForbidden, w.Code)
+
+		var unchanged models.Passenger
+		db.GetDB().First(&unchanged, defaultP.ID)
+		assert.Equal(t, "Default", unchanged.Name)
+		assert.Equal(t, "adult", unchanged.PassengerType)
 	})
 }
 
