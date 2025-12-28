@@ -170,6 +170,7 @@ const filteredTrains = computed(() => {
     if (filters.value.seatTypes.length > 0) {
       const hasSeat = filters.value.seatTypes.some(type => {
         const count = train.availableSeats[type];
+        if (typeof count === 'number') return count > 0;
         return count !== undefined && count !== '--' && count !== '无';
       });
       if (!hasSeat) return false;

@@ -50,8 +50,14 @@ export async function searchTrains(
       const availableSeats: any = {}
 
       ;(t.seats || []).forEach((seat: any) => {
-        const zhType = translateSeatType(seat.type)
-        availableSeats[zhType] = seat.left
+        const rawType = (seat && seat.type) ? String(seat.type) : ''
+        const translated = translateSeatType(rawType)
+        const zhType = (rawType === 'preferredFirst' || rawType === 'PreferredFirst' || rawType === 'preferred_first' || translated === '优选一等座')
+          ? '一等座'
+          : translated
+
+        const left = typeof seat?.left === 'number' ? seat.left : 0
+        availableSeats[zhType] = (availableSeats[zhType] || 0) + left
       })
 
       return {
