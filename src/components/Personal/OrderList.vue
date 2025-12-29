@@ -41,6 +41,7 @@ const seatTypeMap: Record<string, string> = {
   hard_seat: '硬座',
   hard_sleeper: '硬卧',
   soft_sleeper: '软卧',
+  softSleeper: '软卧',
   no_seat: '无座'
 }
 
