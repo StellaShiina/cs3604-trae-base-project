@@ -32,3 +32,19 @@ ui_forgot_password:
     - api_forgot_verify_user
     - api_forgot_verify_sms
     - api_forgot_reset
+UI-SEARCH-PAGE:
+  related_req_id: REQ-2
+  path: frontend/src/pages/SearchPage.jsx
+  description: Search Result Page for Ticket Query
+  upstream_ids:
+    - UI-HOME-PAGE
+  downstream_ids:
+    - API-TICKET-QUERY
+UI-TICKET-SEARCH-FORM:
+  related_req_id: REQ-2
+  path: frontend/src/components/TicketSearchForm.jsx
+  description: Form for searching tickets (From, To, Date)
+  upstream_ids:
+    - UI-HOME-PAGE
+  downstream_ids:
+    - UI-SEARCH-PAGE

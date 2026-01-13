@@ -36,7 +36,14 @@
       - api_forgot_verify_sms
       - api_forgot_reset
 - id: REQ-2
-  status: unprocessed
+  status: processed
+  artifacts:
+    ui_ids:
+      - UI-SEARCH-PAGE
+      - UI-TICKET-SEARCH-FORM
+    api_ids:
+      - API-TICKET-QUERY
+      - API-STATIONS-LIST
 - id: REQ-3
   status: unprocessed
 - id: REQ-4

@@ -30,6 +30,32 @@ function initTables() {
       console.log('Users table initialized.');
     }
   });
+
+  db.run(`CREATE TABLE IF NOT EXISTS stations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT UNIQUE NOT NULL,
+    code TEXT UNIQUE NOT NULL,
+    city TEXT NOT NULL
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS trains (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    train_number TEXT UNIQUE NOT NULL,
+    type TEXT NOT NULL
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS schedules (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    train_id INTEGER,
+    from_station_id INTEGER,
+    to_station_id INTEGER,
+    departure_time TEXT NOT NULL,
+    arrival_time TEXT NOT NULL,
+    duration TEXT,
+    FOREIGN KEY(train_id) REFERENCES trains(id),
+    FOREIGN KEY(from_station_id) REFERENCES stations(id),
+    FOREIGN KEY(to_station_id) REFERENCES stations(id)
+  )`);
 }
 
 module.exports = db;

@@ -85,6 +85,22 @@ nodes:
     type: API
     path: backend/src/routes/auth.js
     signature: POST /api/auth/forgot-password/reset
+  UI-SEARCH-PAGE:
+    type: UI
+    path: frontend/src/pages/SearchPage.jsx
+    description: Search Result Page for Ticket Query
+  UI-TICKET-SEARCH-FORM:
+    type: UI
+    path: frontend/src/components/TicketSearchForm.jsx
+    description: Form for searching tickets (From, To, Date)
+  API-TICKET-QUERY:
+    type: API
+    path: /api/tickets/query
+    signature: GET /api/tickets/query?fromStation=&toStation=&date=
+  API-STATIONS-LIST:
+    type: API
+    path: /api/tickets/stations
+    signature: GET /api/tickets/stations
 edges:
   - from: ROOT
     to: REQ-1
@@ -197,3 +213,42 @@ edges:
   - from: REQ-1-3
     to: api_forgot_reset
     relation: DEFINES
+  - from: REQ-2
+    to: UI-SEARCH-PAGE
+    relation: DEFINES
+  - from: UI-HOME-PAGE
+    to: UI-SEARCH-PAGE
+    relation: CALLS
+  - from: UI-SEARCH-PAGE
+    to: API-TICKET-QUERY
+    relation: CALLS
+  - from: REQ-2
+    to: UI-TICKET-SEARCH-FORM
+    relation: DEFINES
+  - from: UI-HOME-PAGE
+    to: UI-TICKET-SEARCH-FORM
+    relation: CALLS
+  - from: UI-TICKET-SEARCH-FORM
+    to: UI-SEARCH-PAGE
+    relation: CALLS
+  - from: REQ-2
+    to: API-TICKET-QUERY
+    relation: DEFINES
+  - from: API-TICKET-QUERY
+    to: DB-SCHEDULES
+    relation: CALLS
+  - from: API-TICKET-QUERY
+    to: DB-TRAINS
+    relation: CALLS
+  - from: API-TICKET-QUERY
+    to: DB-STATIONS
+    relation: CALLS
+  - from: REQ-2
+    to: API-STATIONS-LIST
+    relation: DEFINES
+  - from: UI-TICKET-SEARCH-FORM
+    to: API-STATIONS-LIST
+    relation: CALLS
+  - from: API-STATIONS-LIST
+    to: DB-STATIONS
+    relation: CALLS

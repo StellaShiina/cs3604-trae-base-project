@@ -51,3 +51,21 @@ api_forgot_reset:
   upstream_ids:
     - ui_forgot_password
   downstream_ids: []
+API-TICKET-QUERY:
+  related_req_id: REQ-2
+  path: /api/tickets/query
+  signature: GET /api/tickets/query?fromStation=&toStation=&date=
+  upstream_ids:
+    - UI-SEARCH-PAGE
+  downstream_ids:
+    - DB-SCHEDULES
+    - DB-TRAINS
+    - DB-STATIONS
+API-STATIONS-LIST:
+  related_req_id: REQ-2
+  path: /api/tickets/stations
+  signature: GET /api/tickets/stations
+  upstream_ids:
+    - UI-TICKET-SEARCH-FORM
+  downstream_ids:
+    - DB-STATIONS

@@ -1,0 +1,147 @@
+.header-wrapper {
+  width: 100%;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.top-global-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.logo-area .logo-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #333;
+}
+
+.logo-icon {
+  font-size: 32px;
+  margin-right: 10px;
+  color: #ff0000;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-text .cn {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+}
+
+.logo-text .en {
+  font-size: 12px;
+  color: #666;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.search-bar input {
+  padding: 8px;
+  width: 300px;
+  border: none;
+  outline: none;
+}
+
+.search-bar .search-btn {
+  padding: 8px 12px;
+  background-color: #3b99fc;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.header-tools {
+  display: flex;
+  gap: 15px;
+  font-size: 14px;
+  color: #666;
+}
+
+.auth-status a {
+  color: #3b99fc;
+  text-decoration: none;
+}
+
+.main-nav {
+  background-color: #3b99fc;
+  color: white;
+}
+
+.nav-list {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.nav-item {
+  position: relative;
+  padding: 15px 20px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.nav-item:hover {
+  background-color: #2a88eb;
+}
+
+.nav-item a {
+  color: white;
+  text-decoration: none;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  color: #333;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  min-width: 150px;
+  z-index: 1000;
+  border: 1px solid #eee;
+}
+
+.dropdown-section {
+  padding: 10px;
+}
+
+.dropdown-title {
+  color: #3b99fc;
+  font-weight: bold;
+  margin-bottom: 5px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+}
+
+.dropdown-links {
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-links span {
+  padding: 5px 0;
+  cursor: pointer;
+}
+
+.dropdown-links span:hover {
+  color: #3b99fc;
+}

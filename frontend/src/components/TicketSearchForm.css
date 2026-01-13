@@ -1,0 +1,86 @@
+.ticket-search-form {
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  width: 400px;
+  margin: 0 auto;
+  overflow: hidden;
+  text-align: left;
+}
+
+.form-tabs {
+  display: flex;
+  background-color: #f0f0f0;
+  border-bottom: 1px solid #ddd;
+}
+
+.form-tab {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+  cursor: pointer;
+  color: #666;
+}
+
+.form-tab.active {
+  background-color: white;
+  color: #3b99fc;
+  font-weight: bold;
+  border-top: 2px solid #3b99fc;
+}
+
+.search-form-content {
+  padding: 20px;
+}
+
+.station-row, .date-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.input-group label {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 5px;
+}
+
+.input-group input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.swap-icon {
+  margin: 0 10px;
+  cursor: pointer;
+  font-size: 20px;
+  color: #3b99fc;
+  padding-top: 15px;
+}
+
+.search-submit-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #ff9900;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.search-submit-btn:hover {
+  background-color: #e68a00;
+}

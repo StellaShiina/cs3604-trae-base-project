@@ -13,7 +13,9 @@ require('./database/init_db');
 
  
 const authRoutes = require('./routes/auth');
+const ticketRoutes = require('./routes/tickets');
 app.use('/api/auth', authRoutes);
+app.use('/api/tickets', ticketRoutes);
 
 app.get('/', (req, res) => {
   res.json({ code: 200, message: 'Backend Ready' });
