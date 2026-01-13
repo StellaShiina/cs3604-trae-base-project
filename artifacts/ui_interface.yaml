@@ -135,3 +135,11 @@ REQ-4-3-UI-ORDER-LIST-CANCEL:
     - REQ-4-UI-PERSONAL-CENTER
   downstream_ids:
     - REQ-4-3-API-CANCEL-ORDER
+REQ-4-4-UI-PAY-BUTTON:
+  related_req_id: REQ-4-4
+  path: frontend/src/pages/PersonalCenterPage.jsx
+  description: Pay Order Button and Logic
+  upstream_ids:
+    - REQ-4-UI-PERSONAL-CENTER
+  downstream_ids:
+    - REQ-4-4-API-PAY-ORDER

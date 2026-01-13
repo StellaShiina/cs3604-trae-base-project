@@ -70,3 +70,11 @@ REQ-4-3-FUNC-CANCEL-ORDER:
     - REQ-4-2-DB-ORDERS
   db_tables:
     - orders
+REQ-4-4-FUNC-PAY-ORDER:
+  related_req_id: REQ-4-4
+  path: backend/src/routes/orders.js
+  signature: router.put('/:id/status', ...)
+  upstream_ids:
+    - REQ-4-2-DB-ORDERS
+  db_tables:
+    - orders

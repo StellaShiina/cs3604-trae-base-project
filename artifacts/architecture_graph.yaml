@@ -186,6 +186,20 @@ nodes:
     type: UI
     path: frontend/src/pages/PersonalCenterPage.jsx
     description: Order List Cancel Button and Logic
+  REQ-4-4-API-PAY-ORDER:
+    type: API
+    path: /api/orders/:id/status
+    signature: PUT /api/orders/:id/status (status='paid')
+  REQ-4-4-FUNC-PAY-ORDER:
+    type: FUNC
+    path: backend/src/routes/orders.js
+    signature: router.put('/:id/status', ...)
+    db_tables:
+      - orders
+  REQ-4-4-UI-PAY-BUTTON:
+    type: UI
+    path: frontend/src/pages/PersonalCenterPage.jsx
+    description: Pay Order Button and Logic
 edges:
   - from: ROOT
     to: REQ-1
@@ -438,4 +452,28 @@ edges:
     relation: CALLS
   - from: REQ-4-3-UI-ORDER-LIST-CANCEL
     to: REQ-4-3-API-CANCEL-ORDER
+    relation: CALLS
+  - from: REQ-4-4
+    to: REQ-4-4-API-PAY-ORDER
+    relation: DEFINES
+  - from: REQ-4-4-FUNC-PAY-ORDER
+    to: REQ-4-4-API-PAY-ORDER
+    relation: CALLS
+  - from: REQ-4-4-API-PAY-ORDER
+    to: REQ-4-4-UI-PAY-BUTTON
+    relation: CALLS
+  - from: REQ-4-4
+    to: REQ-4-4-FUNC-PAY-ORDER
+    relation: DEFINES
+  - from: REQ-4-2-DB-ORDERS
+    to: REQ-4-4-FUNC-PAY-ORDER
+    relation: CALLS
+  - from: REQ-4-4
+    to: REQ-4-4-UI-PAY-BUTTON
+    relation: DEFINES
+  - from: REQ-4-UI-PERSONAL-CENTER
+    to: REQ-4-4-UI-PAY-BUTTON
+    relation: CALLS
+  - from: REQ-4-4-UI-PAY-BUTTON
+    to: REQ-4-4-API-PAY-ORDER
     relation: CALLS

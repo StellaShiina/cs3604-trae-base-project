@@ -94,6 +94,22 @@ const PersonalCenterPage = () => {
     }
   };
 
+  const handlePayOrder = async (orderId) => {
+    // Mock payment process
+    try {
+      const res = await axios.put(`/api/orders/${orderId}/status`, { status: 'paid' });
+      if (res.data.code === 200) {
+        alert('支付成功');
+        fetchOrders();
+      } else {
+        alert(res.data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('支付失败');
+    }
+  };
+
   // ... (handleAddPassenger, handleDeletePassenger same)
 
   const renderContent = () => {
@@ -180,7 +196,7 @@ const PersonalCenterPage = () => {
         </div>
       );
     } else if (activeTab === 'orders') {
-      if (loading) return <div>Loading...</div>;
+      // if (loading) return <div>Loading...</div>; // Moved loading check inside
       if (error) return <div className="error">{error}</div>;
 
       return (
@@ -207,7 +223,9 @@ const PersonalCenterPage = () => {
           </div>
           
           <div className="order-list">
-             {orders.length === 0 ? (
+             {loading ? (
+               <div>Loading...</div>
+             ) : orders.length === 0 ? (
                <div>暂无订单</div>
              ) : (
                <ul className="order-items">
@@ -227,7 +245,7 @@ const PersonalCenterPage = () => {
                        <div className="order-actions">
                          {order.status === 'pending_payment' && (
                            <>
-                             <button className="btn-primary">支付</button>
+                             <button className="btn-primary" onClick={() => handlePayOrder(order.id)}>支付</button>
                              <button className="btn-secondary" onClick={() => handleCancelOrder(order.id)}>取消</button>
                            </>
                          )}
