@@ -89,11 +89,12 @@ api_passengers_list:
 REQ-1-API-REGISTER:
   related_req_id: REQ-1
   path: backend/src/routes/auth.js
-  signature: POST /auth/register
+  signature: POST /api/auth/register
   upstream_ids:
     - REQ-1-UI-REGISTER
   downstream_ids:
     - REQ-1-DB-USERS
+    - REQ-1-FUNC-REGISTER
 REQ-1-API-LOGIN:
   related_req_id: REQ-1
   path: /api/auth/login
@@ -112,3 +113,26 @@ REQ-1-API-CHECK-USERNAME:
     - REQ-1-FUNC-CHECK-USER
   downstream_ids:
     - REQ-1-UI-REGISTER
+REQ-1-API-FP-VERIFY-USER:
+  related_req_id: REQ-1
+  path: backend/src/routes/auth.js
+  signature: POST /api/auth/forgot-password/verify-user
+  upstream_ids:
+    - REQ-1-UI-FORGOT-PASSWORD
+  downstream_ids:
+    - REQ-1-FUNC-FP-VERIFY-USER
+REQ-1-API-FP-VERIFY-SMS:
+  related_req_id: REQ-1
+  path: backend/src/routes/auth.js
+  signature: POST /api/auth/forgot-password/verify-sms
+  upstream_ids:
+    - REQ-1-UI-FORGOT-PASSWORD
+  downstream_ids: []
+REQ-1-API-FP-RESET:
+  related_req_id: REQ-1
+  path: backend/src/routes/auth.js
+  signature: POST /api/auth/forgot-password/reset
+  upstream_ids:
+    - REQ-1-UI-FORGOT-PASSWORD
+  downstream_ids:
+    - REQ-1-FUNC-FP-RESET

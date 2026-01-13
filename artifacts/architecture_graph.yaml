@@ -42,11 +42,11 @@ nodes:
   REQ-1-UI-REGISTER:
     type: UI
     path: frontend/src/pages/RegisterPage.jsx
-    description: User registration page with real-time validation and async username check
+    description: User Registration Page with Real Name, ID, Phone, Password Strength
   REQ-1-API-REGISTER:
     type: API
     path: backend/src/routes/auth.js
-    signature: POST /auth/register
+    signature: POST /api/auth/register
   REQ-1-API-LOGIN:
     type: API
     path: /api/auth/login
@@ -71,6 +71,22 @@ nodes:
     signature: db.get(SELECT * FROM users WHERE username/phone/email = ?)
     db_tables:
       - users
+  REQ-1-UI-FORGOT-PASSWORD:
+    type: UI
+    path: frontend/src/pages/ForgotPasswordPage.jsx
+    description: Forgot Password Page with 4-step wizard
+  REQ-1-API-FP-VERIFY-USER:
+    type: API
+    path: backend/src/routes/auth.js
+    signature: POST /api/auth/forgot-password/verify-user
+  REQ-1-API-FP-VERIFY-SMS:
+    type: API
+    path: backend/src/routes/auth.js
+    signature: POST /api/auth/forgot-password/verify-sms
+  REQ-1-API-FP-RESET:
+    type: API
+    path: backend/src/routes/auth.js
+    signature: POST /api/auth/forgot-password/reset
 edges:
   - from: ROOT
     to: REQ-1
@@ -153,3 +169,33 @@ edges:
   - from: REQ-1-2
     to: REQ-1-FUNC-LOGIN
     relation: DEFINES
+  - from: REQ-1
+    to: REQ-1-UI-FORGOT-PASSWORD
+    relation: DEFINES
+  - from: REQ-1-UI-FORGOT-PASSWORD
+    to: REQ-1-API-FP-VERIFY-USER
+    relation: CALLS
+  - from: REQ-1-UI-FORGOT-PASSWORD
+    to: REQ-1-API-FP-VERIFY-SMS
+    relation: CALLS
+  - from: REQ-1-UI-FORGOT-PASSWORD
+    to: REQ-1-API-FP-RESET
+    relation: CALLS
+  - from: REQ-1-API-REGISTER
+    to: REQ-1-FUNC-REGISTER
+    relation: CALLS
+  - from: REQ-1
+    to: REQ-1-API-FP-VERIFY-USER
+    relation: DEFINES
+  - from: REQ-1-API-FP-VERIFY-USER
+    to: REQ-1-FUNC-FP-VERIFY-USER
+    relation: CALLS
+  - from: REQ-1
+    to: REQ-1-API-FP-VERIFY-SMS
+    relation: DEFINES
+  - from: REQ-1
+    to: REQ-1-API-FP-RESET
+    relation: DEFINES
+  - from: REQ-1-API-FP-RESET
+    to: REQ-1-FUNC-FP-RESET
+    relation: CALLS

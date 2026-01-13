@@ -97,16 +97,21 @@ router.post('/send-sms', (req, res) => {
 });
 
 router.post('/forgot-password/verify-user', (req, res) => {
-  const { phone, idNumber } = req.body;
-  if (!phone || !idNumber) {
+  const { phone, idNumber, idType } = req.body;
+  console.log('Verify User Request:', { phone, idNumber, idType });
+  if (!phone || !idNumber || !idType) {
     return res.status(400).json({ code: 400, message: 'Missing required fields' });
   }
 
-  db.get("SELECT id FROM users WHERE phone = ? AND id_number = ?", [phone, idNumber], (err, row) => {
+  db.get("SELECT id, id_type FROM users WHERE phone = ? AND id_number = ?", [phone, idNumber], (err, row) => {
+    console.log('DB Result:', err, row);
     if (err) {
       return res.status(500).json({ code: 500, message: 'Database error' });
     }
     if (!row) {
+      return res.status(404).json({ code: 404, message: 'User not found or information mismatch' });
+    }
+    if (row.id_type !== idType) {
       return res.status(404).json({ code: 404, message: 'User not found or information mismatch' });
     }
     res.status(200).json({ code: 200, message: 'User verified' });

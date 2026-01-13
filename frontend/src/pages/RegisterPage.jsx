@@ -183,6 +183,20 @@ const RegisterPage = () => {
             </div>
 
             <div className="form-row">
+              <label htmlFor="realName">姓名：</label>
+              <div className="input-wrapper">
+                <input 
+                  id="realName"
+                  name="realName" 
+                  value={formData.realName} 
+                  onChange={handleChange} 
+                  onBlur={handleBlur}
+                  placeholder="请输入真实姓名"
+                />
+              </div>
+            </div>
+
+            <div className="form-row">
               <label htmlFor="idType">证件类型：</label>
               <div className="input-wrapper">
                 <select id="idType" name="idType" value={formData.idType} onChange={handleChange}>

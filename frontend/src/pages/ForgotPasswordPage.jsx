@@ -32,7 +32,8 @@ const ForgotPasswordPage = () => {
     try {
       const response = await axios.post('/api/auth/forgot-password/verify-user', {
         phone: formData.phone,
-        idNumber: formData.idNumber
+        idNumber: formData.idNumber,
+        idType: formData.idType
       });
       if (response.data.code === 200) {
         setError('');

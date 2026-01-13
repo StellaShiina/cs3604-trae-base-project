@@ -66,12 +66,13 @@ LoginModal:
 REQ-1-UI-REGISTER:
   related_req_id: REQ-1
   path: frontend/src/pages/RegisterPage.jsx
-  description: User registration page with real-time validation and async username check
+  description: User Registration Page with Real Name, ID, Phone, Password Strength
   upstream_ids:
     - REQ-1-API-REGISTER
     - REQ-1-API-CHECK-USERNAME
   downstream_ids:
     - REQ-1-API-REGISTER
+    - REQ-1-API-CHECK-USERNAME
 REQ-1-UI-LOGIN:
   related_req_id: REQ-1-2
   path: frontend/src/pages/LoginPage.jsx
@@ -79,3 +80,12 @@ REQ-1-UI-LOGIN:
   upstream_ids:
     - REQ-1-API-LOGIN
   downstream_ids: []
+REQ-1-UI-FORGOT-PASSWORD:
+  related_req_id: REQ-1
+  path: frontend/src/pages/ForgotPasswordPage.jsx
+  description: Forgot Password Page with 4-step wizard
+  upstream_ids: []
+  downstream_ids:
+    - REQ-1-API-FP-VERIFY-USER
+    - REQ-1-API-FP-VERIFY-SMS
+    - REQ-1-API-FP-RESET

@@ -5,10 +5,14 @@
   artifacts:
     ui_ids:
       - REQ-1-UI-REGISTER
+      - REQ-1-UI-FORGOT-PASSWORD
     api_ids:
       - REQ-1-API-REGISTER
       - REQ-1-API-LOGIN
       - REQ-1-API-CHECK-USERNAME
+      - REQ-1-API-FP-VERIFY-USER
+      - REQ-1-API-FP-VERIFY-SMS
+      - REQ-1-API-FP-RESET
     func_ids:
       - REQ-1-FUNC-CHECK-USER
 - id: REQ-1-1
@@ -23,7 +27,7 @@
     func_ids:
       - REQ-1-FUNC-LOGIN
 - id: REQ-1-3
-  status: unprocessed
+  status: processed
 - id: REQ-2
   status: unprocessed
 - id: REQ-3
