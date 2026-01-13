@@ -22,3 +22,11 @@ API-Register:
     - DB-Init
   downstream_ids:
     - UI-RegisterPage
+API-Login:
+  related_req_id: REQ-1-2
+  path: backend/src/routes/auth.js
+  signature: POST /api/auth/login
+  upstream_ids:
+    - DB-Init
+  downstream_ids:
+    - UI-LoginPage

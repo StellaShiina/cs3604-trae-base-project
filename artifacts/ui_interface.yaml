@@ -16,3 +16,10 @@ UI-RegisterPage:
   upstream_ids:
     - API-Auth
   downstream_ids: []
+UI-LoginPage:
+  related_req_id: REQ-1-2
+  path: frontend/src/pages/LoginPage.jsx
+  description: User Login Page with account and QR code login modes
+  upstream_ids:
+    - API-Login
+  downstream_ids: []

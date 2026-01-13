@@ -30,7 +30,53 @@ router.post('/register', (req, res) => {
 });
 
 router.post('/login', (req, res) => {
-  res.status(501).json({ message: 'Not Implemented' });
+  const { username, password, idLast4, smsCode } = req.body;
+
+  if (!username || !password || !idLast4 || !smsCode) {
+    return res.status(400).json({ code: 400, message: 'Missing required fields' });
+  }
+
+  // 1. Verify SMS Code (Mock)
+  if (smsCode !== '123456') {
+    return res.status(401).json({ code: 401, message: 'Invalid SMS code' });
+  }
+
+  // 2. Find User
+  db.get("SELECT * FROM users WHERE username = ? OR phone = ? OR email = ?", [username, username, username], (err, user) => {
+    if (err) {
+      return res.status(500).json({ code: 500, message: 'Database error' });
+    }
+    if (!user) {
+      return res.status(401).json({ code: 401, message: 'Invalid credentials' });
+    }
+
+    // 3. Verify Password
+    if (user.password !== password) {
+      return res.status(401).json({ code: 401, message: 'Invalid credentials' });
+    }
+
+    // 4. Verify ID Last 4 Digits
+    const actualIdLast4 = user.id_number.slice(-4);
+    if (actualIdLast4 !== idLast4) {
+      return res.status(401).json({ code: 401, message: 'Invalid ID verification' });
+    }
+
+    // Success
+    res.status(200).json({ 
+      code: 200, 
+      message: 'Login successful',
+      data: {
+        userId: user.id,
+        username: user.username,
+        token: 'mock-jwt-token'
+      }
+    });
+  });
+});
+
+router.post('/send-sms', (req, res) => {
+  // Mock SMS sending
+  res.status(200).json({ code: 200, message: 'SMS sent successfully' });
 });
 
 module.exports = router;

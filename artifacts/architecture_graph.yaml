@@ -61,6 +61,14 @@ nodes:
     type: API
     path: backend/src/routes/auth.js
     signature: POST /api/auth/register
+  UI-LoginPage:
+    type: UI
+    path: frontend/src/pages/LoginPage.jsx
+    description: User Login Page with account and QR code login modes
+  API-Login:
+    type: API
+    path: backend/src/routes/auth.js
+    signature: POST /api/auth/login
 edges:
   - from: ROOT
     to: REQ-1
@@ -139,4 +147,16 @@ edges:
     relation: CALLS
   - from: API-Register
     to: UI-RegisterPage
+    relation: CALLS
+  - from: REQ-1-2
+    to: UI-LoginPage
+    relation: DEFINES
+  - from: API-Login
+    to: UI-LoginPage
+    relation: CALLS
+  - from: REQ-1-2
+    to: API-Login
+    relation: DEFINES
+  - from: DB-Init
+    to: API-Login
     relation: CALLS

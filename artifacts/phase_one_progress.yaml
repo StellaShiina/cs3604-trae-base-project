@@ -20,7 +20,12 @@
     api_ids:
       - API-Register
 - id: REQ-1-2
-  status: unprocessed
+  status: processed
+  artifacts:
+    ui_ids:
+      - UI-LoginPage
+    api_ids:
+      - API-Login
 - id: REQ-1-3
   status: unprocessed
 - id: REQ-2
