@@ -86,3 +86,18 @@ api_passengers_list:
     - OrderPage
   downstream_ids:
     - db_passengers_select
+REQ-1-API-REGISTER:
+  related_req_id: REQ-1
+  path: backend/src/routes/auth.js
+  signature: POST /auth/register
+  upstream_ids:
+    - REQ-1-UI-REGISTER
+  downstream_ids:
+    - REQ-1-DB-USERS
+REQ-1-API-LOGIN:
+  related_req_id: REQ-1
+  path: backend/src/routes/auth.js
+  signature: POST /auth/login
+  upstream_ids: []
+  downstream_ids:
+    - REQ-1-DB-USERS

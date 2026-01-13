@@ -39,6 +39,18 @@ nodes:
     type: UI
     path: frontend/src/components/LoginModal.jsx
     description: 登录弹窗组件，用于在非登录状态下拦截操作并提供登录功能
+  REQ-1-UI-REGISTER:
+    type: UI
+    path: frontend/src/pages/RegisterPage.jsx
+    description: User registration page with form validation
+  REQ-1-API-REGISTER:
+    type: API
+    path: backend/src/routes/auth.js
+    signature: POST /auth/register
+  REQ-1-API-LOGIN:
+    type: API
+    path: backend/src/routes/auth.js
+    signature: POST /auth/login
 edges:
   - from: ROOT
     to: REQ-1
@@ -69,4 +81,22 @@ edges:
     relation: DEFINES
   - from: SearchPage
     to: LoginModal
+    relation: CALLS
+  - from: REQ-1
+    to: REQ-1-UI-REGISTER
+    relation: DEFINES
+  - from: REQ-1-UI-REGISTER
+    to: REQ-1-API-REGISTER
+    relation: CALLS
+  - from: REQ-1
+    to: REQ-1-API-REGISTER
+    relation: DEFINES
+  - from: REQ-1-API-REGISTER
+    to: REQ-1-DB-USERS
+    relation: CALLS
+  - from: REQ-1
+    to: REQ-1-API-LOGIN
+    relation: DEFINES
+  - from: REQ-1-API-LOGIN
+    to: REQ-1-DB-USERS
     relation: CALLS

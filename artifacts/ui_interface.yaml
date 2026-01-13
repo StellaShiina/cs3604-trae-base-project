@@ -63,3 +63,10 @@ LoginModal:
   upstream_ids:
     - SearchPage
   downstream_ids: []
+REQ-1-UI-REGISTER:
+  related_req_id: REQ-1
+  path: frontend/src/pages/RegisterPage.jsx
+  description: User registration page with form validation
+  upstream_ids: []
+  downstream_ids:
+    - REQ-1-API-REGISTER

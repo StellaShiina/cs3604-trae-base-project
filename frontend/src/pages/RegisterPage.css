@@ -1,58 +1,73 @@
 .register-container {
   max-width: 800px;
-  margin: 0 auto;
+  margin: 20px auto;
   padding: 20px;
-  background-color: #fff;
+  background: white;
   border: 1px solid #ddd;
-  margin-top: 30px;
 }
 
 .register-header {
-  border-bottom: 2px solid #3b99fc;
-  margin-bottom: 20px;
+  border-bottom: 2px solid #ff8c00;
   padding-bottom: 10px;
-}
-
-.form-group {
-  margin-bottom: 15px;
-  display: flex;
-  align-items: center;
-}
-
-.form-group label {
-  width: 120px;
-  text-align: right;
-  margin-right: 15px;
+  margin-bottom: 20px;
+  font-size: 18px;
   font-weight: bold;
 }
 
-.form-group input, .form-group select {
+.register-form .form-row {
+  display: flex;
+  margin-bottom: 15px;
+  align-items: center;
+}
+
+.register-form label {
+  width: 120px;
+  text-align: right;
+  margin-right: 15px;
+  font-size: 14px;
+}
+
+.register-form .input-wrapper {
+  flex: 1;
+  position: relative;
+}
+
+.register-form input, .register-form select {
+  width: 100%;
+  max-width: 300px;
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  flex: 1;
-  max-width: 300px;
 }
 
-.phone-input-group {
-  display: flex;
-  flex: 1;
-  max-width: 300px;
-}
-
-.phone-input-group .area-code {
-  width: 70px;
-  margin-right: 5px;
-}
-
-.error-msg {
+.validation-message {
   color: red;
   font-size: 12px;
   margin-left: 10px;
 }
 
-.btn-submit {
-  background-color: #ff8001;
+.password-strength {
+  display: inline-block;
+  margin-left: 10px;
+  width: 100px;
+  height: 10px;
+  background: #eee;
+  border-radius: 5px;
+  position: relative;
+}
+
+.password-strength .bar {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.3s, background 0.3s;
+}
+
+.strength-low { width: 33%; background: red; }
+.strength-medium { width: 66%; background: orange; }
+.strength-high { width: 100%; background: green; }
+
+.submit-btn {
+  background-color: #ff8c00;
   color: white;
   padding: 10px 40px;
   border: none;
@@ -62,11 +77,7 @@
   margin-left: 135px;
 }
 
-.btn-submit:hover {
-  background-color: #e67300;
-}
-
-.strength-meter {
-  margin-left: 10px;
-  font-size: 12px;
+.submit-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
