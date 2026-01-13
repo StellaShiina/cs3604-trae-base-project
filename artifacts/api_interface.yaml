@@ -96,11 +96,13 @@ REQ-1-API-REGISTER:
     - REQ-1-DB-USERS
 REQ-1-API-LOGIN:
   related_req_id: REQ-1
-  path: backend/src/routes/auth.js
-  signature: POST /auth/login
-  upstream_ids: []
+  path: /api/auth/login
+  signature: POST (username, password, idLast4, smsCode) -> { token, user }
+  upstream_ids:
+    - REQ-1-FUNC-LOGIN
   downstream_ids:
     - REQ-1-DB-USERS
+    - REQ-1-UI-LOGIN
 REQ-1-API-CHECK-USERNAME:
   related_req_id: REQ-1
   path: /api/auth/check-username

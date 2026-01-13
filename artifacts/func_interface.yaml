@@ -12,3 +12,10 @@ REQ-1-FUNC-CHECK-USER:
   upstream_ids: []
   db_tables:
     - users
+REQ-1-FUNC-LOGIN:
+  related_req_id: REQ-1-2
+  path: backend/src/routes/auth.js
+  signature: db.get(SELECT * FROM users WHERE username/phone/email = ?)
+  upstream_ids: []
+  db_tables:
+    - users

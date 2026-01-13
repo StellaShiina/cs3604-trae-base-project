@@ -72,3 +72,10 @@ REQ-1-UI-REGISTER:
     - REQ-1-API-CHECK-USERNAME
   downstream_ids:
     - REQ-1-API-REGISTER
+REQ-1-UI-LOGIN:
+  related_req_id: REQ-1-2
+  path: frontend/src/pages/LoginPage.jsx
+  description: Login Page with Account/QR tabs and 2FA verification modal
+  upstream_ids:
+    - REQ-1-API-LOGIN
+  downstream_ids: []

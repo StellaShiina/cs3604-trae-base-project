@@ -49,8 +49,8 @@ nodes:
     signature: POST /auth/register
   REQ-1-API-LOGIN:
     type: API
-    path: backend/src/routes/auth.js
-    signature: POST /auth/login
+    path: /api/auth/login
+    signature: POST (username, password, idLast4, smsCode) -> { token, user }
   REQ-1-API-CHECK-USERNAME:
     type: API
     path: /api/auth/check-username
@@ -59,6 +59,16 @@ nodes:
     type: FUNC
     path: backend/src/routes/auth.js
     signature: db.get(SELECT id FROM users WHERE username = ?)
+    db_tables:
+      - users
+  REQ-1-UI-LOGIN:
+    type: UI
+    path: frontend/src/pages/LoginPage.jsx
+    description: Login Page with Account/QR tabs and 2FA verification modal
+  REQ-1-FUNC-LOGIN:
+    type: FUNC
+    path: backend/src/routes/auth.js
+    signature: db.get(SELECT * FROM users WHERE username/phone/email = ?)
     db_tables:
       - users
 edges:
@@ -127,4 +137,19 @@ edges:
     relation: CALLS
   - from: REQ-1
     to: REQ-1-FUNC-CHECK-USER
+    relation: DEFINES
+  - from: REQ-1-2
+    to: REQ-1-UI-LOGIN
+    relation: DEFINES
+  - from: REQ-1-API-LOGIN
+    to: REQ-1-UI-LOGIN
+    relation: CALLS
+  - from: REQ-1-2
+    to: REQ-1-API-LOGIN
+    relation: DEFINES
+  - from: REQ-1-FUNC-LOGIN
+    to: REQ-1-API-LOGIN
+    relation: CALLS
+  - from: REQ-1-2
+    to: REQ-1-FUNC-LOGIN
     relation: DEFINES

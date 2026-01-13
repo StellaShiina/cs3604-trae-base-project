@@ -14,7 +14,14 @@
 - id: REQ-1-1
   status: processed
 - id: REQ-1-2
-  status: unprocessed
+  status: processed
+  artifacts:
+    ui_ids:
+      - REQ-1-UI-LOGIN
+    api_ids:
+      - REQ-1-API-LOGIN
+    func_ids:
+      - REQ-1-FUNC-LOGIN
 - id: REQ-1-3
   status: unprocessed
 - id: REQ-2
