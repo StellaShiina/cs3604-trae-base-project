@@ -1,5 +1,10 @@
 - id: ROOT
   status: processed
+  artifacts:
+    ui_ids:
+      - HomePage
+    api_ids:
+      - API-Root
 - id: REQ-1
   status: unprocessed
 - id: REQ-1-1

@@ -35,6 +35,14 @@ nodes:
     type: REQUIREMENT
     name: 个人中心
     description: 提供个人信息查看、订单查询与乘车人管理，参考图片：[image](./assets/self.png)、[image](./assets/orders.png)、[image](./assets/passenger.png)。
+  HomePage:
+    type: UI
+    path: frontend/src/pages/HomePage.jsx
+    description: Main Homepage Component
+  API-Root:
+    type: API
+    path: backend/src/index.js
+    signature: GET /
 edges:
   - from: ROOT
     to: REQ-1
@@ -60,3 +68,24 @@ edges:
   - from: ROOT
     to: REQ-5
     relation: HAS_CHILD
+  - from: ROOT
+    to: HomePage
+    relation: DEFINES
+  - from: HomePage
+    to: REQ-1
+    relation: CALLS
+  - from: HomePage
+    to: REQ-2
+    relation: CALLS
+  - from: HomePage
+    to: REQ-3
+    relation: CALLS
+  - from: HomePage
+    to: REQ-4
+    relation: CALLS
+  - from: HomePage
+    to: REQ-5
+    relation: CALLS
+  - from: ROOT
+    to: API-Root
+    relation: DEFINES

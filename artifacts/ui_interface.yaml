@@ -1,0 +1,11 @@
+HomePage:
+  related_req_id: ROOT
+  path: frontend/src/pages/HomePage.jsx
+  description: Main Homepage Component
+  upstream_ids: []
+  downstream_ids:
+    - REQ-1
+    - REQ-2
+    - REQ-3
+    - REQ-4
+    - REQ-5
