@@ -95,6 +95,13 @@ nodes:
       - stations
       - trains
       - train_station_mapping
+  REQ-4-SCE-0-DB-INIT:
+    type: FUNC
+    path: backend/src/database/init_db.js
+    signature: init_db.js:createOrderTables
+    db_tables:
+      - orders
+      - order_items
 edges:
   - from: ROOT
     to: REQ-1
@@ -209,4 +216,7 @@ edges:
     relation: CALLS
   - from: REQ-2:SCE-0
     to: REQ-2-SCE-0-DB-INIT
+    relation: DEFINES
+  - from: REQ-4:SCE-0
+    to: REQ-4-SCE-0-DB-INIT
     relation: DEFINES

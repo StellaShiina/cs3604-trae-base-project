@@ -36,6 +36,6 @@
     ui_ids:
       - LoginModal
 - id: REQ-4
-  status: unprocessed
+  status: processed
 - id: REQ-5
   status: unprocessed

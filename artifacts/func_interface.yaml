@@ -27,3 +27,10 @@ REQ-2-SCE-0-DB-INIT:
     - stations
     - trains
     - train_station_mapping
+REQ-4-SCE-0-DB-INIT:
+  related_req_id: REQ-4:SCE-0
+  path: backend/src/database/init_db.js
+  signature: init_db.js:createOrderTables
+  db_tables:
+    - orders
+    - order_items

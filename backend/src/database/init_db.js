@@ -95,7 +95,7 @@ function initTables() {
       FOREIGN KEY(train_id) REFERENCES trains(id)
     )`);
 
-    db.run(`CREATE TABLE IF NOT EXISTS order_tickets (
+    db.run(`CREATE TABLE IF NOT EXISTS order_items (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       order_id INTEGER,
       passenger_id INTEGER,
