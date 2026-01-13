@@ -19,3 +19,11 @@ REQ-1-FUNC-LOGIN:
   upstream_ids: []
   db_tables:
     - users
+REQ-2-SCE-0-DB-INIT:
+  related_req_id: REQ-2:SCE-0
+  path: backend/src/database/init_db.js
+  signature: init_db.js:createTables,seedData
+  db_tables:
+    - stations
+    - trains
+    - train_station_mapping

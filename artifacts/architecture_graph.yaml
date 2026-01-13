@@ -87,6 +87,14 @@ nodes:
     type: API
     path: backend/src/routes/auth.js
     signature: POST /api/auth/forgot-password/reset
+  REQ-2-SCE-0-DB-INIT:
+    type: FUNC
+    path: backend/src/database/init_db.js
+    signature: init_db.js:createTables,seedData
+    db_tables:
+      - stations
+      - trains
+      - train_station_mapping
 edges:
   - from: ROOT
     to: REQ-1
@@ -199,3 +207,6 @@ edges:
   - from: REQ-1-API-FP-RESET
     to: REQ-1-FUNC-FP-RESET
     relation: CALLS
+  - from: REQ-2:SCE-0
+    to: REQ-2-SCE-0-DB-INIT
+    relation: DEFINES
