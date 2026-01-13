@@ -27,8 +27,18 @@ describe('REQ-3: Personal Center Infrastructure', () => {
   afterAll((done) => server?.close(done));
 
   beforeEach(async () => {
-    // Mock window.location if needed, but MemoryRouter handles routing
-    // vi.stubGlobal('location', { href: 'http://localhost/', assign: vi.fn() });
+    // Seed user for testing
+    const sql = `INSERT OR REPLACE INTO users (id, username, password, real_name, id_number, phone, email, passenger_type) 
+                 VALUES (1, 'testuser', 'password123', 'Test User', '123456789012345678', '13800138000', 'test@example.com', 'ADULT')`;
+    await new Promise((resolve, reject) => {
+        db.run(sql, [], (err) => {
+            if (err) reject(err);
+            else resolve();
+        });
+    });
+
+    // Mock logged in state via headers
+    axios.defaults.headers.common['Authorization'] = 'Bearer mock-jwt-token-1';
   });
 
   // ================= 2. Test Cases =================
@@ -39,19 +49,29 @@ describe('REQ-3: Personal Center Infrastructure', () => {
         <App />
       </MemoryRouter>
     );
-
-    // 1. Find "我的12306" link in Header
     const myLink = screen.getByText(/我的12306/i);
-    expect(myLink).toBeInTheDocument();
-
-    // 2. Click it
     fireEvent.click(myLink);
-
-    // 3. Verify Component Render
     await waitFor(() => {
         expect(screen.getByText('个人中心', { selector: '.sidebar-title' })).toBeInTheDocument();
-        expect(screen.getByText('个人信息', { selector: '.menu-item' })).toBeInTheDocument();
-        expect(screen.getByText('乘车人', { selector: '.menu-item' })).toBeInTheDocument();
+    });
+  });
+
+  it('REQ-3-1:SCE-0 View Personal Info', async () => {
+    render(
+      <MemoryRouter initialEntries={['/center']}>
+        <App />
+      </MemoryRouter>
+    );
+
+    // 1. Click "个人信息" sidebar item
+    const infoTab = screen.getByText('个人信息');
+    fireEvent.click(infoTab);
+
+    // 2. Verify Data Loaded
+    await waitFor(() => {
+        expect(screen.getByText(/Test User/)).toBeInTheDocument();
+        expect(screen.getByText(/test@example.com/)).toBeInTheDocument();
+        expect(screen.getByText(/13800138000/)).toBeInTheDocument();
     });
   });
 

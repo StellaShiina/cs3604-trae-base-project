@@ -106,6 +106,10 @@ nodes:
     type: UI
     path: frontend/src/pages/PersonalCenterPage.jsx
     description: Personal Center Layout with Sidebar and Route
+  REQ-3-1-API-GET-ME:
+    type: API
+    path: backend/src/routes/users.js
+    signature: GET /api/users/me
 edges:
   - from: ROOT
     to: REQ-1
@@ -228,5 +232,11 @@ edges:
     to: REQ-3-UI-CENTER
     relation: DEFINES
   - from: REQ-1-UI-LOGIN
+    to: REQ-3-UI-CENTER
+    relation: CALLS
+  - from: REQ-3-1:SCE-0
+    to: REQ-3-1-API-GET-ME
+    relation: DEFINES
+  - from: REQ-3-1-API-GET-ME
     to: REQ-3-UI-CENTER
     relation: CALLS

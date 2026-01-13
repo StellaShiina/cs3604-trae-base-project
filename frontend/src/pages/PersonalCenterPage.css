@@ -57,3 +57,25 @@
     flex: 1;
     padding: 20px;
 }
+
+.info-panel {
+    padding: 20px;
+    border: 1px solid #eee;
+    background-color: #fff;
+}
+
+.info-item {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.info-item label {
+    width: 100px;
+    font-weight: bold;
+    color: #666;
+}
+
+.info-item span {
+    color: #333;
+}

@@ -136,3 +136,10 @@ REQ-1-API-FP-RESET:
     - REQ-1-UI-FORGOT-PASSWORD
   downstream_ids:
     - REQ-1-FUNC-FP-RESET
+REQ-3-1-API-GET-ME:
+  related_req_id: REQ-3-1:SCE-0
+  path: backend/src/routes/users.js
+  signature: GET /api/users/me
+  upstream_ids: []
+  downstream_ids:
+    - REQ-3-UI-CENTER
