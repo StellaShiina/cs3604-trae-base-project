@@ -8,8 +8,11 @@
     api_ids:
       - REQ-1-API-REGISTER
       - REQ-1-API-LOGIN
+      - REQ-1-API-CHECK-USERNAME
+    func_ids:
+      - REQ-1-FUNC-CHECK-USER
 - id: REQ-1-1
-  status: unprocessed
+  status: processed
 - id: REQ-1-2
   status: unprocessed
 - id: REQ-1-3

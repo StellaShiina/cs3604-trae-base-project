@@ -54,6 +54,7 @@
   background: #eee;
   border-radius: 5px;
   position: relative;
+  vertical-align: middle;
 }
 
 .password-strength .bar {
@@ -80,4 +81,20 @@
 .submit-btn:disabled {
   background-color: #ccc;
   cursor: not-allowed;
+}
+
+/* Phone Input Styling */
+.phone-wrapper {
+  display: flex;
+  align-items: center;
+  max-width: 300px;
+}
+
+.phone-prefix {
+  width: 120px !important;
+  margin-right: 5px;
+}
+
+.phone-input {
+  flex: 1;
 }

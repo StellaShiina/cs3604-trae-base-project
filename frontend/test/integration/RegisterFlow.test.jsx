@@ -22,27 +22,84 @@ describe('Integration: Registration Flow', () => {
     expect(screen.getByText('密码：')).toBeInTheDocument();
   });
 
-  it('validates username format', async () => {
-    render(
-      <MemoryRouter>
-        <RegisterPage />
-      </MemoryRouter>
-    );
+  // Layer 2 & 3: 交互与验证
+  it('validates username availability on blur', async () => {
+    // Mock check-username response for existing user
+    axios.get.mockResolvedValueOnce({ data: { available: false } });
 
+    render(<MemoryRouter><RegisterPage /></MemoryRouter>);
+    
     const usernameInput = screen.getByLabelText('用户名：');
-    fireEvent.change(usernameInput, { target: { value: '123' } }); // Invalid start
+    fireEvent.change(usernameInput, { target: { value: 'existing_user' } });
     fireEvent.blur(usernameInput);
+    
+    try {
+      await waitFor(() => {
+        expect(axios.get).toHaveBeenCalled();
+        expect(screen.getByText('用户名已被占用')).toBeInTheDocument();
+      });
+    } catch (e) {
+      console.error('Test Failed. Axios calls:', axios.get.mock.calls);
+      throw e;
+    }
+  });
 
+  it('renders phone area code selector', () => {
+    render(<MemoryRouter><RegisterPage /></MemoryRouter>);
+    expect(screen.getByRole('combobox', { name: /mobile-prefix/i })).toBeInTheDocument();
+  });
+
+  it('validates id number format', async () => {
+    render(<MemoryRouter><RegisterPage /></MemoryRouter>);
+    const idInput = screen.getByLabelText('证件号码：');
+    fireEvent.change(idInput, { target: { value: '123' } });
+    fireEvent.blur(idInput);
     await waitFor(() => {
-      expect(screen.getByText('用户名格式错误')).toBeInTheDocument();
+      expect(screen.getByText('身份证号码格式错误')).toBeInTheDocument();
+    });
+    
+    fireEvent.change(idInput, { target: { value: '110101199001018888' } }); // Valid ID
+    fireEvent.blur(idInput);
+    await waitFor(() => {
+      expect(screen.queryByText('身份证号码格式错误')).not.toBeInTheDocument();
+    });
+  });
+
+  it('validates phone number format', async () => {
+    render(<MemoryRouter><RegisterPage /></MemoryRouter>);
+    const phoneInput = screen.getByLabelText('手机号码：');
+    fireEvent.change(phoneInput, { target: { value: '123' } });
+    fireEvent.blur(phoneInput);
+    await waitFor(() => {
+      expect(screen.getByText('手机号码格式错误')).toBeInTheDocument();
     });
 
-    fireEvent.change(usernameInput, { target: { value: 'ValidUser123' } });
-    fireEvent.blur(usernameInput);
-
+    fireEvent.change(phoneInput, { target: { value: '13800138000' } }); // Valid Phone
+    fireEvent.blur(phoneInput);
     await waitFor(() => {
-      expect(screen.queryByText('用户名格式错误')).not.toBeInTheDocument();
+      expect(screen.queryByText('手机号码格式错误')).not.toBeInTheDocument();
     });
+  });
+
+  it('updates password strength indicator', async () => {
+    render(<MemoryRouter><RegisterPage /></MemoryRouter>);
+    const passwordInput = screen.getByLabelText('密码：');
+    
+    // Weak
+    fireEvent.change(passwordInput, { target: { value: '123456' } });
+    // Expect bar to be red or class to be strength-low (implementation detail)
+    // The component has className={`password-strength strength-...`}
+    // let's check class existence via container
+    const strengthBar = passwordInput.parentElement.querySelector('.password-strength');
+    expect(strengthBar).toHaveClass('strength-low');
+
+    // Medium
+    fireEvent.change(passwordInput, { target: { value: '123456a' } });
+    expect(strengthBar).toHaveClass('strength-medium');
+
+    // Strong
+    fireEvent.change(passwordInput, { target: { value: '123456a@' } });
+    expect(strengthBar).toHaveClass('strength-high');
   });
 
   it('validates password mismatch', async () => {

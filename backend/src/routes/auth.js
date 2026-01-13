@@ -29,6 +29,23 @@ router.post('/register', (req, res) => {
   });
 });
 
+router.get('/check-username', (req, res) => {
+  const { username } = req.query;
+  if (!username) {
+    return res.status(400).json({ code: 400, message: 'Username is required' });
+  }
+
+  db.get("SELECT id FROM users WHERE username = ?", [username], (err, row) => {
+    if (err) {
+      return res.status(500).json({ code: 500, message: 'Database error' });
+    }
+    if (row) {
+      return res.status(200).json({ code: 200, available: false, message: 'Username already exists' });
+    }
+    res.status(200).json({ code: 200, available: true, message: 'Username available' });
+  });
+});
+
 router.post('/login', (req, res) => {
   const { username, password, idLast4, smsCode } = req.body;
 

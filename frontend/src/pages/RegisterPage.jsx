@@ -77,9 +77,25 @@ const RegisterPage = () => {
     return error;
   };
 
-  const handleBlur = (e) => {
+  const handleBlur = async (e) => {
     const { name, value } = e.target;
-    const error = validateField(name, value);
+    let error = validateField(name, value);
+    
+    // console.error(`[DEBUG] Blur: ${name}, Value: ${value}, Error: ${error}`);
+
+    if (name === 'username' && !error && value) {
+      try {
+        // console.error('[DEBUG] Calling check-username...');
+        const res = await axios.get(`/api/auth/check-username?username=${value}`);
+        // console.error('[DEBUG] check-username res:', res.data);
+        if (!res.data.available) {
+          error = '用户名已被占用';
+        }
+      } catch (err) {
+        console.error('Failed to check username availability', err);
+      }
+    }
+
     if (error) {
       setErrors(prev => ({ ...prev, [name]: error }));
     }
@@ -193,13 +209,20 @@ const RegisterPage = () => {
 
              <div className="form-row">
               <label htmlFor="phone">手机号码：</label>
-              <div className="input-wrapper">
+              <div className="input-wrapper phone-wrapper">
+                <select className="phone-prefix" aria-label="mobile-prefix">
+                  <option value="+86">+86 中国</option>
+                  <option value="+852">+852 香港</option>
+                  <option value="+853">+853 澳门</option>
+                  <option value="+886">+886 台湾</option>
+                </select>
                 <input 
                   id="phone"
                   name="phone" 
                   value={formData.phone} 
                   onChange={handleChange} 
                   onBlur={handleBlur}
+                  className="phone-input"
                 />
                 {errors.phone && <span className="validation-message">{errors.phone}</span>}
               </div>

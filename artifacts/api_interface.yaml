@@ -101,3 +101,12 @@ REQ-1-API-LOGIN:
   upstream_ids: []
   downstream_ids:
     - REQ-1-DB-USERS
+REQ-1-API-CHECK-USERNAME:
+  related_req_id: REQ-1
+  path: /api/auth/check-username
+  signature: 'GET (username) -> { available: boolean }'
+  upstream_ids:
+    - REQ-1-UI-REGISTER
+    - REQ-1-FUNC-CHECK-USER
+  downstream_ids:
+    - REQ-1-UI-REGISTER

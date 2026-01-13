@@ -5,3 +5,10 @@ DB-Init:
   upstream_ids: []
   db_tables:
     - users
+REQ-1-FUNC-CHECK-USER:
+  related_req_id: REQ-1
+  path: backend/src/routes/auth.js
+  signature: db.get(SELECT id FROM users WHERE username = ?)
+  upstream_ids: []
+  db_tables:
+    - users

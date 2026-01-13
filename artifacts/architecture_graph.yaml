@@ -42,7 +42,7 @@ nodes:
   REQ-1-UI-REGISTER:
     type: UI
     path: frontend/src/pages/RegisterPage.jsx
-    description: User registration page with form validation
+    description: User registration page with real-time validation and async username check
   REQ-1-API-REGISTER:
     type: API
     path: backend/src/routes/auth.js
@@ -51,6 +51,16 @@ nodes:
     type: API
     path: backend/src/routes/auth.js
     signature: POST /auth/login
+  REQ-1-API-CHECK-USERNAME:
+    type: API
+    path: /api/auth/check-username
+    signature: 'GET (username) -> { available: boolean }'
+  REQ-1-FUNC-CHECK-USER:
+    type: FUNC
+    path: backend/src/routes/auth.js
+    signature: db.get(SELECT id FROM users WHERE username = ?)
+    db_tables:
+      - users
 edges:
   - from: ROOT
     to: REQ-1
@@ -100,3 +110,21 @@ edges:
   - from: REQ-1-API-LOGIN
     to: REQ-1-DB-USERS
     relation: CALLS
+  - from: REQ-1
+    to: REQ-1-API-CHECK-USERNAME
+    relation: DEFINES
+  - from: REQ-1-UI-REGISTER
+    to: REQ-1-API-CHECK-USERNAME
+    relation: CALLS
+  - from: REQ-1-FUNC-CHECK-USER
+    to: REQ-1-API-CHECK-USERNAME
+    relation: CALLS
+  - from: REQ-1-API-CHECK-USERNAME
+    to: REQ-1-UI-REGISTER
+    relation: CALLS
+  - from: REQ-1-API-REGISTER
+    to: REQ-1-UI-REGISTER
+    relation: CALLS
+  - from: REQ-1
+    to: REQ-1-FUNC-CHECK-USER
+    relation: DEFINES
