@@ -30,3 +30,24 @@ API-Login:
     - DB-Init
   downstream_ids:
     - UI-LoginPage
+api_forgot_verify_user:
+  related_req_id: REQ-1-3
+  path: backend/src/routes/auth.js
+  signature: POST /api/auth/forgot-password/verify-user
+  upstream_ids:
+    - ui_forgot_password
+  downstream_ids: []
+api_forgot_verify_sms:
+  related_req_id: REQ-1-3
+  path: backend/src/routes/auth.js
+  signature: POST /api/auth/forgot-password/verify-sms
+  upstream_ids:
+    - ui_forgot_password
+  downstream_ids: []
+api_forgot_reset:
+  related_req_id: REQ-1-3
+  path: backend/src/routes/auth.js
+  signature: POST /api/auth/forgot-password/reset
+  upstream_ids:
+    - ui_forgot_password
+  downstream_ids: []

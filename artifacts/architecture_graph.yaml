@@ -69,6 +69,22 @@ nodes:
     type: API
     path: backend/src/routes/auth.js
     signature: POST /api/auth/login
+  ui_forgot_password:
+    type: UI
+    path: frontend/src/pages/ForgotPasswordPage.jsx
+    description: Forgot Password Page with multi-step wizard
+  api_forgot_verify_user:
+    type: API
+    path: backend/src/routes/auth.js
+    signature: POST /api/auth/forgot-password/verify-user
+  api_forgot_verify_sms:
+    type: API
+    path: backend/src/routes/auth.js
+    signature: POST /api/auth/forgot-password/verify-sms
+  api_forgot_reset:
+    type: API
+    path: backend/src/routes/auth.js
+    signature: POST /api/auth/forgot-password/reset
 edges:
   - from: ROOT
     to: REQ-1
@@ -160,3 +176,24 @@ edges:
   - from: DB-Init
     to: API-Login
     relation: CALLS
+  - from: REQ-1-3
+    to: ui_forgot_password
+    relation: DEFINES
+  - from: ui_forgot_password
+    to: api_forgot_verify_user
+    relation: CALLS
+  - from: ui_forgot_password
+    to: api_forgot_verify_sms
+    relation: CALLS
+  - from: ui_forgot_password
+    to: api_forgot_reset
+    relation: CALLS
+  - from: REQ-1-3
+    to: api_forgot_verify_user
+    relation: DEFINES
+  - from: REQ-1-3
+    to: api_forgot_verify_sms
+    relation: DEFINES
+  - from: REQ-1-3
+    to: api_forgot_reset
+    relation: DEFINES

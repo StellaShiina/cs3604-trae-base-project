@@ -79,4 +79,49 @@ router.post('/send-sms', (req, res) => {
   res.status(200).json({ code: 200, message: 'SMS sent successfully' });
 });
 
+router.post('/forgot-password/verify-user', (req, res) => {
+  const { phone, idNumber } = req.body;
+  if (!phone || !idNumber) {
+    return res.status(400).json({ code: 400, message: 'Missing required fields' });
+  }
+
+  db.get("SELECT id FROM users WHERE phone = ? AND id_number = ?", [phone, idNumber], (err, row) => {
+    if (err) {
+      return res.status(500).json({ code: 500, message: 'Database error' });
+    }
+    if (!row) {
+      return res.status(404).json({ code: 404, message: 'User not found or information mismatch' });
+    }
+    res.status(200).json({ code: 200, message: 'User verified' });
+  });
+});
+
+router.post('/forgot-password/verify-sms', (req, res) => {
+  const { phone, smsCode } = req.body;
+  // Mock SMS verification
+  if (smsCode === '123456') {
+    res.status(200).json({ code: 200, message: 'Verification successful' });
+  } else {
+    res.status(400).json({ code: 400, message: 'Invalid verification code' });
+  }
+});
+
+router.post('/forgot-password/reset', (req, res) => {
+  const { phone, newPassword } = req.body;
+  if (!phone || !newPassword) {
+    return res.status(400).json({ code: 400, message: 'Missing required fields' });
+  }
+
+  const sql = "UPDATE users SET password = ? WHERE phone = ?";
+  db.run(sql, [newPassword, phone], function(err) {
+    if (err) {
+      return res.status(500).json({ code: 500, message: 'Database error' });
+    }
+    if (this.changes === 0) {
+      return res.status(404).json({ code: 404, message: 'User not found' });
+    }
+    res.status(200).json({ code: 200, message: 'Password reset successful' });
+  });
+});
+
 module.exports = router;

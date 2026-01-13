@@ -27,7 +27,14 @@
     api_ids:
       - API-Login
 - id: REQ-1-3
-  status: unprocessed
+  status: processed
+  artifacts:
+    ui_ids:
+      - ui_forgot_password
+    api_ids:
+      - api_forgot_verify_user
+      - api_forgot_verify_sms
+      - api_forgot_reset
 - id: REQ-2
   status: unprocessed
 - id: REQ-3
