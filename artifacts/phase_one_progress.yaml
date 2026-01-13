@@ -6,7 +6,12 @@
     api_ids:
       - API-Root
 - id: REQ-1
-  status: unprocessed
+  status: processed
+  artifacts:
+    api_ids:
+      - API-Auth
+    func_ids:
+      - DB-Init
 - id: REQ-1-1
   status: unprocessed
 - id: REQ-1-2

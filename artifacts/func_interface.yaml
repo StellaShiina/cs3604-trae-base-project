@@ -1,0 +1,7 @@
+DB-Init:
+  related_req_id: REQ-1
+  path: backend/src/database/init_db.js
+  signature: initTables()
+  upstream_ids: []
+  db_tables:
+    - users

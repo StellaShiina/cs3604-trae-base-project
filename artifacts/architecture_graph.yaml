@@ -43,6 +43,16 @@ nodes:
     type: API
     path: backend/src/index.js
     signature: GET /
+  API-Auth:
+    type: API
+    path: backend/src/routes/auth.js
+    signature: POST /api/auth/register, POST /api/auth/login
+  DB-Init:
+    type: FUNC
+    path: backend/src/database/init_db.js
+    signature: initTables()
+    db_tables:
+      - users
 edges:
   - from: ROOT
     to: REQ-1
@@ -88,4 +98,22 @@ edges:
     relation: CALLS
   - from: ROOT
     to: API-Root
+    relation: DEFINES
+  - from: REQ-1
+    to: API-Auth
+    relation: DEFINES
+  - from: API-Root
+    to: API-Auth
+    relation: CALLS
+  - from: API-Auth
+    to: REQ-1-1
+    relation: CALLS
+  - from: API-Auth
+    to: REQ-1-2
+    relation: CALLS
+  - from: API-Auth
+    to: REQ-1-3
+    relation: CALLS
+  - from: REQ-1
+    to: DB-Init
     relation: DEFINES

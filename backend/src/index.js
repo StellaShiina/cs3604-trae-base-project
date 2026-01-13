@@ -12,6 +12,9 @@ app.use(bodyParser.json());
 require('./database/init_db');
 
  
+const authRoutes = require('./routes/auth');
+app.use('/api/auth', authRoutes);
+
 app.get('/', (req, res) => {
   res.json({ code: 200, message: 'Backend Ready' });
 });
