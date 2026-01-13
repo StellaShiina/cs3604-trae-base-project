@@ -75,4 +75,23 @@ describe('REQ-3: Personal Center Infrastructure', () => {
     });
   });
 
+  it('REQ-3-2:SCE-0 List Passengers', async () => {
+    render(
+      <MemoryRouter initialEntries={['/center']}>
+        <App />
+      </MemoryRouter>
+    );
+
+    // 1. Click "乘车人" sidebar item
+    const passengersTab = screen.getByText('乘车人');
+    fireEvent.click(passengersTab);
+
+    // 2. Verify List Loaded
+    await waitFor(() => {
+        expect(screen.getByText('Passenger A')).toBeInTheDocument();
+        expect(screen.getByText('Passenger B')).toBeInTheDocument();
+        expect(screen.getByText('111111111111111111')).toBeInTheDocument();
+    });
+  });
+
 });

@@ -8,12 +8,15 @@ import './PersonalCenterPage.css';
 const PersonalCenterPage = () => {
   const [activeTab, setActiveTab] = useState('personal_info');
   const [userInfo, setUserInfo] = useState(null);
+  const [passengers, setPassengers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     if (activeTab === 'personal_info') {
       fetchUserInfo();
+    } else if (activeTab === 'passengers') {
+      fetchPassengers();
     }
   }, [activeTab]);
 
@@ -29,6 +32,23 @@ const PersonalCenterPage = () => {
     } catch (err) {
       console.error(err);
       setError('Failed to load user info');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchPassengers = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get('/api/passengers');
+      if (res.data.code === 200) {
+        setPassengers(res.data.data);
+      } else {
+        setError(res.data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Failed to load passengers');
     } finally {
       setLoading(false);
     }
@@ -71,6 +91,29 @@ const PersonalCenterPage = () => {
             <label>旅客类型：</label>
             <span>{userInfo.passenger_type}</span>
           </div>
+        </div>
+      );
+    } else if (activeTab === 'passengers') {
+      if (loading) return <div>Loading...</div>;
+      if (error) return <div className="error">{error}</div>;
+      
+      return (
+        <div className="passenger-list">
+           <h3>常用联系人</h3>
+           {passengers.length === 0 ? (
+             <div>暂无联系人</div>
+           ) : (
+             <ul className="passenger-items">
+               {passengers.map(p => (
+                 <li key={p.id} className="passenger-item">
+                   <span>{p.name}</span>
+                   <span>{p.id_type}</span>
+                   <span>{p.id_number}</span>
+                   <span>{p.passenger_type}</span>
+                 </li>
+               ))}
+             </ul>
+           )}
         </div>
       );
     }

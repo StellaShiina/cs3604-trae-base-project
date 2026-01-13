@@ -110,6 +110,14 @@ nodes:
     type: API
     path: backend/src/routes/users.js
     signature: GET /api/users/me
+  REQ-3-2-API-LIST-PASSENGERS:
+    type: API
+    path: /api/passengers
+    signature: GET /api/passengers
+  REQ-3-2-UI-PASSENGER-LIST:
+    type: UI
+    path: frontend/src/pages/PersonalCenterPage.jsx
+    description: Passenger List within Personal Center
 edges:
   - from: ROOT
     to: REQ-1
@@ -240,3 +248,15 @@ edges:
   - from: REQ-3-1-API-GET-ME
     to: REQ-3-UI-CENTER
     relation: CALLS
+  - from: REQ-3-2:SCE-0
+    to: REQ-3-2-API-LIST-PASSENGERS
+    relation: DEFINES
+  - from: REQ-3-UI-CENTER
+    to: REQ-3-2-API-LIST-PASSENGERS
+    relation: CALLS
+  - from: REQ-3-2-API-LIST-PASSENGERS
+    to: REQ-3-2-UI-PASSENGER-LIST
+    relation: CALLS
+  - from: REQ-3-2:SCE-0
+    to: REQ-3-2-UI-PASSENGER-LIST
+    relation: DEFINES

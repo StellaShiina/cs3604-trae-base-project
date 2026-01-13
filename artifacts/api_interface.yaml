@@ -143,3 +143,11 @@ REQ-3-1-API-GET-ME:
   upstream_ids: []
   downstream_ids:
     - REQ-3-UI-CENTER
+REQ-3-2-API-LIST-PASSENGERS:
+  related_req_id: REQ-3-2:SCE-0
+  path: /api/passengers
+  signature: GET /api/passengers
+  upstream_ids:
+    - REQ-3-UI-CENTER
+  downstream_ids:
+    - REQ-3-2-UI-PASSENGER-LIST

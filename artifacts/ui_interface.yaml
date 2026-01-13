@@ -96,3 +96,10 @@ REQ-3-UI-CENTER:
   upstream_ids:
     - REQ-1-UI-LOGIN
   downstream_ids: []
+REQ-3-2-UI-PASSENGER-LIST:
+  related_req_id: REQ-3-2:SCE-0
+  path: frontend/src/pages/PersonalCenterPage.jsx
+  description: Passenger List within Personal Center
+  upstream_ids:
+    - REQ-3-2-API-LIST-PASSENGERS
+  downstream_ids: []
