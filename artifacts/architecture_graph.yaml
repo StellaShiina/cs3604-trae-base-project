@@ -101,6 +101,18 @@ nodes:
     type: API
     path: /api/tickets/stations
     signature: GET /api/tickets/stations
+  OrderPage:
+    type: UI
+    path: frontend/src/pages/OrderPage.jsx
+    description: 订单填写页面，用于选择乘车人、查看车次信息并提交订单
+  api_orders_create:
+    type: API
+    path: backend/src/routes/orders.js
+    signature: POST /api/orders
+  api_passengers_list:
+    type: API
+    path: backend/src/routes/passengers.js
+    signature: GET /api/passengers
 edges:
   - from: ROOT
     to: REQ-1
@@ -251,4 +263,34 @@ edges:
     relation: CALLS
   - from: API-STATIONS-LIST
     to: DB-STATIONS
+    relation: CALLS
+  - from: REQ-3
+    to: OrderPage
+    relation: DEFINES
+  - from: TicketQuery
+    to: OrderPage
+    relation: CALLS
+  - from: OrderPage
+    to: PaymentPage
+    relation: CALLS
+  - from: REQ-3
+    to: api_orders_create
+    relation: DEFINES
+  - from: OrderPage
+    to: api_orders_create
+    relation: CALLS
+  - from: api_orders_create
+    to: db_orders_insert
+    relation: CALLS
+  - from: api_orders_create
+    to: db_tickets_insert
+    relation: CALLS
+  - from: REQ-3
+    to: api_passengers_list
+    relation: DEFINES
+  - from: OrderPage
+    to: api_passengers_list
+    relation: CALLS
+  - from: api_passengers_list
+    to: db_passengers_select
     relation: CALLS

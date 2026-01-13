@@ -56,6 +56,40 @@ function initTables() {
     FOREIGN KEY(from_station_id) REFERENCES stations(id),
     FOREIGN KEY(to_station_id) REFERENCES stations(id)
   )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS passengers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    name TEXT NOT NULL,
+    id_type TEXT NOT NULL,
+    id_number TEXT NOT NULL,
+    phone TEXT,
+    type TEXT NOT NULL,
+    FOREIGN KEY(user_id) REFERENCES users(id)
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS orders (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    train_id INTEGER,
+    from_station_id INTEGER,
+    to_station_id INTEGER,
+    departure_date TEXT,
+    status TEXT,
+    created_at TEXT,
+    FOREIGN KEY(user_id) REFERENCES users(id),
+    FOREIGN KEY(train_id) REFERENCES trains(id)
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS order_tickets (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id INTEGER,
+    passenger_id INTEGER,
+    seat_type TEXT,
+    price REAL,
+    FOREIGN KEY(order_id) REFERENCES orders(id),
+    FOREIGN KEY(passenger_id) REFERENCES passengers(id)
+  )`);
 }
 
 module.exports = db;

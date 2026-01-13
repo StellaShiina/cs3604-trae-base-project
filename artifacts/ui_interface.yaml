@@ -48,3 +48,11 @@ UI-TICKET-SEARCH-FORM:
     - UI-HOME-PAGE
   downstream_ids:
     - UI-SEARCH-PAGE
+OrderPage:
+  related_req_id: REQ-3
+  path: frontend/src/pages/OrderPage.jsx
+  description: 订单填写页面，用于选择乘车人、查看车次信息并提交订单
+  upstream_ids:
+    - TicketQuery
+  downstream_ids:
+    - PaymentPage

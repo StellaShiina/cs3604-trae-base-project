@@ -45,8 +45,14 @@
       - API-TICKET-QUERY
       - API-STATIONS-LIST
 - id: REQ-3
-  status: unprocessed
+  status: processed
+  artifacts:
+    ui_ids:
+      - OrderPage
+    api_ids:
+      - api_orders_create
+      - api_passengers_list
 - id: REQ-4
-  status: unprocessed
+  status: processed
 - id: REQ-5
-  status: unprocessed
+  status: processed

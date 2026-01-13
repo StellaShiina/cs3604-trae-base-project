@@ -69,3 +69,20 @@ API-STATIONS-LIST:
     - UI-TICKET-SEARCH-FORM
   downstream_ids:
     - DB-STATIONS
+api_orders_create:
+  related_req_id: REQ-3
+  path: backend/src/routes/orders.js
+  signature: POST /api/orders
+  upstream_ids:
+    - OrderPage
+  downstream_ids:
+    - db_orders_insert
+    - db_tickets_insert
+api_passengers_list:
+  related_req_id: REQ-3
+  path: backend/src/routes/passengers.js
+  signature: GET /api/passengers
+  upstream_ids:
+    - OrderPage
+  downstream_ids:
+    - db_passengers_select

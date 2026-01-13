@@ -68,7 +68,7 @@ router.post('/login', (req, res) => {
       data: {
         userId: user.id,
         username: user.username,
-        token: 'mock-jwt-token'
+        token: `mock-jwt-token-${user.id}`
       }
     });
   });
