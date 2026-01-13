@@ -118,4 +118,43 @@ router.get('/', (req, res) => {
   });
 });
 
+// Update Order Status (Cancel, Pay)
+router.put('/:id/status', (req, res) => {
+  const userId = req.user ? req.user.id : null;
+  if (!userId) {
+    return res.status(401).json({ code: 401, message: 'Unauthorized' });
+  }
+
+  const { id } = req.params;
+  const { status } = req.body;
+
+  if (!['cancelled', 'paid'].includes(status)) {
+    return res.status(400).json({ code: 400, message: 'Invalid status' });
+  }
+
+  // Check if order exists and belongs to user
+  const checkSql = 'SELECT id, status FROM orders WHERE id = ? AND user_id = ?';
+  db.get(checkSql, [id, userId], (err, order) => {
+    if (err) return res.status(500).json({ code: 500, message: 'Database error' });
+    if (!order) return res.status(404).json({ code: 404, message: 'Order not found' });
+
+    // State machine check
+    if (status === 'cancelled' && order.status !== 'pending_payment') {
+      return res.status(400).json({ code: 400, message: 'Cannot cancel order in current status' });
+    }
+    // if (status === 'paid' && order.status !== 'pending_payment') ...
+
+    const updateSql = 'UPDATE orders SET status = ? WHERE id = ?';
+    db.run(updateSql, [status, id], function(err) {
+      if (err) return res.status(500).json({ code: 500, message: 'Update failed' });
+      
+      res.json({
+        code: 200,
+        message: 'Order status updated',
+        data: { id, status }
+      });
+    });
+  });
+});
+
 module.exports = router;

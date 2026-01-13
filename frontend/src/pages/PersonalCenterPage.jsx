@@ -11,7 +11,7 @@ const PersonalCenterPage = () => {
   const [userInfo, setUserInfo] = useState(null);
   const [passengers, setPassengers] = useState([]);
   const [orders, setOrders] = useState([]);
-  const [orderStatus, setOrderStatus] = useState('0'); // 0: Unfinished, 1: Finished, 2: Cancelled
+  const [orderStatus, setOrderStatus] = useState('pending_payment'); // pending_payment, paid, cancelled
   const [isAddingPassenger, setIsAddingPassenger] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -77,76 +77,66 @@ const PersonalCenterPage = () => {
     }
   };
 
-
-  const handleAddPassenger = async (passengerData) => {
-    try {
-      const res = await axios.post('/api/passengers', passengerData);
-      if (res.data.code === 201) {
-        setIsAddingPassenger(false);
-        fetchPassengers();
-      } else {
-        throw new Error(res.data.message);
-      }
-    } catch (err) {
-      throw err; // Let Form handle error display
-    }
-  };
-
-  const handleDeletePassenger = async (id) => {
-    if (!window.confirm('确定要删除该乘车人吗？')) return;
+  const handleCancelOrder = async (orderId) => {
+    if (!window.confirm('确定要取消该订单吗？')) return;
 
     try {
-      const res = await axios.delete(`/api/passengers/${id}`);
+      const res = await axios.put(`/api/orders/${orderId}/status`, { status: 'cancelled' });
       if (res.data.code === 200) {
-        fetchPassengers();
+        // Refresh list
+        fetchOrders();
       } else {
         alert(res.data.message);
       }
     } catch (err) {
       console.error(err);
-      alert('删除失败');
+      alert('取消订单失败');
     }
   };
 
-  const renderContent = () => {
-    if (activeTab === 'personal_info') {
-      if (loading) return <div>Loading...</div>;
-      if (error) return <div className="error">{error}</div>;
-      if (!userInfo) return <div>No user info</div>;
+  // ... (handleAddPassenger, handleDeletePassenger same)
 
-      return (
-        <div className="info-panel">
-          <h3>基本信息</h3>
-          <div className="info-item">
-            <label>用户名：</label>
-            <span>{userInfo.username}</span>
+  const renderContent = () => {
+    // ... (personal_info, passengers same)
+    if (activeTab === 'personal_info') {
+        // ... (existing code)
+        if (loading) return <div>Loading...</div>;
+        if (error) return <div className="error">{error}</div>;
+        if (!userInfo) return <div>No user info</div>;
+  
+        return (
+          <div className="info-panel">
+            <h3>基本信息</h3>
+            <div className="info-item">
+              <label>用户名：</label>
+              <span>{userInfo.username}</span>
+            </div>
+            <div className="info-item">
+              <label>姓名：</label>
+              <span>{userInfo.real_name}</span>
+            </div>
+            <div className="info-item">
+              <label>证件类型：</label>
+              <span>{userInfo.id_type || '中国居民身份证'}</span>
+            </div>
+             <div className="info-item">
+              <label>证件号码：</label>
+              <span>{userInfo.id_number}</span>
+            </div>
+            <div className="info-item">
+              <label>手机号：</label>
+              <span>{userInfo.phone}</span>
+            </div>
+            <div className="info-item">
+              <label>邮箱：</label>
+              <span>{userInfo.email}</span>
+            </div>
+             <div className="info-item">
+              <label>旅客类型：</label>
+              <span>{userInfo.passenger_type}</span>
+            </div>
           </div>
-          <div className="info-item">
-            <label>姓名：</label>
-            <span>{userInfo.real_name}</span>
-          </div>
-          <div className="info-item">
-            <label>证件类型：</label>
-            <span>{userInfo.id_type || '中国居民身份证'}</span>
-          </div>
-           <div className="info-item">
-            <label>证件号码：</label>
-            <span>{userInfo.id_number}</span>
-          </div>
-          <div className="info-item">
-            <label>手机号：</label>
-            <span>{userInfo.phone}</span>
-          </div>
-          <div className="info-item">
-            <label>邮箱：</label>
-            <span>{userInfo.email}</span>
-          </div>
-           <div className="info-item">
-            <label>旅客类型：</label>
-            <span>{userInfo.passenger_type}</span>
-          </div>
-        </div>
-      );
+        );
     } else if (activeTab === 'passengers') {
       if (loading && !isAddingPassenger) return <div>Loading...</div>;
       if (error) return <div className="error">{error}</div>;
@@ -197,20 +187,20 @@ const PersonalCenterPage = () => {
         <div className="order-list-panel">
           <div className="order-tabs">
             <button 
-              className={orderStatus === '0' ? 'active' : ''} 
-              onClick={() => setOrderStatus('0')}
+              className={orderStatus === 'pending_payment' ? 'active' : ''} 
+              onClick={() => setOrderStatus('pending_payment')}
             >
               未完成订单
             </button>
             <button 
-              className={orderStatus === '1' ? 'active' : ''} 
-              onClick={() => setOrderStatus('1')}
+              className={orderStatus === 'paid' ? 'active' : ''} 
+              onClick={() => setOrderStatus('paid')}
             >
               未出行订单
             </button>
             <button 
-              className={orderStatus === '2' ? 'active' : ''} 
-              onClick={() => setOrderStatus('2')}
+              className={orderStatus === 'cancelled' ? 'active' : ''} 
+              onClick={() => setOrderStatus('cancelled')}
             >
               历史订单
             </button>
@@ -226,7 +216,7 @@ const PersonalCenterPage = () => {
                      <div className="order-header">
                        <span>订单号: {order.id}</span>
                        <span>下单时间: {order.created_at}</span>
-                       <span>状态: {order.status === '0' ? '未支付' : (order.status === '1' ? '已支付' : '已取消')}</span>
+                       <span>状态: {order.status === 'pending_payment' ? '未支付' : (order.status === 'paid' ? '已支付' : '已取消')}</span>
                      </div>
                      <div className="order-body">
                        <div className="train-info">
@@ -235,13 +225,13 @@ const PersonalCenterPage = () => {
                          <span>{order.departure_date}</span>
                        </div>
                        <div className="order-actions">
-                         {order.status === '0' && (
+                         {order.status === 'pending_payment' && (
                            <>
                              <button className="btn-primary">支付</button>
-                             <button className="btn-secondary">取消</button>
+                             <button className="btn-secondary" onClick={() => handleCancelOrder(order.id)}>取消</button>
                            </>
                          )}
-                         {order.status === '1' && (
+                         {order.status === 'paid' && (
                            <button className="btn-secondary">改签</button>
                          )}
                        </div>

@@ -191,3 +191,11 @@ REQ-4-2-API-GET-TRAIN:
     - REQ-4-2-FUNC-GET-TRAIN
   downstream_ids:
     - REQ-4-2-UI-ORDER-FORM
+REQ-4-3-API-CANCEL-ORDER:
+  related_req_id: REQ-4-3
+  path: /api/orders/:id/status
+  signature: PUT /api/orders/:id/status
+  upstream_ids:
+    - REQ-4-3-FUNC-CANCEL-ORDER
+  downstream_ids:
+    - REQ-4-3-UI-ORDER-LIST-CANCEL

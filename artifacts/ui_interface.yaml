@@ -127,3 +127,11 @@ REQ-4-2-UI-ORDER-FORM:
   downstream_ids:
     - REQ-4-2-API-CREATE-ORDER
     - REQ-4-2-API-GET-TRAIN
+REQ-4-3-UI-ORDER-LIST-CANCEL:
+  related_req_id: REQ-4-3
+  path: frontend/src/pages/PersonalCenterPage.jsx
+  description: Order List Cancel Button and Logic
+  upstream_ids:
+    - REQ-4-UI-PERSONAL-CENTER
+  downstream_ids:
+    - REQ-4-3-API-CANCEL-ORDER

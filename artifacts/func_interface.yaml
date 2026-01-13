@@ -62,3 +62,11 @@ REQ-4-2-FUNC-GET-TRAIN:
   db_tables:
     - trains
     - train_station_mapping
+REQ-4-3-FUNC-CANCEL-ORDER:
+  related_req_id: REQ-4-3
+  path: backend/src/routes/orders.js
+  signature: router.put('/:id/status', ...)
+  upstream_ids:
+    - REQ-4-2-DB-ORDERS
+  db_tables:
+    - orders

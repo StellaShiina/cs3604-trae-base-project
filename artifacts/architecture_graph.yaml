@@ -172,6 +172,20 @@ nodes:
     type: UI
     path: frontend/src/pages/OrderFormPage.jsx
     description: Order Submission Form Page
+  REQ-4-3-API-CANCEL-ORDER:
+    type: API
+    path: /api/orders/:id/status
+    signature: PUT /api/orders/:id/status
+  REQ-4-3-FUNC-CANCEL-ORDER:
+    type: FUNC
+    path: backend/src/routes/orders.js
+    signature: router.put('/:id/status', ...)
+    db_tables:
+      - orders
+  REQ-4-3-UI-ORDER-LIST-CANCEL:
+    type: UI
+    path: frontend/src/pages/PersonalCenterPage.jsx
+    description: Order List Cancel Button and Logic
 edges:
   - from: ROOT
     to: REQ-1
@@ -400,4 +414,28 @@ edges:
     relation: CALLS
   - from: REQ-4-2-UI-ORDER-FORM
     to: REQ-4-2-API-GET-TRAIN
+    relation: CALLS
+  - from: REQ-4-3
+    to: REQ-4-3-API-CANCEL-ORDER
+    relation: DEFINES
+  - from: REQ-4-3-FUNC-CANCEL-ORDER
+    to: REQ-4-3-API-CANCEL-ORDER
+    relation: CALLS
+  - from: REQ-4-3-API-CANCEL-ORDER
+    to: REQ-4-3-UI-ORDER-LIST-CANCEL
+    relation: CALLS
+  - from: REQ-4-3
+    to: REQ-4-3-FUNC-CANCEL-ORDER
+    relation: DEFINES
+  - from: REQ-4-2-DB-ORDERS
+    to: REQ-4-3-FUNC-CANCEL-ORDER
+    relation: CALLS
+  - from: REQ-4-3
+    to: REQ-4-3-UI-ORDER-LIST-CANCEL
+    relation: DEFINES
+  - from: REQ-4-UI-PERSONAL-CENTER
+    to: REQ-4-3-UI-ORDER-LIST-CANCEL
+    relation: CALLS
+  - from: REQ-4-3-UI-ORDER-LIST-CANCEL
+    to: REQ-4-3-API-CANCEL-ORDER
     relation: CALLS
