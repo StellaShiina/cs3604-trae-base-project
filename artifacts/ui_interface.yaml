@@ -118,3 +118,12 @@ REQ-4-1-UI-ORDER-LIST:
     - REQ-3-1-UI-PERSONAL-CENTER
   downstream_ids:
     - REQ-4-1-API-GET-ORDERS
+REQ-4-2-UI-ORDER-FORM:
+  related_req_id: REQ-4-2
+  path: frontend/src/pages/OrderFormPage.jsx
+  description: Order Submission Form Page
+  upstream_ids:
+    - REQ-2-2-UI-TRAIN-LIST
+  downstream_ids:
+    - REQ-4-2-API-CREATE-ORDER
+    - REQ-4-2-API-GET-TRAIN

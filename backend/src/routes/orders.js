@@ -32,7 +32,7 @@ router.post('/', (req, res) => {
 
       const orderId = this.lastID;
       const insertTicketSql = `
-        INSERT INTO order_tickets (order_id, passenger_id, seat_type, price)
+        INSERT INTO order_items (order_id, passenger_id, seat_type, price)
         VALUES (?, ?, ?, ?)
       `;
 

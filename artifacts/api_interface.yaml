@@ -175,3 +175,19 @@ REQ-4-1-API-GET-ORDERS:
     - REQ-4-1-FUNC-GET-ORDERS
   downstream_ids:
     - REQ-4-1-UI-ORDER-LIST
+REQ-4-2-API-CREATE-ORDER:
+  related_req_id: REQ-4-2
+  path: /api/orders
+  signature: POST /api/orders
+  upstream_ids:
+    - REQ-4-2-FUNC-CREATE-ORDER
+  downstream_ids:
+    - REQ-4-2-UI-ORDER-FORM
+REQ-4-2-API-GET-TRAIN:
+  related_req_id: REQ-4-2
+  path: /api/trains/:id
+  signature: GET /api/trains/:id
+  upstream_ids:
+    - REQ-4-2-FUNC-GET-TRAIN
+  downstream_ids:
+    - REQ-4-2-UI-ORDER-FORM

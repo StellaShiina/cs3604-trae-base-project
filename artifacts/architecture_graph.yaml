@@ -146,6 +146,32 @@ nodes:
     type: UI
     path: frontend/src/pages/PersonalCenterPage.jsx
     description: Personal Center Page with Order Management
+  REQ-4-2-API-CREATE-ORDER:
+    type: API
+    path: /api/orders
+    signature: POST /api/orders
+  REQ-4-2-API-GET-TRAIN:
+    type: API
+    path: /api/trains/:id
+    signature: GET /api/trains/:id
+  REQ-4-2-FUNC-CREATE-ORDER:
+    type: FUNC
+    path: backend/src/routes/orders.js
+    signature: router.post('/', ...)
+    db_tables:
+      - orders
+      - order_items
+  REQ-4-2-FUNC-GET-TRAIN:
+    type: FUNC
+    path: backend/src/routes/trains.js
+    signature: router.get('/:id', ...)
+    db_tables:
+      - trains
+      - train_station_mapping
+  REQ-4-2-UI-ORDER-FORM:
+    type: UI
+    path: frontend/src/pages/OrderFormPage.jsx
+    description: Order Submission Form Page
 edges:
   - from: ROOT
     to: REQ-1
@@ -332,4 +358,46 @@ edges:
     relation: DEFINES
   - from: REQ-3-1-UI-PERSONAL-CENTER
     to: REQ-4-1-UI-ORDER-LIST
+    relation: CALLS
+  - from: REQ-4-2
+    to: REQ-4-2-API-CREATE-ORDER
+    relation: DEFINES
+  - from: REQ-4-2-FUNC-CREATE-ORDER
+    to: REQ-4-2-API-CREATE-ORDER
+    relation: CALLS
+  - from: REQ-4-2-API-CREATE-ORDER
+    to: REQ-4-2-UI-ORDER-FORM
+    relation: CALLS
+  - from: REQ-4-2
+    to: REQ-4-2-API-GET-TRAIN
+    relation: DEFINES
+  - from: REQ-4-2-FUNC-GET-TRAIN
+    to: REQ-4-2-API-GET-TRAIN
+    relation: CALLS
+  - from: REQ-4-2-API-GET-TRAIN
+    to: REQ-4-2-UI-ORDER-FORM
+    relation: CALLS
+  - from: REQ-4-2
+    to: REQ-4-2-FUNC-CREATE-ORDER
+    relation: DEFINES
+  - from: REQ-4-2-DB-ORDERS
+    to: REQ-4-2-FUNC-CREATE-ORDER
+    relation: CALLS
+  - from: REQ-4-2
+    to: REQ-4-2-FUNC-GET-TRAIN
+    relation: DEFINES
+  - from: REQ-2-DB-TRAINS
+    to: REQ-4-2-FUNC-GET-TRAIN
+    relation: CALLS
+  - from: REQ-4-2
+    to: REQ-4-2-UI-ORDER-FORM
+    relation: DEFINES
+  - from: REQ-2-2-UI-TRAIN-LIST
+    to: REQ-4-2-UI-ORDER-FORM
+    relation: CALLS
+  - from: REQ-4-2-UI-ORDER-FORM
+    to: REQ-4-2-API-CREATE-ORDER
+    relation: CALLS
+  - from: REQ-4-2-UI-ORDER-FORM
+    to: REQ-4-2-API-GET-TRAIN
     relation: CALLS

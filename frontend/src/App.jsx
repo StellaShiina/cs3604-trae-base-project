@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import SearchPage from './pages/SearchPage';
 import OrderPage from './pages/OrderPage';
+import OrderFormPage from './pages/OrderFormPage';
 import PersonalCenterPage from './pages/PersonalCenterPage';
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/search" element={<SearchPage />} />
       <Route path="/order" element={<OrderPage />} />
+      <Route path="/order/create/:trainId" element={<OrderFormPage />} />
       <Route path="/center" element={<PersonalCenterPage />} />
     </Routes>
   );

@@ -14,6 +14,7 @@ require('./database/init_db');
  
 const authRoutes = require('./routes/auth');
 const ticketRoutes = require('./routes/tickets');
+const trainRoutes = require('./routes/trains');
 const passengerRoutes = require('./routes/passengers');
 const orderRoutes = require('./routes/orders');
 const usersRoutes = require('./routes/users');
@@ -22,6 +23,7 @@ const authMiddleware = require('./middleware/authMiddleware');
 // Public Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/tickets', ticketRoutes);
+app.use('/api/trains', trainRoutes);
 
 // Protected Routes
 app.use('/api/users', authMiddleware, usersRoutes);

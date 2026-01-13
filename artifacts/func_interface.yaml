@@ -44,3 +44,21 @@ REQ-4-1-FUNC-GET-ORDERS:
     - orders
     - trains
     - stations
+REQ-4-2-FUNC-CREATE-ORDER:
+  related_req_id: REQ-4-2
+  path: backend/src/routes/orders.js
+  signature: router.post('/', ...)
+  upstream_ids:
+    - REQ-4-2-DB-ORDERS
+  db_tables:
+    - orders
+    - order_items
+REQ-4-2-FUNC-GET-TRAIN:
+  related_req_id: REQ-4-2
+  path: backend/src/routes/trains.js
+  signature: router.get('/:id', ...)
+  upstream_ids:
+    - REQ-2-DB-TRAINS
+  db_tables:
+    - trains
+    - train_station_mapping
