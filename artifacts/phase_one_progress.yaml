@@ -1,58 +1,21 @@
 - id: ROOT
   status: processed
-  artifacts:
-    ui_ids:
-      - HomePage
-    api_ids:
-      - API-Root
 - id: REQ-1
-  status: processed
-  artifacts:
-    api_ids:
-      - API-Auth
-    func_ids:
-      - DB-Init
+  status: unprocessed
 - id: REQ-1-1
-  status: processed
-  artifacts:
-    ui_ids:
-      - UI-RegisterPage
-    api_ids:
-      - API-Register
+  status: unprocessed
 - id: REQ-1-2
-  status: processed
-  artifacts:
-    ui_ids:
-      - UI-LoginPage
-    api_ids:
-      - API-Login
+  status: unprocessed
 - id: REQ-1-3
-  status: processed
-  artifacts:
-    ui_ids:
-      - ui_forgot_password
-    api_ids:
-      - api_forgot_verify_user
-      - api_forgot_verify_sms
-      - api_forgot_reset
+  status: unprocessed
 - id: REQ-2
-  status: processed
-  artifacts:
-    ui_ids:
-      - UI-SEARCH-PAGE
-      - UI-TICKET-SEARCH-FORM
-    api_ids:
-      - API-TICKET-QUERY
-      - API-STATIONS-LIST
+  status: unprocessed
 - id: REQ-3
-  status: processed
+  status: unprocessed
   artifacts:
     ui_ids:
-      - OrderPage
-    api_ids:
-      - api_orders_create
-      - api_passengers_list
+      - LoginModal
 - id: REQ-4
-  status: processed
+  status: unprocessed
 - id: REQ-5
-  status: processed
+  status: unprocessed

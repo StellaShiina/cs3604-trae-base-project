@@ -56,3 +56,10 @@ OrderPage:
     - TicketQuery
   downstream_ids:
     - PaymentPage
+LoginModal:
+  related_req_id: REQ-3
+  path: frontend/src/components/LoginModal.jsx
+  description: 登录弹窗组件，用于在非登录状态下拦截操作并提供登录功能
+  upstream_ids:
+    - SearchPage
+  downstream_ids: []
