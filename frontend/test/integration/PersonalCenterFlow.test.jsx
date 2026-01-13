@@ -133,4 +133,43 @@ describe('REQ-3: Personal Center Infrastructure', () => {
     });
   });
 
+  it('REQ-3-2-2:SCE-0 Delete Passenger', async () => {
+    render(
+      <MemoryRouter initialEntries={['/center']}>
+        <App />
+      </MemoryRouter>
+    );
+
+    // 1. Click "乘车人" sidebar item
+    fireEvent.click(screen.getByText('乘车人'));
+
+    // 2. Wait for list
+    await waitFor(() => {
+        expect(screen.getByText('Passenger A')).toBeInTheDocument();
+    });
+
+    // 3. Mock window.confirm
+    const confirmSpy = vi.spyOn(window, 'confirm').mockImplementation(() => true);
+
+    // 4. Click "Delete" button for Passenger A
+    // Finding the specific delete button might be tricky if not labelled uniquely.
+    // Assuming the button is within the same list item.
+    // Let's find the list item first.
+    const passengerAItem = screen.getByText('Passenger A').closest('li');
+    const deleteBtn = passengerAItem.querySelector('button.btn-delete') || screen.getAllByText('删除')[0];
+    
+    // Fallback if structure is simple
+    fireEvent.click(deleteBtn);
+
+    // 5. Verify Confirm called
+    expect(confirmSpy).toHaveBeenCalled();
+
+    // 6. Verify Passenger A gone
+    await waitFor(() => {
+        expect(screen.queryByText('Passenger A')).not.toBeInTheDocument();
+    });
+    
+    confirmSpy.mockRestore();
+  });
+
 });

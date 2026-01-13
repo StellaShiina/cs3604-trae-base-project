@@ -61,4 +61,26 @@ describe('REQ-3-2: Passenger API', () => {
     expect(listRes.body.data).toHaveLength(3);
     expect(listRes.body.data.find(p => p.name === 'Passenger C')).toBeDefined();
   });
+
+  it('DELETE /api/passengers/:id should delete passenger', async () => {
+    // First get the list to find a passenger ID to delete
+    const listRes = await request(app)
+      .get('/api/passengers')
+      .set('Authorization', 'Bearer mock-jwt-token-1');
+    const passengerToDelete = listRes.body.data[0];
+    const idToDelete = passengerToDelete.id;
+
+    const res = await request(app)
+      .delete(`/api/passengers/${idToDelete}`)
+      .set('Authorization', 'Bearer mock-jwt-token-1');
+
+    expect(res.status).toBe(200);
+    expect(res.body.code).toBe(200);
+
+    // Verify it's gone
+    const listResAfter = await request(app)
+      .get('/api/passengers')
+      .set('Authorization', 'Bearer mock-jwt-token-1');
+    expect(listResAfter.body.data.find(p => p.id === idToDelete)).toBeUndefined();
+  });
 });

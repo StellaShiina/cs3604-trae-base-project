@@ -60,4 +60,29 @@ router.post('/', (req, res) => {
   });
 });
 
+// Delete passenger
+router.delete('/:id', (req, res) => {
+  const userId = req.user ? req.user.id : null;
+  if (!userId) {
+    return res.status(401).json({ code: 401, message: 'Unauthorized' });
+  }
+
+  const passengerId = req.params.id;
+  
+  // Ensure the passenger belongs to the user
+  const sql = 'DELETE FROM passengers WHERE id = ? AND user_id = ?';
+  db.run(sql, [passengerId, userId], function(err) {
+    if (err) {
+      return res.status(500).json({ code: 500, message: 'Database error', error: err.message });
+    }
+    if (this.changes === 0) {
+        return res.status(404).json({ code: 404, message: 'Passenger not found or not authorized' });
+    }
+    res.json({
+      code: 200,
+      message: 'Passenger deleted successfully'
+    });
+  });
+});
+
 module.exports = router;

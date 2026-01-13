@@ -126,6 +126,10 @@ nodes:
     type: API
     path: /api/passengers
     signature: POST /api/passengers
+  REQ-3-2-API-DELETE-PASSENGER:
+    type: API
+    path: backend/src/routes/passengers.js
+    signature: DELETE /api/passengers/:id
 edges:
   - from: ROOT
     to: REQ-1
@@ -282,4 +286,10 @@ edges:
     relation: CALLS
   - from: REQ-3-2-API-ADD-PASSENGER
     to: REQ-3-2-UI-PASSENGER-FORM
+    relation: CALLS
+  - from: REQ-3-2-2
+    to: REQ-3-2-API-DELETE-PASSENGER
+    relation: DEFINES
+  - from: REQ-3-UI-CENTER
+    to: REQ-3-2-API-DELETE-PASSENGER
     relation: CALLS

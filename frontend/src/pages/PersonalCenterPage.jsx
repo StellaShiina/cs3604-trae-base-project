@@ -70,6 +70,22 @@ const PersonalCenterPage = () => {
     }
   };
 
+  const handleDeletePassenger = async (id) => {
+    if (!window.confirm('确定要删除该乘车人吗？')) return;
+
+    try {
+      const res = await axios.delete(`/api/passengers/${id}`);
+      if (res.data.code === 200) {
+        fetchPassengers();
+      } else {
+        alert(res.data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('删除失败');
+    }
+  };
+
   const renderContent = () => {
     if (activeTab === 'personal_info') {
       if (loading) return <div>Loading...</div>;
@@ -133,10 +149,18 @@ const PersonalCenterPage = () => {
              <ul className="passenger-items">
                {passengers.map(p => (
                  <li key={p.id} className="passenger-item">
-                   <span>{p.name}</span>
-                   <span>{p.id_type}</span>
-                   <span>{p.id_number}</span>
-                   <span>{p.passenger_type}</span>
+                   <div className="passenger-info">
+                     <span>{p.name}</span>
+                     <span>{p.id_type}</span>
+                     <span>{p.id_number}</span>
+                     <span>{p.passenger_type}</span>
+                   </div>
+                   <button 
+                     className="btn-delete" 
+                     onClick={() => handleDeletePassenger(p.id)}
+                   >
+                     删除
+                   </button>
                  </li>
                ))}
              </ul>

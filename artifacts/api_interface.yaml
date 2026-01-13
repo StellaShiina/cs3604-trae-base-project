@@ -159,3 +159,10 @@ REQ-3-2-API-ADD-PASSENGER:
     - REQ-3-UI-CENTER
   downstream_ids:
     - REQ-3-2-UI-PASSENGER-FORM
+REQ-3-2-API-DELETE-PASSENGER:
+  related_req_id: REQ-3-2-2
+  path: backend/src/routes/passengers.js
+  signature: DELETE /api/passengers/:id
+  upstream_ids:
+    - REQ-3-UI-CENTER
+  downstream_ids: []
