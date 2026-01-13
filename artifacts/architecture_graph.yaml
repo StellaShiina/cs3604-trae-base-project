@@ -130,6 +130,22 @@ nodes:
     type: API
     path: backend/src/routes/passengers.js
     signature: DELETE /api/passengers/:id
+  REQ-4-1-API-GET-ORDERS:
+    type: API
+    path: /api/orders
+    signature: GET /api/orders?status={status}
+  REQ-4-1-FUNC-GET-ORDERS:
+    type: FUNC
+    path: backend/src/routes/orders.js
+    signature: db.all(SELECT ... FROM orders ...)
+    db_tables:
+      - orders
+      - trains
+      - stations
+  REQ-4-1-UI-ORDER-LIST:
+    type: UI
+    path: frontend/src/pages/PersonalCenterPage.jsx
+    description: Personal Center Page with Order Management
 edges:
   - from: ROOT
     to: REQ-1
@@ -292,4 +308,28 @@ edges:
     relation: DEFINES
   - from: REQ-3-UI-CENTER
     to: REQ-3-2-API-DELETE-PASSENGER
+    relation: CALLS
+  - from: REQ-4-1
+    to: REQ-4-1-API-GET-ORDERS
+    relation: DEFINES
+  - from: REQ-4-1-UI-ORDER-LIST
+    to: REQ-4-1-API-GET-ORDERS
+    relation: CALLS
+  - from: REQ-4-1-FUNC-GET-ORDERS
+    to: REQ-4-1-API-GET-ORDERS
+    relation: CALLS
+  - from: REQ-4-1-API-GET-ORDERS
+    to: REQ-4-1-UI-ORDER-LIST
+    relation: CALLS
+  - from: REQ-4-1
+    to: REQ-4-1-FUNC-GET-ORDERS
+    relation: DEFINES
+  - from: REQ-4-1-DB-ORDERS
+    to: REQ-4-1-FUNC-GET-ORDERS
+    relation: CALLS
+  - from: REQ-4-1
+    to: REQ-4-1-UI-ORDER-LIST
+    relation: DEFINES
+  - from: REQ-3-1-UI-PERSONAL-CENTER
+    to: REQ-4-1-UI-ORDER-LIST
     relation: CALLS

@@ -34,3 +34,13 @@ REQ-4-SCE-0-DB-INIT:
   db_tables:
     - orders
     - order_items
+REQ-4-1-FUNC-GET-ORDERS:
+  related_req_id: REQ-4-1
+  path: backend/src/routes/orders.js
+  signature: db.all(SELECT ... FROM orders ...)
+  upstream_ids:
+    - REQ-4-1-DB-ORDERS
+  db_tables:
+    - orders
+    - trains
+    - stations

@@ -10,6 +10,8 @@ const PersonalCenterPage = () => {
   const [activeTab, setActiveTab] = useState('personal_info');
   const [userInfo, setUserInfo] = useState(null);
   const [passengers, setPassengers] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [orderStatus, setOrderStatus] = useState('0'); // 0: Unfinished, 1: Finished, 2: Cancelled
   const [isAddingPassenger, setIsAddingPassenger] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -19,8 +21,10 @@ const PersonalCenterPage = () => {
       fetchUserInfo();
     } else if (activeTab === 'passengers') {
       fetchPassengers();
+    } else if (activeTab === 'orders') {
+      fetchOrders();
     }
-  }, [activeTab]);
+  }, [activeTab, orderStatus]);
 
   const fetchUserInfo = async () => {
     try {
@@ -55,6 +59,24 @@ const PersonalCenterPage = () => {
       setLoading(false);
     }
   };
+
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`/api/orders?status=${orderStatus}`);
+      if (res.data.code === 200) {
+        setOrders(res.data.data);
+      } else {
+        setError(res.data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Failed to load orders');
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const handleAddPassenger = async (passengerData) => {
     try {
@@ -167,6 +189,70 @@ const PersonalCenterPage = () => {
            )}
         </div>
       );
+    } else if (activeTab === 'orders') {
+      if (loading) return <div>Loading...</div>;
+      if (error) return <div className="error">{error}</div>;
+
+      return (
+        <div className="order-list-panel">
+          <div className="order-tabs">
+            <button 
+              className={orderStatus === '0' ? 'active' : ''} 
+              onClick={() => setOrderStatus('0')}
+            >
+              未完成订单
+            </button>
+            <button 
+              className={orderStatus === '1' ? 'active' : ''} 
+              onClick={() => setOrderStatus('1')}
+            >
+              未出行订单
+            </button>
+            <button 
+              className={orderStatus === '2' ? 'active' : ''} 
+              onClick={() => setOrderStatus('2')}
+            >
+              历史订单
+            </button>
+          </div>
+          
+          <div className="order-list">
+             {orders.length === 0 ? (
+               <div>暂无订单</div>
+             ) : (
+               <ul className="order-items">
+                 {orders.map(order => (
+                   <li key={order.id} className="order-item">
+                     <div className="order-header">
+                       <span>订单号: {order.id}</span>
+                       <span>下单时间: {order.created_at}</span>
+                       <span>状态: {order.status === '0' ? '未支付' : (order.status === '1' ? '已支付' : '已取消')}</span>
+                     </div>
+                     <div className="order-body">
+                       <div className="train-info">
+                         <span>{order.train_number}</span>
+                         <span>{order.from_station_name} -> {order.to_station_name}</span>
+                         <span>{order.departure_date}</span>
+                       </div>
+                       <div className="order-actions">
+                         {order.status === '0' && (
+                           <>
+                             <button className="btn-primary">支付</button>
+                             <button className="btn-secondary">取消</button>
+                           </>
+                         )}
+                         {order.status === '1' && (
+                           <button className="btn-secondary">改签</button>
+                         )}
+                       </div>
+                     </div>
+                   </li>
+                 ))}
+               </ul>
+             )}
+          </div>
+        </div>
+      );
     }
     return <div>Select an item from the sidebar.</div>;
   };
@@ -191,9 +277,21 @@ const PersonalCenterPage = () => {
               乘车人
             </li>
           </ul>
+          
+          <div className="sidebar-title">订单中心</div>
+          <ul className="sidebar-menu">
+            <li 
+              className={`menu-item ${activeTab === 'orders' ? 'active' : ''}`}
+              onClick={() => setActiveTab('orders')}
+            >
+              火车票订单
+            </li>
+          </ul>
         </div>
         <div className="main-content">
-          <h2>个人中心</h2>
+          <h2>
+            {activeTab === 'orders' ? '火车票订单' : '个人中心'}
+          </h2>
           {renderContent()}
         </div>
       </div>

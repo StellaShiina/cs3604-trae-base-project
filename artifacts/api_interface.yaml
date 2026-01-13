@@ -166,3 +166,12 @@ REQ-3-2-API-DELETE-PASSENGER:
   upstream_ids:
     - REQ-3-UI-CENTER
   downstream_ids: []
+REQ-4-1-API-GET-ORDERS:
+  related_req_id: REQ-4-1
+  path: /api/orders
+  signature: GET /api/orders?status={status}
+  upstream_ids:
+    - REQ-4-1-UI-ORDER-LIST
+    - REQ-4-1-FUNC-GET-ORDERS
+  downstream_ids:
+    - REQ-4-1-UI-ORDER-LIST

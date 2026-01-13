@@ -68,4 +68,54 @@ router.post('/', (req, res) => {
   });
 });
 
+// Get Orders List
+router.get('/', (req, res) => {
+  const userId = req.user ? req.user.id : null;
+  if (!userId) {
+    return res.status(401).json({ code: 401, message: 'Unauthorized' });
+  }
+
+  const status = req.query.status;
+  let sql = `
+    SELECT 
+        o.id, o.train_id, o.from_station_id, o.to_station_id, o.departure_date, o.status, o.created_at,
+        t.train_number,
+        fs.name as from_station_name,
+        ts.name as to_station_name
+    FROM orders o
+    LEFT JOIN trains t ON o.train_id = t.id
+    LEFT JOIN stations fs ON o.from_station_id = fs.id
+    LEFT JOIN stations ts ON o.to_station_id = ts.id
+    WHERE o.user_id = ?
+  `;
+  
+  const params = [userId];
+
+  if (status !== undefined) {
+    sql += ' AND o.status = ?';
+    params.push(status);
+  }
+
+  sql += ' ORDER BY o.created_at DESC';
+
+  db.all(sql, params, (err, rows) => {
+    if (err) {
+      return res.status(500).json({ code: 500, message: 'Database error', error: err.message });
+    }
+
+    // Optionally fetch items for each order? 
+    // For now, let's just return the order details. 
+    // If frontend needs ticket details in the list, we can add it.
+    // Let's add a simple loop to fetch items if needed, but for MVP list, maybe not.
+    // However, the "Unfinished Order" tab usually shows payment amount which comes from tickets.
+    // Let's just return orders for now.
+
+    res.json({
+      code: 200,
+      message: 'Success',
+      data: rows
+    });
+  });
+});
+
 module.exports = router;
