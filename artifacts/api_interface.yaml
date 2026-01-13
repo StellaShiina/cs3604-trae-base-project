@@ -14,3 +14,11 @@ API-Auth:
     - REQ-1-1
     - REQ-1-2
     - REQ-1-3
+API-Register:
+  related_req_id: REQ-1-1
+  path: backend/src/routes/auth.js
+  signature: POST /api/auth/register
+  upstream_ids:
+    - DB-Init
+  downstream_ids:
+    - UI-RegisterPage

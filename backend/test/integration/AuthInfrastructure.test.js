@@ -4,9 +4,10 @@ import app from '../../src/index';
 import db from '../../src/database/init_db';
 
 describe('Auth Infrastructure', () => {
-  it('should have /api/auth/register endpoint returning 501', async () => {
-    const res = await request(app).post('/api/auth/register');
-    expect(res.status).toBe(501);
+  it('should have /api/auth/register endpoint handling requests', async () => {
+    // Missing fields -> 400
+    const res = await request(app).post('/api/auth/register').send({});
+    expect(res.status).toBe(400);
   });
 
   it('should have /api/auth/login endpoint returning 501', async () => {

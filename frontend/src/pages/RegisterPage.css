@@ -1,0 +1,72 @@
+.register-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  margin-top: 30px;
+}
+
+.register-header {
+  border-bottom: 2px solid #3b99fc;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+}
+
+.form-group label {
+  width: 120px;
+  text-align: right;
+  margin-right: 15px;
+  font-weight: bold;
+}
+
+.form-group input, .form-group select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  flex: 1;
+  max-width: 300px;
+}
+
+.phone-input-group {
+  display: flex;
+  flex: 1;
+  max-width: 300px;
+}
+
+.phone-input-group .area-code {
+  width: 70px;
+  margin-right: 5px;
+}
+
+.error-msg {
+  color: red;
+  font-size: 12px;
+  margin-left: 10px;
+}
+
+.btn-submit {
+  background-color: #ff8001;
+  color: white;
+  padding: 10px 40px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-left: 135px;
+}
+
+.btn-submit:hover {
+  background-color: #e67300;
+}
+
+.strength-meter {
+  margin-left: 10px;
+  font-size: 12px;
+}

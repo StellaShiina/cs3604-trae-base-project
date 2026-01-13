@@ -1,7 +1,8 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-const dbPath = path.resolve(process.cwd(), 'database.db');
+// Use __dirname to ensure db file is always in backend directory, regardless of CWD
+const dbPath = path.resolve(__dirname, '../../database.db');
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
     console.error('Error opening database', err.message);

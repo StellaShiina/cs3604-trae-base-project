@@ -53,6 +53,14 @@ nodes:
     signature: initTables()
     db_tables:
       - users
+  UI-RegisterPage:
+    type: UI
+    path: frontend/src/pages/RegisterPage.jsx
+    description: User Registration Page with form validation
+  API-Register:
+    type: API
+    path: backend/src/routes/auth.js
+    signature: POST /api/auth/register
 edges:
   - from: ROOT
     to: REQ-1
@@ -117,3 +125,18 @@ edges:
   - from: REQ-1
     to: DB-Init
     relation: DEFINES
+  - from: REQ-1-1
+    to: UI-RegisterPage
+    relation: DEFINES
+  - from: API-Auth
+    to: UI-RegisterPage
+    relation: CALLS
+  - from: REQ-1-1
+    to: API-Register
+    relation: DEFINES
+  - from: DB-Init
+    to: API-Register
+    relation: CALLS
+  - from: API-Register
+    to: UI-RegisterPage
+    relation: CALLS

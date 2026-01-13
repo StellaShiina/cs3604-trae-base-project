@@ -13,7 +13,12 @@
     func_ids:
       - DB-Init
 - id: REQ-1-1
-  status: unprocessed
+  status: processed
+  artifacts:
+    ui_ids:
+      - UI-RegisterPage
+    api_ids:
+      - API-Register
 - id: REQ-1-2
   status: unprocessed
 - id: REQ-1-3

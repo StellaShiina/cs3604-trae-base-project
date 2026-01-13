@@ -9,3 +9,10 @@ HomePage:
     - REQ-3
     - REQ-4
     - REQ-5
+UI-RegisterPage:
+  related_req_id: REQ-1-1
+  path: frontend/src/pages/RegisterPage.jsx
+  description: User Registration Page with form validation
+  upstream_ids:
+    - API-Auth
+  downstream_ids: []
