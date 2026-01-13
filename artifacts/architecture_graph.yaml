@@ -1,0 +1,62 @@
+nodes:
+  ROOT:
+    type: REQUIREMENT
+    name: 12306购票系统复刻
+    description: 基于Web的铁路购票系统，包含用户认证、车票查询、预订、订单管理及个人中心等核心功能，首页参考图片：[image](./assets/index.png)。
+  REQ-1:
+    type: REQUIREMENT
+    name: 用户认证模块
+    description: 提供用户注册、登录及密码找回能力，参考图片：[image](./assets/login.png)、[image](./assets/register.png)、[image](./assets/forgetpassword.png)。
+  REQ-1-1:
+    type: REQUIREMENT
+    name: 用户注册
+    description: 新用户创建账户，并初始化必要的关联数据（如本人乘车人）。
+  REQ-1-2:
+    type: REQUIREMENT
+    name: 用户登录
+    description: 验证用户身份并建立会话。
+  REQ-1-3:
+    type: REQUIREMENT
+    name: 找回密码
+    description: 通过手机找回流程重置登录密码。
+  REQ-2:
+    type: REQUIREMENT
+    name: 车票查询模块
+    description: 支持从首页发起查询并在结果页筛选车次，参考图片：[image](./assets/query.png)、[image](./assets/result.png)。
+  REQ-3:
+    type: REQUIREMENT
+    name: 订单填写与提交
+    description: 用户选择席别与乘车人并提交订单，参考图片：[image](./assets/fill_in_order.png)。
+  REQ-4:
+    type: REQUIREMENT
+    name: 支付与购票成功
+    description: 完成支付倒计时、取消订单及支付成功跳转流程。
+  REQ-5:
+    type: REQUIREMENT
+    name: 个人中心
+    description: 提供个人信息查看、订单查询与乘车人管理，参考图片：[image](./assets/self.png)、[image](./assets/orders.png)、[image](./assets/passenger.png)。
+edges:
+  - from: ROOT
+    to: REQ-1
+    relation: HAS_CHILD
+  - from: REQ-1
+    to: REQ-1-1
+    relation: HAS_CHILD
+  - from: REQ-1
+    to: REQ-1-2
+    relation: HAS_CHILD
+  - from: REQ-1
+    to: REQ-1-3
+    relation: HAS_CHILD
+  - from: ROOT
+    to: REQ-2
+    relation: HAS_CHILD
+  - from: ROOT
+    to: REQ-3
+    relation: HAS_CHILD
+  - from: ROOT
+    to: REQ-4
+    relation: HAS_CHILD
+  - from: ROOT
+    to: REQ-5
+    relation: HAS_CHILD
