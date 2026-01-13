@@ -89,3 +89,10 @@ REQ-1-UI-FORGOT-PASSWORD:
     - REQ-1-API-FP-VERIFY-USER
     - REQ-1-API-FP-VERIFY-SMS
     - REQ-1-API-FP-RESET
+REQ-3-UI-CENTER:
+  related_req_id: REQ-3:SCE-0
+  path: frontend/src/pages/PersonalCenterPage.jsx
+  description: Personal Center Layout with Sidebar and Route
+  upstream_ids:
+    - REQ-1-UI-LOGIN
+  downstream_ids: []

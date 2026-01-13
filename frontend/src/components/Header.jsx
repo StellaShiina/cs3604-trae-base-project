@@ -33,7 +33,7 @@ const Header = () => {
           <span>无障碍</span>
           <span>爱老版</span>
           <span>English</span>
-          <span>我的12306</span>
+          <Link to="/center" className="my-12306-link">我的12306</Link>
           <div className="auth-status">
             <span>您好，请</span>
             <Link to="/login">登录</Link> | <Link to="/register">注册</Link>
