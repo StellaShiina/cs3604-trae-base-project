@@ -151,3 +151,11 @@ REQ-3-2-API-LIST-PASSENGERS:
     - REQ-3-UI-CENTER
   downstream_ids:
     - REQ-3-2-UI-PASSENGER-LIST
+REQ-3-2-API-ADD-PASSENGER:
+  related_req_id: REQ-3-2-1:SCE-0
+  path: /api/passengers
+  signature: POST /api/passengers
+  upstream_ids:
+    - REQ-3-UI-CENTER
+  downstream_ids:
+    - REQ-3-2-UI-PASSENGER-FORM

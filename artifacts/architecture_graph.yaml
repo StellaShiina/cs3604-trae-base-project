@@ -118,6 +118,14 @@ nodes:
     type: UI
     path: frontend/src/pages/PersonalCenterPage.jsx
     description: Passenger List within Personal Center
+  REQ-3-2-UI-PASSENGER-FORM:
+    type: UI
+    path: frontend/src/components/PassengerForm.jsx
+    description: Passenger Add Form Modal
+  REQ-3-2-API-ADD-PASSENGER:
+    type: API
+    path: /api/passengers
+    signature: POST /api/passengers
 edges:
   - from: ROOT
     to: REQ-1
@@ -260,3 +268,18 @@ edges:
   - from: REQ-3-2:SCE-0
     to: REQ-3-2-UI-PASSENGER-LIST
     relation: DEFINES
+  - from: REQ-3-2-1:SCE-0
+    to: REQ-3-2-UI-PASSENGER-FORM
+    relation: DEFINES
+  - from: REQ-3-2-UI-PASSENGER-LIST
+    to: REQ-3-2-UI-PASSENGER-FORM
+    relation: CALLS
+  - from: REQ-3-2-1:SCE-0
+    to: REQ-3-2-API-ADD-PASSENGER
+    relation: DEFINES
+  - from: REQ-3-UI-CENTER
+    to: REQ-3-2-API-ADD-PASSENGER
+    relation: CALLS
+  - from: REQ-3-2-API-ADD-PASSENGER
+    to: REQ-3-2-UI-PASSENGER-FORM
+    relation: CALLS

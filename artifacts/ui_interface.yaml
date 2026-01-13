@@ -103,3 +103,10 @@ REQ-3-2-UI-PASSENGER-LIST:
   upstream_ids:
     - REQ-3-2-API-LIST-PASSENGERS
   downstream_ids: []
+REQ-3-2-UI-PASSENGER-FORM:
+  related_req_id: REQ-3-2-1:SCE-0
+  path: frontend/src/components/PassengerForm.jsx
+  description: Passenger Add Form Modal
+  upstream_ids:
+    - REQ-3-2-UI-PASSENGER-LIST
+  downstream_ids: []

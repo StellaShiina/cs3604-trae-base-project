@@ -3,12 +3,14 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import PassengerForm from '../components/PassengerForm';
 import './PersonalCenterPage.css';
 
 const PersonalCenterPage = () => {
   const [activeTab, setActiveTab] = useState('personal_info');
   const [userInfo, setUserInfo] = useState(null);
   const [passengers, setPassengers] = useState([]);
+  const [isAddingPassenger, setIsAddingPassenger] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -54,6 +56,20 @@ const PersonalCenterPage = () => {
     }
   };
 
+  const handleAddPassenger = async (passengerData) => {
+    try {
+      const res = await axios.post('/api/passengers', passengerData);
+      if (res.data.code === 201) {
+        setIsAddingPassenger(false);
+        fetchPassengers();
+      } else {
+        throw new Error(res.data.message);
+      }
+    } catch (err) {
+      throw err; // Let Form handle error display
+    }
+  };
+
   const renderContent = () => {
     if (activeTab === 'personal_info') {
       if (loading) return <div>Loading...</div>;
@@ -94,12 +110,23 @@ const PersonalCenterPage = () => {
         </div>
       );
     } else if (activeTab === 'passengers') {
-      if (loading) return <div>Loading...</div>;
+      if (loading && !isAddingPassenger) return <div>Loading...</div>;
       if (error) return <div className="error">{error}</div>;
       
       return (
         <div className="passenger-list">
-           <h3>常用联系人</h3>
+           <div className="passenger-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+             <h3>常用联系人</h3>
+             <button className="btn-primary" onClick={() => setIsAddingPassenger(true)}>添加</button>
+           </div>
+           
+           {isAddingPassenger && (
+             <PassengerForm 
+               onSave={handleAddPassenger} 
+               onCancel={() => setIsAddingPassenger(false)} 
+             />
+           )}
+
            {passengers.length === 0 ? (
              <div>暂无联系人</div>
            ) : (

@@ -34,4 +34,31 @@ describe('REQ-3-2: Passenger API', () => {
     expect(res.body.data[0].name).toBe('Passenger A');
     expect(res.body.data[1].name).toBe('Passenger B');
   });
+
+  it('POST /api/passengers should add new passenger', async () => {
+    const newPassenger = {
+      name: 'Passenger C',
+      idType: 'ID_CARD',
+      idNumber: '333333333333333333',
+      phone: '13900139002',
+      type: 'ADULT'
+    };
+
+    const res = await request(app)
+      .post('/api/passengers')
+      .set('Authorization', 'Bearer mock-jwt-token-1')
+      .send(newPassenger);
+
+    expect(res.status).toBe(201);
+    expect(res.body.code).toBe(201);
+    expect(res.body.data.name).toBe('Passenger C');
+    expect(res.body.data.id).toBeDefined();
+
+    // Verify it's in the list
+    const listRes = await request(app)
+        .get('/api/passengers')
+        .set('Authorization', 'Bearer mock-jwt-token-1');
+    expect(listRes.body.data).toHaveLength(3);
+    expect(listRes.body.data.find(p => p.name === 'Passenger C')).toBeDefined();
+  });
 });

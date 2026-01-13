@@ -27,13 +27,19 @@ describe('REQ-3: Personal Center Infrastructure', () => {
   afterAll((done) => server?.close(done));
 
   beforeEach(async () => {
-    // Seed user for testing
-    const sql = `INSERT OR REPLACE INTO users (id, username, password, real_name, id_number, phone, email, passenger_type) 
-                 VALUES (1, 'testuser', 'password123', 'Test User', '123456789012345678', '13800138000', 'test@example.com', 'ADULT')`;
+    // Seed user and passengers for testing
     await new Promise((resolve, reject) => {
-        db.run(sql, [], (err) => {
-            if (err) reject(err);
-            else resolve();
+        db.serialize(() => {
+            db.run("DELETE FROM passengers");
+            db.run(`INSERT OR REPLACE INTO users (id, username, password, real_name, id_number, phone, email, passenger_type) 
+                    VALUES (1, 'testuser', 'password123', 'Test User', '123456789012345678', '13800138000', 'test@example.com', 'ADULT')`);
+            db.run(`INSERT INTO passengers (user_id, name, id_type, id_number, phone, type) 
+                    VALUES (1, 'Passenger A', 'ID_CARD', '111111111111111111', '13900139000', 'ADULT')`);
+            db.run(`INSERT INTO passengers (user_id, name, id_type, id_number, phone, type) 
+                    VALUES (1, 'Passenger B', 'ID_CARD', '222222222222222222', '13900139001', 'CHILD')`, (err) => {
+                if (err) reject(err);
+                else resolve();
+            });
         });
     });
 
@@ -91,6 +97,39 @@ describe('REQ-3: Personal Center Infrastructure', () => {
         expect(screen.getByText('Passenger A')).toBeInTheDocument();
         expect(screen.getByText('Passenger B')).toBeInTheDocument();
         expect(screen.getByText('111111111111111111')).toBeInTheDocument();
+    });
+  });
+
+  it('REQ-3-2-1:SCE-0 Add Passenger', async () => {
+    render(
+      <MemoryRouter initialEntries={['/center']}>
+        <App />
+      </MemoryRouter>
+    );
+
+    // 1. Click "乘车人" sidebar item
+    fireEvent.click(screen.getByText('乘车人'));
+
+    // 2. Click "Add" button
+    await waitFor(() => {
+        expect(screen.getByText('添加')).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByText('添加'));
+
+    // 3. Fill form
+    fireEvent.change(screen.getByLabelText(/姓名/i), { target: { value: 'New Passenger' } });
+    fireEvent.change(screen.getByLabelText(/证件号码/i), { target: { value: '999999999999999999' } });
+    fireEvent.change(screen.getByLabelText(/手机号/i), { target: { value: '13900139999' } });
+    // Assuming defaults for Type (ADULT) and ID Type (ID_CARD) or explicit selection
+    // fireEvent.change(screen.getByLabelText(/旅客类型/i), { target: { value: 'ADULT' } });
+
+    // 4. Click "Save"
+    fireEvent.click(screen.getByText('保存'));
+
+    // 5. Verify New Passenger appears
+    await waitFor(() => {
+        expect(screen.getByText('New Passenger')).toBeInTheDocument();
+        expect(screen.getByText('999999999999999999')).toBeInTheDocument();
     });
   });
 
