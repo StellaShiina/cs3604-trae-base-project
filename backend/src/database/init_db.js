@@ -1,16 +1,40 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-// Use __dirname to ensure db file is always in backend directory, regardless of CWD
-const dbPath = path.resolve(__dirname, '../../database.db');
-const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) {
-    console.error('Error opening database', err.message);
-  } else {
-    console.log('Connected to the SQLite database.');
-    initTables();
+// Use :memory: for tests to avoid contention and ensure clean state
+const dbPath = process.env.NODE_ENV === 'test' 
+  ? ':memory:' 
+  : path.resolve(__dirname, '../../database.db');
+
+let db;
+
+if (process.env.NODE_ENV === 'test') {
+  if (!global._testDbInstance) {
+    global._testDbInstance = new sqlite3.Database(dbPath, (err) => {
+      if (err) {
+        console.error('Error opening database', err.message);
+      } else {
+        console.log(`Connected to the SQLite database (TEST MODE). ID: ${Math.random()}`);
+        // initTables() moved out to ensure synchronous queuing
+      }
+    });
   }
-});
+  db = global._testDbInstance;
+  // Queue initTables immediately if we just created it (or even if existing? No, only once)
+  if (!global._testDbInitialized) {
+      initTables();
+      global._testDbInitialized = true;
+  }
+} else {
+  db = new sqlite3.Database(dbPath, (err) => {
+    if (err) {
+      console.error('Error opening database', err.message);
+    } else {
+      console.log(`Connected to the SQLite database. ID: ${Math.random()}`);
+    }
+  });
+  initTables();
+}
 
 function initTables() {
   db.run(`CREATE TABLE IF NOT EXISTS users (
@@ -161,7 +185,14 @@ function seedMappings() {
                 [trainMap['G1'], stationMap['天津南'], 2, '09:30', '09:32', 2],
                 [trainMap['G1'], stationMap['济南西'], 3, '10:15', '10:17', 2],
                 [trainMap['G1'], stationMap['南京南'], 4, '11:30', '11:32', 2],
-                [trainMap['G1'], stationMap['上海虹桥'], 5, '12:30', null, 0]
+                [trainMap['G1'], stationMap['上海虹桥'], 5, '12:30', null, 0],
+
+                // G2: Shanghai Hongqiao -> Beijing Nan
+                [trainMap['G2'], stationMap['上海虹桥'], 1, null, '14:00', 0],
+                [trainMap['G2'], stationMap['南京南'], 2, '14:58', '15:00', 2],
+                [trainMap['G2'], stationMap['济南西'], 3, '16:15', '16:17', 2],
+                [trainMap['G2'], stationMap['天津南'], 4, '17:00', '17:02', 2],
+                [trainMap['G2'], stationMap['北京南'], 5, '17:30', null, 0]
             ];
 
             const stmt = db.prepare("INSERT INTO train_station_mapping (train_id, station_id, stop_order, arrival_time, departure_time, duration) VALUES (?, ?, ?, ?, ?, ?)");

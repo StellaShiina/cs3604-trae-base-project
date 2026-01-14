@@ -21,22 +21,26 @@ router.get('/stations', (req, res) => {
 router.get('/query', (req, res) => {
   const { fromStation, toStation, date } = req.query;
   
-  // Note: Date filtering is omitted for MVP as we might not have seeded date-specific data
-  // or we need to handle date format strictly.
-  
+  if (!fromStation || !toStation) {
+     return res.json({ code: 200, message: 'Success', data: [] });
+  }
+
+  // Use train_station_mapping to find trains
   const sql = `
     SELECT 
       t.train_number as trainNumber, 
-      s.departure_time as departureTime, 
-      s.arrival_time as arrivalTime, 
-      s.duration,
+      tsm1.departure_time as departureTime, 
+      tsm2.arrival_time as arrivalTime,
+      tsm1.duration as durationStart,
+      tsm2.duration as durationEnd,
       fs.name as fromStation,
       ts.name as toStation
-    FROM schedules s
-    JOIN trains t ON s.train_id = t.id
-    JOIN stations fs ON s.from_station_id = fs.id
-    JOIN stations ts ON s.to_station_id = ts.id
-    WHERE fs.name LIKE ? AND ts.name LIKE ?
+    FROM trains t
+    JOIN train_station_mapping tsm1 ON t.id = tsm1.train_id
+    JOIN train_station_mapping tsm2 ON t.id = tsm2.train_id
+    JOIN stations fs ON tsm1.station_id = fs.id
+    JOIN stations ts ON tsm2.station_id = ts.id
+    WHERE fs.name LIKE ? AND ts.name LIKE ? AND tsm1.stop_order < tsm2.stop_order
   `;
 
   const params = [`%${fromStation}%`, `%${toStation}%`];
@@ -45,10 +49,34 @@ router.get('/query', (req, res) => {
     if (err) {
       return res.status(500).json({ error: err.message });
     }
+
+    // Process rows to add duration string and prices
+    const results = rows.map(row => {
+        // Simple duration calculation (mock or based on time)
+        // For now just returning string
+        const duration = '2时30分'; // Mock
+        
+        // Mock Prices based on train number or random
+        const isG = row.trainNumber.startsWith('G');
+        const basePrice = isG ? 500 : 200;
+        
+        return {
+            ...row,
+            duration,
+            price: {
+                business: isG ? basePrice * 3 : null,
+                first: isG ? basePrice * 1.6 : null,
+                second: basePrice,
+                softSleeper: !isG ? basePrice * 1.5 : null,
+                hardSleeper: !isG ? basePrice * 1.2 : null
+            }
+        };
+    });
+
     res.json({
       code: 200,
       message: 'Success',
-      data: rows
+      data: results
     });
   });
 });

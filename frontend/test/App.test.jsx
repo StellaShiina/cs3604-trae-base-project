@@ -10,6 +10,6 @@ describe('App Routing', () => {
         <App />
       </BrowserRouter>
     );
-    expect(screen.getByText('12306 China Railway')).toBeInTheDocument();
+    expect(screen.getByText('12306 CHINA RAILWAY')).toBeInTheDocument();
   });
 });

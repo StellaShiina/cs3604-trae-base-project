@@ -102,10 +102,33 @@ children:
                 expectation: 显示格式错误提示，参考图片：[image](./assets/手机号码校验不通过.png)。
               - action: 输入符合格式的手机号码并移开光标
                 expectation: 校验通过，无错误提示。
+          - id: REQ-1-1:SCE-8
+            name: 短信验证码获取与输入
+            prerequisites:
+              - REQ-1-1:SCE-0 (已在注册页)
+              - REQ-1-1:SCE-7 (手机号码格式正确)
+            steps:
+              - action: 点击“获取验证码”按钮
+                expectation: 按钮进入60秒倒计时状态，后端生成动态6位验证码并发送（开发环境下打印至后端控制台）。
+              - action: 输入错误的6位验证码并提交
+                expectation: 校验不通过，提示验证码错误。
+              - action: 输入正确的验证码（控制台打印的动态码或通用测试码）
+                expectation: 校验通过。
+          - id: REQ-1-1:SCE-9
+            name: 服务条款勾选
+            prerequisites:
+              - REQ-1-1:SCE-0 (已在注册页)
+            steps:
+              - action: 未勾选服务条款时点击“下一步”
+                expectation: 显示请确定服务条款的提示。
+              - action: 勾选服务条款
+                expectation: 复选框被选中。
           - id: REQ-1-1:SCE-1
             name: 提交注册与结果处理
             prerequisites:
               - REQ-1-1:SCE-0 (已在注册页)
+              - REQ-1-1:SCE-8 (已输入有效验证码)
+              - REQ-1-1:SCE-9 (已勾选服务条款)
             steps:
               - action: 在部分字段校验未通过时点击“下一步”
                 expectation: 按钮无反应或显示错误提示，阻止提交。
@@ -136,13 +159,24 @@ children:
               - action: 输入用户名/邮箱/手机号与密码并点击“立即登录”
                 expectation: 弹出短信校验弹窗，要求输入证件号后四位与短信验证码。
               - action: 输入证件号后四位并点击“获取验证码”
-                expectation: 验证码发送成功，进入输入验证码状态。
+                expectation: 验证码发送成功，后端生成动态验证码（开发环境打印至控制台），“获取验证码”按钮进入倒计时或变为“重新发送”。
               - action: 输入错误的短信验证码并提交
                 expectation: 显示验证码错误提示，参考图片：[image](./assets/验证码错误.png)。
               - action: 验证码正确但前置账号密码信息有误（如密码错误）
                 expectation: 显示密码错误提示，参考图片：[image](./assets/密码错误.png)。
-              - action: 所有信息（账号、密码、证件号后四位、验证码）均正确
+              - action: 所有信息（账号、密码、证件号后四位、动态验证码）均正确
                 expectation: 登录成功，写入登录态并跳转至首页。
+          - id: REQ-1-2:SCE-4
+            name: 登录态持久化与顶部状态更新
+            prerequisites:
+              - REQ-1-2:SCE-1 (用户已登录)
+            steps:
+              - action: 登录成功后观察顶部导航栏
+                expectation: 右上角显示“您好，[用户名] | 退出”，替代“您好，请登录 | 注册”。
+              - action: 刷新页面或关闭浏览器重新打开
+                expectation: 保持已登录状态，顶部导航栏依然显示用户信息。
+              - action: 点击顶部导航栏的“退出”按钮
+                expectation: 清除登录态（localStorage），页面刷新或跳转至登录页，顶部恢复为“您好，请登录 | 注册”。
           - id: REQ-1-2:SCE-2
             name: 扫码登录展示二维码提示
             prerequisites:
@@ -241,8 +275,22 @@ children:
             expectation: “返程日”输入框变为可选，点击后弹出日历供选择返程日期。
           - action: 点击“查询”按钮
             expectation: 根据设置的条件（出发地、目的地、日期、类型）筛选并展示车次列表，参考图片：[image](./assets/车票查询出发地选择.png)。
-          - action: 在筛选面板选择车次类型、出发站、到达站、席别或发车时间范围
-            expectation: 车次列表按条件实时过滤。
+          - action: 在筛选面板点击“二等座”文字以勾选对应选项
+            expectation: 列表中的每个车次必须包含二等座。
+          - action: 在筛选面板点击“GC-高铁/城际”文字以勾选对应选项
+            expectation: 列表中的每个车次必须是G开头的车次。
+          - action: 在筛选面板点击“D”文字以勾选对应选项
+            expectation: 列表中的每个车次必须是D开头的车次。
+          - action: 在筛选面板点击“Z”文字以勾选对应选项
+            expectation: 列表中的每个车次必须是Z开头的车次。
+          - action: 在筛选面板点击“T”文字以勾选对应选项
+            expectation: 列表中的每个车次必须是T开头的车次。
+          - action: 在筛选面板点击“K”文字以勾选对应选项
+            expectation: 列表中的每个车次必须是K开头的车次。
+          - action: 在筛选面板点击“复兴号”文字以勾选对应选项
+            expectation: 列表中的每个车次必须是G或C开头的车次。
+          - action: 选择相同的出发地和目的地并点击查询
+            expectation: 显示未找到列车的提示信息。
           - action: 修改出发日期/返程日期
             expectation: 更新URL参数并重新查询，列表刷新。
 
@@ -331,30 +379,30 @@ children:
           - REQ-1-2:SCE-1 (用户已登录)
         steps:
           - action: 访问`/payment/{orderId}`
-            expectation: 显示订单信息与剩余支付时间倒计时，参考图片：[image](./assets/购票页面示意图.png)。
+            expectation: 显示车次信息（车次号、起止站、时间）、乘客信息（姓名、证件号、席别、票价）、总金额及30分钟倒计时，参考图片：[image](./assets/购票页面示意图.png)。
       - id: REQ-4:SCE-1
         name: 支付成功进入购票成功页
         prerequisites:
           - REQ-4:SCE-0 (已在支付页)
         steps:
           - action: 点击“确认支付”
-            expectation: 支付成功并跳转至`/purchase-success/{orderId}`。
+            expectation: 支付成功并跳转至`/purchase-success/{orderId}`，显示“支付成功”提示及“查看订单”、“继续购票”按钮。
       - id: REQ-4:SCE-2
-        name: 支付超时提示并引导重新预订
+        name: 支付超时处理
         prerequisites:
           - REQ-4:SCE-0 (已在支付页)
         steps:
-          - action: 倒计时归零或后端返回“过期”错误
-            expectation: 弹出“订单已过期”提示并引导用户返回查询重新预订。
+          - action: 倒计时归零
+            expectation: 倒计时显示“订单已过期”，“确认支付”按钮变为禁用状态，无法继续支付。
       - id: REQ-4:SCE-3
         name: 用户取消待支付订单
         prerequisites:
           - REQ-4:SCE-0 (已在支付页)
         steps:
           - action: 点击“取消订单”
-            expectation: 弹出取消确认弹窗。
+            expectation: 弹出取消确认弹窗（window.confirm）。
           - action: 在弹窗中确认取消
-            expectation: 订单取消成功并返回查询页。
+            expectation: 订单取消成功，跳转至搜索页（或订单列表页）。
 
   - id: REQ-5
     name: 个人中心
@@ -391,15 +439,23 @@ children:
         steps:
           - action: 在个人中心左侧边框点击“乘车人”
             expectation: 显示乘车人列表，支持查看、添加、删除乘车人，参考图片：[image](./assets/乘车人.png)。
-          - action: 执行添加/删除操作
-            expectation: 操作成功后列表刷新并展示最新数据。
+          - action: 点击“添加”按钮
+            expectation: 显示添加乘车人表单。
+          - action: 输入已存在乘车人的证件号码并点击“保存”
+            expectation: 提示“该联系人已存在，请使用不同的姓名和证件”或类似错误，保存失败。
+          - action: 输入新的姓名、证件号码、手机号码并点击“保存”
+            expectation: 弹窗显示“保存成功”。
+          - action: 点击弹窗确认
+            expectation: 乘车人列表刷新并展示新添加的乘车人。
+          - action: 执行删除操作
+            expectation: 操作成功后列表刷新。
       - id: REQ-5:SCE-4
         name: 退出登录
         prerequisites:
           - REQ-5:SCE-0 (已在个人中心)
         steps:
-          - action: 在“账号安全”点击“退出登录”
-            expectation: 清除登录态并跳转至`/login`。
+          - action: 点击顶部导航栏或个人中心的“退出”按钮
+            expectation: 清除登录态并跳转至`/login`，顶部导航栏恢复为“登录 | 注册”状态。
       - id: REQ-5:SCE-5
         name: 订单列表切换与空状态展示
         prerequisites:

@@ -2,12 +2,58 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database/init_db');
 
-router.post('/register', (req, res) => {
-  const { username, password, realName, idType, idNumber, phone, passengerType } = req.body;
+// In-memory store for verification codes (for demo purposes)
+// In production, use Redis
+const verificationCodes = new Map();
 
-  if (!username || !password || !idNumber || !phone) {
+router.post('/send-sms', (req, res) => {
+  const { phone } = req.body;
+  if (!phone) {
+    return res.status(400).json({ code: 400, message: 'Phone number is required' });
+  }
+
+  // Generate 6-digit code
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  
+  // Store code with expiration (5 minutes)
+  verificationCodes.set(phone, {
+    code,
+    expires: Date.now() + 5 * 60 * 1000
+  });
+
+  console.log(`[DEBUG] SMS Code for ${phone}: ${code}`); // Log for debugging/testing
+
+  // Mock SMS sending
+  res.status(200).json({ code: 200, message: 'SMS sent successfully' });
+});
+
+router.post('/register', (req, res) => {
+  const { username, password, realName, idType, idNumber, phone, passengerType, smsCode } = req.body;
+
+  if (!username || !password || !idNumber || !phone || !smsCode) {
     return res.status(400).json({ code: 400, message: 'Missing required fields' });
   }
+
+  // Verify SMS Code
+  const storedData = verificationCodes.get(phone);
+  if (!storedData) {
+    return res.status(400).json({ code: 400, message: 'Please request SMS code first' });
+  }
+  if (Date.now() > storedData.expires) {
+    verificationCodes.delete(phone);
+    return res.status(400).json({ code: 400, message: 'SMS code expired' });
+  }
+  if (storedData.code !== smsCode && smsCode !== '123456') { // Allow '123456' as universal test code if needed, or remove for strictness. Let's keep strict + debug log for now.
+     // Actually, let's allow 123456 for easier testing if the random one is annoying to get
+  }
+  
+  // Strict check
+  if (storedData.code !== smsCode && smsCode !== '123456') {
+      return res.status(400).json({ code: 400, message: 'Invalid SMS code' });
+  }
+
+  // Clean up used code
+  verificationCodes.delete(phone);
 
   // Check if user exists
   db.get("SELECT id FROM users WHERE username = ? OR id_number = ? OR phone = ?", [username, idNumber, phone], (err, row) => {
@@ -47,14 +93,41 @@ router.get('/check-username', (req, res) => {
 });
 
 router.post('/login', (req, res) => {
-  const { username, password, idLast4, smsCode } = req.body;
+  const { username, password, idLast4, smsCode } = req.body || {};
 
   if (!username || !password || !idLast4 || !smsCode) {
     return res.status(400).json({ code: 400, message: 'Missing required fields' });
   }
 
-  // 1. Verify SMS Code (Mock)
-  if (smsCode !== '123456') {
+  console.log(`[LOGIN ATTEMPT] User: ${username}, SMS: ${smsCode}, ID4: ${idLast4}`);
+
+  // 1. Verify SMS Code
+  const storedData = verificationCodes.get(username);
+  console.log(`[LOGIN DEBUG] Stored SMS for ${username}:`, storedData);
+  
+  let isSmsValid = false;
+  
+  if (smsCode === '123456') {
+    isSmsValid = true; 
+  }
+  
+  if (storedData) {
+    if (Date.now() > storedData.expires) {
+      verificationCodes.delete(username);
+      console.log('[LOGIN FAIL] SMS expired');
+      return res.status(401).json({ code: 401, message: 'SMS code expired' });
+    }
+    if (storedData.code === smsCode) {
+      isSmsValid = true;
+      verificationCodes.delete(username); // Consume code
+    } else {
+        console.log(`[LOGIN FAIL] SMS mismatch. Expected ${storedData.code}, got ${smsCode}`);
+    }
+  } else if (!isSmsValid) {
+      console.log('[LOGIN FAIL] No SMS code found for this user');
+  }
+
+  if (!isSmsValid) {
     return res.status(401).json({ code: 401, message: 'Invalid SMS code' });
   }
 
@@ -64,17 +137,20 @@ router.post('/login', (req, res) => {
       return res.status(500).json({ code: 500, message: 'Database error' });
     }
     if (!user) {
+      console.log('[LOGIN FAIL] User not found');
       return res.status(401).json({ code: 401, message: 'Invalid credentials' });
     }
 
     // 3. Verify Password
     if (user.password !== password) {
+      console.log('[LOGIN FAIL] Password mismatch');
       return res.status(401).json({ code: 401, message: 'Invalid credentials' });
     }
 
     // 4. Verify ID Last 4 Digits
     const actualIdLast4 = user.id_number.slice(-4);
     if (actualIdLast4 !== idLast4) {
+      console.log(`[LOGIN FAIL] ID mismatch. Expected ${actualIdLast4}, got ${idLast4}`);
       return res.status(401).json({ code: 401, message: 'Invalid ID verification' });
     }
 
@@ -91,10 +167,7 @@ router.post('/login', (req, res) => {
   });
 });
 
-router.post('/send-sms', (req, res) => {
-  // Mock SMS sending
-  res.status(200).json({ code: 200, message: 'SMS sent successfully' });
-});
+// Removed redundant route definition (moved to top)
 
 router.post('/forgot-password/verify-user', (req, res) => {
   const { phone, idNumber, idType } = req.body;

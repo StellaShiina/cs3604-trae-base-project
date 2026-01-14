@@ -7,6 +7,8 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import SearchPage from './pages/SearchPage';
 import OrderPage from './pages/OrderPage';
 import OrderFormPage from './pages/OrderFormPage';
+import PaymentPage from './pages/PaymentPage';
+import PurchaseSuccessPage from './pages/PurchaseSuccessPage';
 import PersonalCenterPage from './pages/PersonalCenterPage';
 
 function App() {
@@ -19,6 +21,8 @@ function App() {
       <Route path="/search" element={<SearchPage />} />
       <Route path="/order" element={<OrderPage />} />
       <Route path="/order/create/:trainId" element={<OrderFormPage />} />
+      <Route path="/payment/:orderId" element={<PaymentPage />} />
+      <Route path="/purchase-success/:orderId" element={<PurchaseSuccessPage />} />
       <Route path="/center" element={<PersonalCenterPage />} />
     </Routes>
   );

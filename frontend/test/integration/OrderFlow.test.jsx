@@ -42,26 +42,19 @@ describe('Order Flow Integration', () => {
         // Create Order
         const userId = this.lastID;
         db.run(`INSERT INTO orders (user_id, train_id, from_station_id, to_station_id, departure_date, status, created_at)
-                VALUES (?, 1, 1, 2, '2023-10-01', '0', datetime('now'))`, [userId], resolve);
+                VALUES (?, 1, 1, 2, '2023-10-01', 'pending_payment', datetime('now'))`, [userId], resolve);
       });
     });
 
     // Mock Authorization Header for axios
-    // In real app, this is set after login. For test, we can set it globally or mock localStorage if used.
-    // Our frontend might rely on localStorage or just state. 
-    // If PersonalCenter checks login, we might need to mock that check or ensure axios has token.
-    // Let's assume axios instance in component picks up token or we set it here.
-    // Actually, PersonalCenterPage doesn't seem to check token explicitly before fetch, 
-    // but the backend middleware does.
-    // We need to inject the token into axios.
-    // The previous tests might have handled this.
-    // Let's set default header.
-    // We need to know the user ID. 
-    // Let's fetch the user we just created.
-    const user = await new Promise(resolve => {
-        db.get("SELECT id FROM users WHERE username='testuser'", (err, row) => resolve(row));
+    // Login
+    const loginRes = await axios.post('/api/auth/login', {
+      username: 'testuser',
+      password: 'password123',
+      idLast4: '1111',
+      smsCode: '123456'
     });
-    axios.defaults.headers.common['Authorization'] = `Bearer mock-jwt-token-${user.id}`;
+    axios.defaults.headers.common['Authorization'] = `Bearer ${loginRes.data.data.token}`;
   });
 
   it('REQ-4-1:SCE-0 View Order List', async () => {

@@ -54,7 +54,7 @@ describe('Order Routes', () => {
     expect(order.status).toBe('pending_payment');
 
     const tickets = await new Promise(resolve => {
-        db.all('SELECT * FROM order_tickets WHERE order_id = ?', [res.body.data.orderId], (err, rows) => resolve(rows));
+        db.all('SELECT * FROM order_items WHERE order_id = ?', [res.body.data.orderId], (err, rows) => resolve(rows));
     });
     expect(tickets).toHaveLength(2);
   });

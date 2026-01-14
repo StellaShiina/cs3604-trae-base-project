@@ -37,25 +37,34 @@ router.post('/', (req, res) => {
     return res.status(400).json({ code: 400, message: 'Missing required fields' });
   }
 
-  const sql = `INSERT INTO passengers (user_id, name, id_type, id_number, phone, type) 
+  // Check for duplicate passenger for this user (name + idNumber check)
+  // Assuming a user cannot have two passengers with same ID number.
+  db.get('SELECT id FROM passengers WHERE user_id = ? AND (id_number = ? OR name = ?)', [userId, idNumber, name], (err, row) => {
+    if (err) return res.status(500).json({ code: 500, message: 'Database error', error: err.message });
+    if (row) {
+        return res.status(400).json({ code: 400, message: '该联系人已存在，请使用不同的姓名和证件' });
+    }
+
+    const sql = `INSERT INTO passengers (user_id, name, id_type, id_number, phone, type) 
                VALUES (?, ?, ?, ?, ?, ?)`;
   
-  db.run(sql, [userId, name, idType, idNumber, phone, type], function(err) {
-    if (err) {
-      return res.status(500).json({ code: 500, message: 'Database error', error: err.message });
-    }
-    res.status(201).json({
-      code: 201,
-      message: 'Passenger added successfully',
-      data: {
-        id: this.lastID,
-        userId,
-        name,
-        idType,
-        idNumber,
-        phone,
-        type
+    db.run(sql, [userId, name, idType, idNumber, phone, type], function(err) {
+      if (err) {
+        return res.status(500).json({ code: 500, message: 'Database error', error: err.message });
       }
+      res.status(201).json({
+        code: 201,
+        message: 'Passenger added successfully',
+        data: {
+          id: this.lastID,
+          userId,
+          name,
+          idType,
+          idNumber,
+          phone,
+          type
+        }
+      });
     });
   });
 });

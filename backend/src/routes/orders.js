@@ -103,17 +103,69 @@ router.get('/', (req, res) => {
       return res.status(500).json({ code: 500, message: 'Database error', error: err.message });
     }
 
-    // Optionally fetch items for each order? 
-    // For now, let's just return the order details. 
-    // If frontend needs ticket details in the list, we can add it.
-    // Let's add a simple loop to fetch items if needed, but for MVP list, maybe not.
-    // However, the "Unfinished Order" tab usually shows payment amount which comes from tickets.
-    // Let's just return orders for now.
-
     res.json({
       code: 200,
       message: 'Success',
       data: rows
+    });
+  });
+});
+
+// Get Single Order Details
+router.get('/:id', (req, res) => {
+  const userId = req.user ? req.user.id : null;
+  if (!userId) {
+    return res.status(401).json({ code: 401, message: 'Unauthorized' });
+  }
+
+  const { id } = req.params;
+
+  const orderSql = `
+    SELECT 
+        o.id, o.train_id, o.from_station_id, o.to_station_id, o.departure_date, o.status, o.created_at,
+        t.train_number,
+        map_from.departure_time as start_time,
+        map_to.arrival_time as end_time,
+        fs.name as from_station_name,
+        ts.name as to_station_name
+    FROM orders o
+    LEFT JOIN trains t ON o.train_id = t.id
+    LEFT JOIN stations fs ON o.from_station_id = fs.id
+    LEFT JOIN stations ts ON o.to_station_id = ts.id
+    LEFT JOIN train_station_mapping map_from ON o.train_id = map_from.train_id AND o.from_station_id = map_from.station_id
+    LEFT JOIN train_station_mapping map_to ON o.train_id = map_to.train_id AND o.to_station_id = map_to.station_id
+    WHERE o.id = ? AND o.user_id = ?
+  `;
+
+  db.get(orderSql, [id, userId], (err, order) => {
+    if (err) {
+      console.error('Database error in GET /orders/:id:', err.message);
+      return res.status(500).json({ code: 500, message: 'Database error' });
+    }
+    if (!order) return res.status(404).json({ code: 404, message: 'Order not found' });
+
+    // Fetch Order Items (Tickets)
+    const itemsSql = `
+      SELECT 
+        oi.id, oi.seat_type, oi.price,
+        p.name as passenger_name, p.id_number
+      FROM order_items oi
+      LEFT JOIN passengers p ON oi.passenger_id = p.id
+      WHERE oi.order_id = ?
+    `;
+
+    db.all(itemsSql, [id], (err, items) => {
+      if (err) return res.status(500).json({ code: 500, message: 'Failed to fetch items' });
+      
+      order.tickets = items;
+      // Calculate total price
+      order.totalPrice = items.reduce((sum, item) => sum + item.price, 0);
+
+      res.json({
+        code: 200,
+        message: 'Success',
+        data: order
+      });
     });
   });
 });

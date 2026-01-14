@@ -1,7 +1,8 @@
-const request = require('supertest');
-const express = require('express');
-const trainRoutes = require('../../src/routes/trains');
-const db = require('../../src/database/init_db');
+import request from 'supertest';
+import express from 'express';
+import trainRoutes from '../../src/routes/trains';
+import db from '../../src/database/init_db';
+import { describe, it, expect } from 'vitest';
 
 const app = express();
 app.use(express.json());

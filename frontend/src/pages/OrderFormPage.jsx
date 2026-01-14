@@ -62,7 +62,7 @@ const OrderFormPage = () => {
       const res = await axios.post('/api/orders', payload);
       if (res.data.code === 201) {
         // alert('Order created successfully');
-        navigate('/order'); // Go to order list
+        navigate(`/payment/${res.data.data.orderId}`);
       }
     } catch (error) {
       console.error('Failed to create order', error);

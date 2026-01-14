@@ -8,6 +8,8 @@ const LoginPage = () => {
   const [loginMethod, setLoginMethod] = useState('account'); // 'account' or 'qrcode'
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState('');
+  const [countdown, setCountdown] = useState(0);
+  const [hasSent, setHasSent] = useState(false);
   
   const [formData, setFormData] = useState({
     username: '',
@@ -48,6 +50,16 @@ const LoginPage = () => {
       const response = await axios.post('/api/auth/login', payload);
       if (response.data.code === 200) {
         // Success
+        localStorage.setItem('token', response.data.data.token);
+        localStorage.setItem('username', response.data.data.username);
+        localStorage.setItem('userId', response.data.data.userId);
+        // Force a storage event or custom event if needed, but for now simple navigation is enough
+        // as Header will mount fresh on full page loads, but strictly speaking SPA navigation
+        // might not re-mount Header if it's outside the Routes. 
+        // Let's assume Header checks localStorage on mount/update.
+        // To be safe, dispatch a custom event for immediate UI update if Header doesn't unmount.
+        window.dispatchEvent(new Event('storage'));
+        
         navigate('/');
       }
     } catch (err) {
@@ -56,14 +68,32 @@ const LoginPage = () => {
   };
 
   const sendSmsCode = async () => {
+    if (countdown > 0) return;
+    
+    // Start countdown immediately for UX
+    setCountdown(60);
+    setHasSent(true);
+
     // Mock SMS send
     try {
       await axios.post('/api/auth/send-sms', { phone: formData.username });
-      alert('验证码已发送 (Mock: 123456)');
+      alert('验证码已发送 (请查看后端控制台)');
     } catch (err) {
       console.error(err);
+      // If failed, maybe reset countdown? keeping it simple for now as per requirements
     }
   };
+
+  // Countdown effect
+  React.useEffect(() => {
+    let timer;
+    if (countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [countdown]);
 
   return (
     <div className="login-container">
@@ -128,7 +158,7 @@ const LoginPage = () => {
                 type="text" 
                 name="idLast4" 
                 className="form-input" 
-                placeholder="证件号后四位" 
+                placeholder="请输入登录账号绑定的证件号后4位" 
                 value={verifyData.idLast4}
                 onChange={handleVerifyChange}
               />
@@ -142,7 +172,14 @@ const LoginPage = () => {
                 value={verifyData.smsCode}
                 onChange={handleVerifyChange}
               />
-              <button type="button" className="verify-btn" onClick={sendSmsCode}>获取验证码</button>
+              <button 
+                type="button" 
+                className="verify-btn" 
+                onClick={sendSmsCode}
+                disabled={countdown > 0}
+              >
+                {countdown > 0 ? `重新发送(${countdown}s)` : (hasSent ? '重新发送' : '获取验证码')}
+              </button>
             </div>
             <button type="button" className="login-btn" onClick={handleFinalSubmit}>提交验证</button>
             <button 

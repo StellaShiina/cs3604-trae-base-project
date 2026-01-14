@@ -5,6 +5,22 @@ import './Header.css';
 const Header = () => {
   const navigate = useNavigate();
   const [showTicketDropdown, setShowTicketDropdown] = useState(false);
+  const [username, setUsername] = useState(null);
+
+  React.useEffect(() => {
+    const storedName = localStorage.getItem('username');
+    if (storedName) {
+      setUsername(storedName);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    localStorage.removeItem('userId');
+    setUsername(null);
+    navigate('/login');
+  };
 
   const handleTicketClick = (type) => {
     navigate(`/search?type=${type}`);
@@ -35,8 +51,16 @@ const Header = () => {
           <span>English</span>
           <Link to="/center" className="my-12306-link">我的12306</Link>
           <div className="auth-status">
-            <span>您好，请</span>
-            <Link to="/login">登录</Link> | <Link to="/register">注册</Link>
+            {username ? (
+              <>
+                <span>您好，{username}</span> | <span onClick={handleLogout} style={{cursor: 'pointer', color: '#0078d7'}}>退出</span>
+              </>
+            ) : (
+              <>
+                <span>您好，请</span>
+                <Link to="/login">登录</Link> | <Link to="/register">注册</Link>
+              </>
+            )}
           </div>
         </div>
       </div>

@@ -35,9 +35,10 @@ const OrderPage = () => {
 
   const fetchPassengers = async () => {
     try {
-      const userStr = localStorage.getItem('user');
-      const user = userStr ? JSON.parse(userStr) : null;
-      const token = user ? user.token : 'mock-jwt-token-1'; // Fallback for dev
+      const token = localStorage.getItem('token');
+      // const userStr = localStorage.getItem('user');
+      // const user = userStr ? JSON.parse(userStr) : null;
+      // const token = user ? user.token : 'mock-jwt-token-1'; // Fallback for dev
 
       const res = await axios.get('/api/passengers', {
         headers: { Authorization: `Bearer ${token}` }
@@ -69,9 +70,10 @@ const OrderPage = () => {
     }
 
     try {
-      const userStr = localStorage.getItem('user');
-      const user = userStr ? JSON.parse(userStr) : null;
-      const token = user ? user.token : 'mock-jwt-token-1';
+      const token = localStorage.getItem('token');
+      // const userStr = localStorage.getItem('user');
+      // const user = userStr ? JSON.parse(userStr) : null;
+      // const token = user ? user.token : 'mock-jwt-token-1';
 
       const selectedPassengers = passengers
         .filter(p => selectedPassengerIds.includes(p.id))

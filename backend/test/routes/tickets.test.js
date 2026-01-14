@@ -5,6 +5,9 @@ import db from '../../src/database/init_db';
 
 describe('Ticket API', () => {
   beforeAll(async () => {
+    // Wait for DB init
+    await new Promise(resolve => setTimeout(resolve, 500));
+
     // Clear and Seed Data
     await new Promise(resolve => db.run('DELETE FROM schedules', resolve));
     await new Promise(resolve => db.run('DELETE FROM trains', resolve));

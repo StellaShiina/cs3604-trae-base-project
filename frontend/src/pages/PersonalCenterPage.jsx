@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -7,6 +8,7 @@ import PassengerForm from '../components/PassengerForm';
 import './PersonalCenterPage.css';
 
 const PersonalCenterPage = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('personal_info');
   const [userInfo, setUserInfo] = useState(null);
   const [passengers, setPassengers] = useState([]);
@@ -94,23 +96,40 @@ const PersonalCenterPage = () => {
     }
   };
 
-  const handlePayOrder = async (orderId) => {
-    // Mock payment process
+  const handlePayOrder = (orderId) => {
+    navigate(`/payment/${orderId}`);
+  };
+
+  const handleAddPassenger = async (passengerData) => {
     try {
-      const res = await axios.put(`/api/orders/${orderId}/status`, { status: 'paid' });
-      if (res.data.code === 200) {
-        alert('支付成功');
-        fetchOrders();
+      const res = await axios.post('/api/passengers', passengerData);
+      if (res.data.code === 200 || res.data.code === 201) {
+        alert('保存成功');
+        setIsAddingPassenger(false);
+        fetchPassengers();
       } else {
         alert(res.data.message);
       }
     } catch (err) {
       console.error(err);
-      alert('支付失败');
+      alert('Failed to add passenger');
     }
   };
 
-  // ... (handleAddPassenger, handleDeletePassenger same)
+  const handleDeletePassenger = async (id) => {
+    if (!window.confirm('确定要删除该乘车人吗？')) return;
+    try {
+      const res = await axios.delete(`/api/passengers/${id}`);
+      if (res.data.code === 200) {
+        fetchPassengers();
+      } else {
+        alert(res.data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Failed to delete passenger');
+    }
+  };
 
   const renderContent = () => {
     // ... (personal_info, passengers same)
@@ -276,7 +295,7 @@ const PersonalCenterPage = () => {
               className={`menu-item ${activeTab === 'personal_info' ? 'active' : ''}`}
               onClick={() => setActiveTab('personal_info')}
             >
-              个人信息
+              查看个人信息
             </li>
             <li 
               className={`menu-item ${activeTab === 'passengers' ? 'active' : ''}`}

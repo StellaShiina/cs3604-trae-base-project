@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react';
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import PersonalCenterPage from '../../src/pages/PersonalCenterPage';
@@ -16,7 +17,7 @@ describe('PersonalCenterPage Unit Test', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText('个人中心')).toBeInTheDocument();
+    expect(screen.getAllByText('个人中心')[0]).toBeInTheDocument();
     expect(screen.getByText('订单中心')).toBeInTheDocument();
     expect(screen.getByText('个人信息')).toBeInTheDocument();
     expect(screen.getByText('乘车人')).toBeInTheDocument();
