@@ -180,7 +180,7 @@ router.put('/:id/status', (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
 
-  if (!['cancelled', 'paid'].includes(status)) {
+  if (!['cancelled', 'paid', 'refunded'].includes(status)) {
     return res.status(400).json({ code: 400, message: 'Invalid status' });
   }
 
@@ -194,6 +194,9 @@ router.put('/:id/status', (req, res) => {
     if (status === 'cancelled' && order.status !== 'pending_payment') {
       return res.status(400).json({ code: 400, message: 'Cannot cancel order in current status' });
     }
+    if (status === 'refunded' && order.status !== 'paid') {
+      return res.status(400).json({ code: 400, message: 'Cannot refund unpaid or already refunded order' });
+    }
     // if (status === 'paid' && order.status !== 'pending_payment') ...
 
     const updateSql = 'UPDATE orders SET status = ? WHERE id = ?';
@@ -202,7 +205,7 @@ router.put('/:id/status', (req, res) => {
       
       res.json({
         code: 200,
-        message: 'Order status updated',
+        message: status === 'refunded' ? '退票成功' : 'Order status updated',
         data: { id, status }
       });
     });

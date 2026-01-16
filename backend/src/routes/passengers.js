@@ -78,19 +78,41 @@ router.delete('/:id', (req, res) => {
 
   const passengerId = req.params.id;
   
-  // Ensure the passenger belongs to the user
-  const sql = 'DELETE FROM passengers WHERE id = ? AND user_id = ?';
-  db.run(sql, [passengerId, userId], function(err) {
-    if (err) {
-      return res.status(500).json({ code: 500, message: 'Database error', error: err.message });
-    }
-    if (this.changes === 0) {
-        return res.status(404).json({ code: 404, message: 'Passenger not found or not authorized' });
-    }
-    res.json({
-      code: 200,
-      message: 'Passenger deleted successfully'
-    });
+  // 1. Check if passenger is self
+  db.get('SELECT p.id_number, p.user_id FROM passengers p WHERE p.id = ?', [passengerId], (err, passenger) => {
+      if (err) return res.status(500).json({ code: 500, message: 'Database error', error: err.message });
+      if (!passenger) return res.status(404).json({ code: 404, message: 'Passenger not found' });
+      
+      // Check ownership
+      if (passenger.user_id !== userId) {
+          return res.status(404).json({ code: 404, message: 'Passenger not found or not authorized' });
+      }
+
+      // Get User ID number
+      db.get('SELECT id_number FROM users WHERE id = ?', [userId], (err, user) => {
+          if (err) return res.status(500).json({ code: 500, message: 'Database error', error: err.message });
+          
+          if (user && user.id_number === passenger.id_number) {
+              // This is the self-passenger
+              return res.status(403).json({ code: 403, message: '本人乘车人不可删除' });
+          }
+
+          // Proceed to delete
+          const sql = 'DELETE FROM passengers WHERE id = ? AND user_id = ?';
+          db.run(sql, [passengerId, userId], function(err) {
+            if (err) {
+              return res.status(500).json({ code: 500, message: 'Database error', error: err.message });
+            }
+            if (this.changes === 0) {
+                // Should not happen given logic above, but safe to keep
+                return res.status(404).json({ code: 404, message: 'Passenger not found or not authorized' });
+            }
+            res.json({
+              code: 200,
+              message: 'Passenger deleted successfully'
+            });
+          });
+      });
   });
 });
 

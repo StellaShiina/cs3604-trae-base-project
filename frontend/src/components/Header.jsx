@@ -8,10 +8,20 @@ const Header = () => {
   const [username, setUsername] = useState(null);
 
   React.useEffect(() => {
-    const storedName = localStorage.getItem('username');
-    if (storedName) {
+    const checkLoginStatus = () => {
+      const storedName = localStorage.getItem('username');
       setUsername(storedName);
-    }
+    };
+
+    // Initial check
+    checkLoginStatus();
+
+    // Listen for storage events (cross-tab) and custom events (same-tab)
+    window.addEventListener('storage', checkLoginStatus);
+    
+    return () => {
+      window.removeEventListener('storage', checkLoginStatus);
+    };
   }, []);
 
   const handleLogout = () => {

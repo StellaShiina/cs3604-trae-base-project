@@ -96,6 +96,24 @@ const PersonalCenterPage = () => {
     }
   };
 
+  const handleRefundOrder = async (orderId) => {
+    if (!window.confirm('确定要退票吗？')) return;
+
+    try {
+      const res = await axios.put(`/api/orders/${orderId}/status`, { status: 'refunded' });
+      if (res.data.code === 200) {
+        alert('退票成功');
+        // Refresh list
+        fetchOrders();
+      } else {
+        alert(res.data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('退票失败');
+    }
+  };
+
   const handlePayOrder = (orderId) => {
     navigate(`/payment/${orderId}`);
   };
@@ -258,7 +276,7 @@ const PersonalCenterPage = () => {
                      <div className="order-body">
                        <div className="train-info">
                          <span>{order.train_number}</span>
-                         <span>{order.from_station_name} -> {order.to_station_name}</span>
+                         <span>{order.from_station_name} &rarr; {order.to_station_name}</span>
                          <span>{order.departure_date}</span>
                        </div>
                        <div className="order-actions">
@@ -269,7 +287,10 @@ const PersonalCenterPage = () => {
                            </>
                          )}
                          {order.status === 'paid' && (
-                           <button className="btn-secondary">改签</button>
+                           <>
+                             <button className="btn-secondary">改签</button>
+                             <button className="btn-secondary" style={{ marginLeft: '10px' }} onClick={() => handleRefundOrder(order.id)}>退票</button>
+                           </>
                          )}
                        </div>
                      </div>

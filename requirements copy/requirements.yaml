@@ -136,6 +136,8 @@ children:
                 expectation: 弹出提示“该证件号码已被注册”，参考图片：[image](./assets/证件号码已被注册.png)；点击“确定”后留在注册页。
               - action: 所有字段校验通过后点击“下一步”，且证件号码未被注册
                 expectation: 显示“注册成功，跳转到登录页面”提示，并自动跳转至登录页。
+              - action: 注册成功后检查后端数据
+                expectation: 系统应自动创建一条与注册用户身份信息一致的乘车人记录，且标记为不可删除。
 
       - id: REQ-1-2
         name: 用户登录
@@ -177,6 +179,8 @@ children:
                 expectation: 保持已登录状态，顶部导航栏依然显示用户信息。
               - action: 点击顶部导航栏的“退出”按钮
                 expectation: 清除登录态（localStorage），页面刷新或跳转至登录页，顶部恢复为“您好，请登录 | 注册”。
+              - action: 在登录成功后检查存储
+                expectation: localStorage中必须同时存储token、username、userId及user对象（user对象用于部分页面状态判断）。
           - id: REQ-1-2:SCE-2
             name: 扫码登录展示二维码提示
             prerequisites:
@@ -264,9 +268,9 @@ children:
           - REQ-2:SCE-0 (已在查询结果页) 或 REQ-2:SCE-2
         steps:
           - action: 点击“出发地”图标/输入框
-            expectation: 展开下拉菜单供选择出发站点，参考图片：[image](./assets/车票查询出发地选择.png)。
+            expectation: 展开下拉菜单显示热门城市/车站列表，支持点击选择。
           - action: 点击“目的地”图标/输入框
-            expectation: 展开下拉菜单供选择到达站点，交互同出发地选择。
+            expectation: 展开下拉菜单显示热门城市/车站列表，支持点击选择。
           - action: 点击“出发日”后的输入框
             expectation: 弹出日历供选择出发日期，参考图片：[image](./assets/出发日日历.png)。
           - action: 选择“单程”类型
@@ -339,7 +343,7 @@ children:
           - action: 点击乘车人“票种”下拉框
             expectation: 展开下拉菜单供选择（如成人票、儿童票等），参考图片：[image](./assets/订单票种选择.png)。
           - action: 点击乘车人“席别”下拉框
-            expectation: 显示席别列表及对应价格，参考图片：[image](./assets/订单席别选择.png)。
+            expectation: 显示席别列表（如二等座、一等座、商务座），仅展示该车次支持的席别。选择后，票价应根据席别自动更新。参考图片：[image](./assets/订单席别选择.png)。
           - action: 选择至少一个乘车人并完成信息确认
             expectation: 汇总区域展示乘车人列表与总价。
           - action: 点击“提交订单”
@@ -425,6 +429,16 @@ children:
         steps:
           - action: 在“未完成订单”列表点击“去支付”
             expectation: 跳转至`/payment/{orderId}`。
+      - id: REQ-5:SCE-9
+        name: 订单退票
+        prerequisites:
+          - REQ-5:SCE-0 (已在个人中心)
+        steps:
+          - action: 在“未完成订单”或“未出行订单”列表找到状态为“已支付”的订单
+          - action: 点击“退票”按钮
+            expectation: 弹出确认弹窗“确定要退票吗？”。
+          - action: 点击确认
+            expectation: 订单状态更新为“已退票”，并提示“退票成功”。
       - id: REQ-5:SCE-2
         name: 在个人中心取消未完成订单
         prerequisites:
@@ -449,6 +463,15 @@ children:
             expectation: 乘车人列表刷新并展示新添加的乘车人。
           - action: 执行删除操作
             expectation: 操作成功后列表刷新。
+          - id: REQ-5:SCE-8
+            name: 尝试删除本人乘车人
+            prerequisites:
+              - REQ-5:SCE-0 (已在个人中心)
+              - REQ-5:SCE-3 (已在乘车人列表)
+            steps:
+              - action: 在乘车人列表中找到与登录用户身份一致的乘车人（本人）
+              - action: 点击“删除”按钮
+                expectation: 弹出提示“本人乘车人不可删除”，操作被拦截，列表未发生变化。
       - id: REQ-5:SCE-4
         name: 退出登录
         prerequisites:

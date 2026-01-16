@@ -53,6 +53,7 @@ const LoginPage = () => {
         localStorage.setItem('token', response.data.data.token);
         localStorage.setItem('username', response.data.data.username);
         localStorage.setItem('userId', response.data.data.userId);
+        localStorage.setItem('user', JSON.stringify(response.data.data));
         // Force a storage event or custom event if needed, but for now simple navigation is enough
         // as Header will mount fresh on full page loads, but strictly speaking SPA navigation
         // might not re-mount Header if it's outside the Routes. 

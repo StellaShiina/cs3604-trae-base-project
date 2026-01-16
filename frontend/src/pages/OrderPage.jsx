@@ -9,8 +9,32 @@ const OrderPage = () => {
   const navigate = useNavigate();
   const [passengers, setPassengers] = useState([]);
   const [selectedPassengerIds, setSelectedPassengerIds] = useState([]);
+  const [selectedSeats, setSelectedSeats] = useState({});
   const [trainInfo, setTrainInfo] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const typeMap = {
+    business: '商务座',
+    first: '一等座',
+    second: '二等座',
+    softSleeper: '软卧',
+    hardSleeper: '硬卧'
+  };
+
+  const getAvailableSeats = () => {
+    if (!trainInfo || !trainInfo.price) return [];
+    const seats = [];
+    Object.keys(trainInfo.price).forEach(key => {
+      if (trainInfo.price[key] !== null) {
+        seats.push({
+          type: key,
+          label: typeMap[key] || key,
+          price: trainInfo.price[key]
+        });
+      }
+    });
+    return seats;
+  };
 
   // Mock data for dev if no location state (e.g. direct access)
   // In real app, we might redirect back to search
@@ -56,11 +80,29 @@ const OrderPage = () => {
   const handlePassengerToggle = (id) => {
     setSelectedPassengerIds(prev => {
       if (prev.includes(id)) {
+        const newSeats = { ...selectedSeats };
+        delete newSeats[id];
+        setSelectedSeats(newSeats);
         return prev.filter(pid => pid !== id);
       } else {
+        // Auto select first available seat
+        const seats = getAvailableSeats();
+        if (seats.length > 0) {
+          setSelectedSeats(prevSeats => ({
+            ...prevSeats,
+            [id]: seats[0].type
+          }));
+        }
         return [...prev, id];
       }
     });
+  };
+
+  const handleSeatChange = (passengerId, newSeatType) => {
+    setSelectedSeats(prev => ({
+      ...prev,
+      [passengerId]: newSeatType
+    }));
   };
 
   const handleSubmit = async () => {
@@ -77,11 +119,15 @@ const OrderPage = () => {
 
       const selectedPassengers = passengers
         .filter(p => selectedPassengerIds.includes(p.id))
-        .map(p => ({
+        .map(p => {
+          const seatTypeKey = selectedSeats[p.id];
+          const price = trainInfo.price ? trainInfo.price[seatTypeKey] : 0;
+          return {
             passengerId: p.id,
-            seatType: '二等座', // Default for now
-            price: 553.0 // Mock price
-        }));
+            seatType: seatTypeKey,
+            price: price
+          };
+        });
 
       const payload = {
         trainId: trainInfo.id || 1, // Fallback
@@ -133,6 +179,19 @@ const OrderPage = () => {
                                  />
                                  {p.name} ({p.id_type}: {p.id_number})
                              </label>
+                         {selectedPassengerIds.includes(p.id) && (
+                           <select
+                             value={selectedSeats[p.id] || ''}
+                             onChange={(e) => handleSeatChange(p.id, e.target.value)}
+                             style={{ marginLeft: '10px', padding: '4px' }}
+                           >
+                             {getAvailableSeats().map(seat => (
+                               <option key={seat.type} value={seat.type}>
+                                 {seat.label} (¥{seat.price})
+                               </option>
+                             ))}
+                           </select>
+                         )}
                          </div>
                      ))
                  )

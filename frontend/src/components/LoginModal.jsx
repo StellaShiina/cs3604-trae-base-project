@@ -29,8 +29,15 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
     try {
       const res = await axios.post('/api/auth/login', formData);
       if (res.data.code === 200) {
-        // Save user to local storage (mock session)
+        // Save user to local storage
         localStorage.setItem('user', JSON.stringify(res.data.data));
+        localStorage.setItem('token', res.data.data.token);
+        localStorage.setItem('username', res.data.data.username);
+        localStorage.setItem('userId', res.data.data.userId);
+
+        // Dispatch storage event to update Header
+        window.dispatchEvent(new Event('storage'));
+
         onLoginSuccess(res.data.data);
       }
     } catch (err) {

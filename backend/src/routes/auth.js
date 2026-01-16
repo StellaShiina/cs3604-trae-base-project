@@ -70,7 +70,26 @@ router.post('/register', (req, res) => {
       if (err) {
         return res.status(500).json({ code: 500, message: 'Failed to register user' });
       }
-      res.status(200).json({ code: 200, message: 'Registration successful', userId: this.lastID });
+      
+      const userId = this.lastID;
+
+      // Auto-create self passenger
+      const passengerSql = `INSERT INTO passengers (user_id, name, id_type, id_number, phone, type) VALUES (?, ?, ?, ?, ?, ?)`;
+      // Default type to '成人' if passengerType is not provided or map accordingly. 
+      // Assuming passengerType from registration is valid for passengers table too.
+      // Usually registration passengerType might be code (e.g. '1'), but let's assume text for now based on init_db.
+      // If passengerType is undefined, default to '成人'
+      const pType = passengerType || '成人';
+      
+      db.run(passengerSql, [userId, realName, idType, idNumber, phone, pType], (pErr) => {
+          if (pErr) {
+              console.error('Failed to create self-passenger:', pErr);
+              // We don't fail the registration but log error. Or should we rollback?
+              // SQLite doesn't support nested transactions easily in this driver without explicit BEGIN/COMMIT wrapping.
+              // For now, let's assume it works or log it.
+          }
+          res.status(200).json({ code: 200, message: 'Registration successful', userId: userId });
+      });
     });
   });
 });

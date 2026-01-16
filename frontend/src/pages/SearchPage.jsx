@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../components/Header';
 import LoginModal from '../components/LoginModal';
+import CitySelector from '../components/CitySelector';
 import './SearchPage.css';
 
 const SearchPage = () => {
@@ -113,8 +114,11 @@ const SearchPage = () => {
   }, [filters]);
 
   const handleBookTicket = (train) => {
+    // Check both user object and token for robustness
     const user = localStorage.getItem('user');
-    if (user) {
+    const token = localStorage.getItem('token');
+
+    if (user || token) {
       navigate('/order', { state: { train } });
     } else {
       setPendingTrain(train);
@@ -142,15 +146,15 @@ const SearchPage = () => {
       {/* Search Bar Area */}
       <div className="search-toolbar">
         <div className="search-inputs">
-          <input 
+          <CitySelector 
             value={filters.fromStation} 
-            onChange={(e) => setFilters({...filters, fromStation: e.target.value})}
+            onChange={(val) => setFilters({ ...filters, fromStation: val })}
             placeholder="出发地"
           />
           <span className="arrow">→</span>
-          <input 
+          <CitySelector 
             value={filters.toStation} 
-            onChange={(e) => setFilters({...filters, toStation: e.target.value})}
+            onChange={(val) => setFilters({ ...filters, toStation: val })}
             placeholder="到达地"
           />
           <input 
