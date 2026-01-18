@@ -53,8 +53,14 @@
 - id: REQ-1-3
   parentId: REQ-1
   childrenIds: []
-  status: PENDING_CONTRACT
-  artifacts: {}
+  status: PENDING_IMPL
+  artifacts:
+    ui_ids:
+      - UI-PAGE-FORGOT-PASSWORD
+    api_ids:
+      - API-AUTH-VERIFY-USER
+      - API-AUTH-SEND-FORGOT-SMS
+      - API-AUTH-RESET-PASSWORD
 - id: REQ-2
   parentId: ROOT
   childrenIds: []

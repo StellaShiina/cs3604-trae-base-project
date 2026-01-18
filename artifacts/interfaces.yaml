@@ -24,9 +24,14 @@ UI-PAGE-REGISTER:
     - API-AUTH-SEND-SMS
 UI-PAGE-FORGOT-PASSWORD:
   type: UI
-  related_req_id: REQ-1
+  related_req_id: REQ-1-3
   description: Forgot Password Page
-  path: frontend/src/pages/ForgotPassword.tsx
+  path: frontend/src/pages/ForgotPassword.jsx
+  upstream_ids: []
+  downstream_ids:
+    - API-AUTH-VERIFY-USER
+    - API-AUTH-SEND-FORGOT-SMS
+    - API-AUTH-RESET-PASSWORD
 API-POST-AUTH-REGISTER:
   type: API
   related_req_id: REQ-1-1
@@ -120,6 +125,39 @@ API-AUTH-SEND-LOGIN-SMS:
   description: Send SMS for login (validates ID last 4)
   upstream_ids:
     - UI-PAGE-LOGIN
+  downstream_ids: []
+  db_tables:
+    - users
+API-AUTH-VERIFY-USER:
+  type: API
+  related_req_id: REQ-1-3
+  signature: POST /api/v1/auth/verify-user
+  path: backend/src/routes/authRoutes.js
+  description: Verify user info for password reset
+  upstream_ids:
+    - UI-PAGE-FORGOT-PASSWORD
+  downstream_ids: []
+  db_tables:
+    - users
+API-AUTH-SEND-FORGOT-SMS:
+  type: API
+  related_req_id: REQ-1-3
+  signature: POST /api/v1/auth/send-forgot-sms
+  path: backend/src/routes/authRoutes.js
+  description: Send SMS for password reset
+  upstream_ids:
+    - UI-PAGE-FORGOT-PASSWORD
+  downstream_ids: []
+  db_tables:
+    - users
+API-AUTH-RESET-PASSWORD:
+  type: API
+  related_req_id: REQ-1-3
+  signature: POST /api/v1/auth/reset-password
+  path: backend/src/routes/authRoutes.js
+  description: Reset password
+  upstream_ids:
+    - UI-PAGE-FORGOT-PASSWORD
   downstream_ids: []
   db_tables:
     - users
