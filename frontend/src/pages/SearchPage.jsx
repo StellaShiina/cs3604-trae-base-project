@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import apiClient from '../api/index';
 
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -35,6 +36,24 @@ const SearchPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleBooking = (ticket) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      // Simple redirect for now
+      // Ideally show login modal as per requirements, but for this step just make it work
+      alert('请先登录');
+      navigate('/login');
+      return;
+    }
+
+    navigate('/order', {
+      state: {
+        ...ticket,
+        date: searchParams.get('date')
+      }
+    });
   };
 
   return (
@@ -78,7 +97,10 @@ const SearchPage = () => {
                       </td>
                       <td>{ticket.duration}</td>
                       <td>
-                        <button style={{ background: '#1677FF', color: 'white', border: 'none', padding: '5px 15px', borderRadius: 4 }}>
+                        <button
+                          onClick={() => handleBooking(ticket)}
+                          style={{ background: '#1677FF', color: 'white', border: 'none', padding: '5px 15px', borderRadius: 4, cursor: 'pointer' }}
+                        >
                           预订
                         </button>
                       </td>

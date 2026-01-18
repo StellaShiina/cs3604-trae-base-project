@@ -5,6 +5,8 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
 import SearchPage from './pages/SearchPage';
+import OrderPage from './pages/OrderPage';
+import PaymentPage from './pages/PaymentPage';
 
 function App() {
   return (
@@ -14,6 +16,8 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/search" element={<SearchPage />} />
+      <Route path="/order" element={<OrderPage />} />
+      <Route path="/payment/:orderId" element={<PaymentPage />} />
     </Routes>
   );
 }

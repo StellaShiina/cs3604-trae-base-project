@@ -75,8 +75,17 @@
 - id: REQ-3
   parentId: ROOT
   childrenIds: []
-  status: PENDING_CONTRACT
-  artifacts: {}
+  status: PENDING_IMPL
+  artifacts:
+    func_ids:
+      - FUNC-ORDER-CREATE
+      - FUNC-ORDER-GET-PASSENGERS
+    api_ids:
+      - API-ORDER-CREATE
+      - API-ORDER-GET-PASSENGERS
+    ui_ids:
+      - UI-PAGE-ORDER
+      - UI-PAGE-PAYMENT
 - id: REQ-4
   parentId: ROOT
   childrenIds: []

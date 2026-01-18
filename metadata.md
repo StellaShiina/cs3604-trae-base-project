@@ -150,6 +150,31 @@ Every Playwright test MUST verify three things:
 | departure_time | TEXT | | HH:MM |
 | stop_order | INTEGER | | Sequence |
 
+### `orders`
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| id | INTEGER | PK, AutoInc | Order ID |
+| user_id | INTEGER | FK(users.id) | User ID |
+| status | TEXT | DEFAULT 'PENDING' | Status |
+| total_price | REAL | | Total Price |
+| created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | |
+
+### `order_items`
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| id | INTEGER | PK, AutoInc | Item ID |
+| order_id | INTEGER | FK(orders.id) | Order ID |
+| passenger_id | INTEGER | FK(passengers.id) | Passenger ID |
+| train_code | TEXT | NOT NULL | Train Code |
+| departure_station | TEXT | NOT NULL | From Station |
+| arrival_station | TEXT | NOT NULL | To Station |
+| departure_time | TEXT | | HH:MM |
+| arrival_time | TEXT | | HH:MM |
+| departure_date | TEXT | NOT NULL | YYYY-MM-DD |
+| seat_type | TEXT | NOT NULL | Seat Type |
+| ticket_type | TEXT | NOT NULL | Ticket Type |
+| price | REAL | NOT NULL | Price |
+
 ## 6. API Registry [DYNAMIC]
 
 > **Instruction for Agent**: During RED Phase, when you design a new Route, verify it follows the Wrapper and list it here.
@@ -168,3 +193,7 @@ Every Playwright test MUST verify three things:
 
 ### Tickets
 - `GET /api/v1/tickets` - Search tickets (params: from, to, date)
+
+### Orders
+- `GET /api/v1/passengers` - Get user passengers
+- `POST /api/v1/orders` - Create order

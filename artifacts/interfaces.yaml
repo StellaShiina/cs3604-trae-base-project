@@ -198,3 +198,65 @@ FUNC-TICKET-SEARCH:
     - routes
     - trains
     - stations
+FUNC-ORDER-CREATE:
+  type: FUNC
+  related_req_id: REQ-3
+  signature: createOrder(userId, orderData)
+  path: backend/src/services/orderService.js
+  description: Create order logic
+  upstream_ids:
+    - API-ORDER-CREATE
+  downstream_ids: []
+  db_tables:
+    - orders
+    - order_items
+    - passengers
+FUNC-ORDER-GET-PASSENGERS:
+  type: FUNC
+  related_req_id: REQ-3
+  signature: getPassengers(userId)
+  path: backend/src/services/orderService.js
+  description: Get passengers logic
+  upstream_ids:
+    - API-ORDER-GET-PASSENGERS
+  downstream_ids: []
+  db_tables:
+    - passengers
+API-ORDER-CREATE:
+  type: API
+  related_req_id: REQ-3
+  signature: POST /api/v1/orders
+  path: backend/src/routes/orderRoutes.js
+  description: Create order endpoint
+  upstream_ids:
+    - UI-PAGE-ORDER
+  downstream_ids:
+    - FUNC-ORDER-CREATE
+API-ORDER-GET-PASSENGERS:
+  type: API
+  related_req_id: REQ-3
+  signature: GET /api/v1/orders/passengers
+  path: backend/src/routes/orderRoutes.js
+  description: Get passengers endpoint
+  upstream_ids:
+    - UI-PAGE-ORDER
+  downstream_ids:
+    - FUNC-ORDER-GET-PASSENGERS
+UI-PAGE-ORDER:
+  type: UI
+  related_req_id: REQ-3
+  description: Order filling page
+  path: frontend/src/pages/OrderPage.jsx
+  upstream_ids:
+    - UI-PAGE-SEARCH
+  downstream_ids:
+    - API-ORDER-CREATE
+    - API-ORDER-GET-PASSENGERS
+UI-PAGE-PAYMENT:
+  type: UI
+  related_req_id: REQ-3
+  description: Payment page
+  path: frontend/src/pages/PaymentPage.jsx
+  upstream_ids:
+    - UI-PAGE-ORDER
+  downstream_ids: []

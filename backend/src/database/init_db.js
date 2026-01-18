@@ -59,6 +59,32 @@ db.serialize(() => {
     FOREIGN KEY(station_id) REFERENCES stations(id)
   )`);
 
+  db.run(`CREATE TABLE IF NOT EXISTS orders (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    status TEXT DEFAULT 'PENDING',
+    total_price REAL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id)
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS order_items (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id INTEGER NOT NULL,
+    passenger_id INTEGER NOT NULL,
+    train_code TEXT NOT NULL,
+    departure_station TEXT NOT NULL,
+    arrival_station TEXT NOT NULL,
+    departure_time TEXT,
+    arrival_time TEXT,
+    departure_date TEXT NOT NULL,
+    seat_type TEXT NOT NULL,
+    ticket_type TEXT NOT NULL,
+    price REAL NOT NULL,
+    FOREIGN KEY(order_id) REFERENCES orders(id),
+    FOREIGN KEY(passenger_id) REFERENCES passengers(id)
+  )`);
+
   // [ALTER TABLE statements for incremental evolution added by the model as needed here]
 });
 

@@ -6,6 +6,7 @@ const app = express();
 // route modules imports
 const authRoutes = require('./routes/authRoutes');
 const ticketRoutes = require('./routes/ticketRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 
 // middleware imports
 app.use(cors());
@@ -17,6 +18,7 @@ require('./database/init_db');
 // register routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/tickets', ticketRoutes);
+app.use('/api/v1/orders', orderRoutes);
 
 app.get('/', (req, res) => {
   res.json({ code: 200, message: 'Backend Ready' });
