@@ -9,7 +9,7 @@ test.describe('REQ-2: Ticket Search', () => {
     await page.locator('text=到达地').locator('..').locator('input').fill('上海');
     await page.locator('text=出发日期').locator('..').locator('input').fill('2025-12-20');
     
-    await page.locator('button:has-text("查询")').click();
+    await page.locator('button:has-text("查 询")').click();
     
     await expect(page).toHaveURL(/.*search/);
     

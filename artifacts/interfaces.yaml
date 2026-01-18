@@ -164,9 +164,10 @@ API-AUTH-RESET-PASSWORD:
 UI-PAGE-SEARCH:
   type: UI
   related_req_id: REQ-2
-  description: Search Result Page
+  description: Ticket Search Result Page
   path: frontend/src/pages/SearchPage.jsx
-  upstream_ids: []
+  upstream_ids:
+    - UI-PAGE-HOME
   downstream_ids:
     - API-TICKET-SEARCH
   db_tables: []
@@ -175,11 +176,25 @@ API-TICKET-SEARCH:
   related_req_id: REQ-2
   signature: GET /api/v1/tickets
   path: backend/src/routes/ticketRoutes.js
-  description: Search tickets
+  description: Search tickets endpoint
   upstream_ids:
     - UI-PAGE-SEARCH
-  downstream_ids: []
+  downstream_ids:
+    - FUNC-TICKET-SEARCH
   db_tables:
     - stations
     - trains
     - routes
+FUNC-TICKET-SEARCH:
+  type: FUNC
+  related_req_id: REQ-2
+  signature: search(from, to, date)
+  path: backend/src/services/ticketService.js
+  description: Search tickets by from/to stations and date
+  upstream_ids:
+    - API-TICKET-SEARCH
+  downstream_ids: []
+  db_tables:
+    - routes
+    - trains
+    - stations

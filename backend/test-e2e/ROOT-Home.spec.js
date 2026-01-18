@@ -21,7 +21,9 @@ test.describe('ROOT: Home Page', () => {
     await expect(page.locator('button:has-text("查 询")')).toBeVisible();
 
     // 5. Check Footer/Promo (Sample)
-    await expect(page.locator('text=会员服务')).toBeVisible();
+    // Use first() to avoid strict mode violation if multiple elements exist (e.g. in Nav and Body)
+    // Or target specific element
+    await expect(page.locator('h3:has-text("会员服务")')).toBeVisible();
     await expect(page.locator('text=铁路畅行 尊享体验')).toBeVisible();
   });
 });
