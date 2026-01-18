@@ -7,6 +7,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import SearchPage from './pages/SearchPage';
 import OrderPage from './pages/OrderPage';
 import PaymentPage from './pages/PaymentPage';
+import PurchaseSuccessPage from './pages/PurchaseSuccessPage';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
       <Route path="/search" element={<SearchPage />} />
       <Route path="/order" element={<OrderPage />} />
       <Route path="/payment/:orderId" element={<PaymentPage />} />
+      <Route path="/purchase-success/:orderId" element={<PurchaseSuccessPage />} />
     </Routes>
   );
 }

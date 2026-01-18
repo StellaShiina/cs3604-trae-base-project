@@ -197,3 +197,6 @@ Every Playwright test MUST verify three things:
 ### Orders
 - `GET /api/v1/passengers` - Get user passengers
 - `POST /api/v1/orders` - Create order
+- `GET /api/v1/orders/:orderId` - Get order details
+- `POST /api/v1/orders/:orderId/pay` - Pay order
+- `POST /api/v1/orders/:orderId/cancel` - Cancel order

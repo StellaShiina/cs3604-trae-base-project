@@ -51,6 +51,40 @@ const orderService = {
         resolve({ code: 0, data: rows });
       });
     });
+  },
+
+  getOrder: (orderId, userId) => {
+    return new Promise((resolve, reject) => {
+      db.get('SELECT * FROM orders WHERE id = ? AND user_id = ?', [orderId, userId], (err, order) => {
+        if (err) return reject(err);
+        if (!order) return resolve({ code: 404, message: 'Order not found' });
+
+        db.all('SELECT * FROM order_items WHERE order_id = ?', [orderId], (err, items) => {
+          if (err) return reject(err);
+          resolve({ code: 0, data: { ...order, items } });
+        });
+      });
+    });
+  },
+
+  payOrder: (orderId, userId) => {
+    return new Promise((resolve, reject) => {
+      db.run('UPDATE orders SET status = "PAID" WHERE id = ? AND user_id = ?', [orderId, userId], function (err) {
+        if (err) return reject(err);
+        if (this.changes === 0) return resolve({ code: 404, message: 'Order not found' });
+        resolve({ code: 0, message: 'Payment successful' });
+      });
+    });
+  },
+
+  cancelOrder: (orderId, userId) => {
+    return new Promise((resolve, reject) => {
+      db.run('UPDATE orders SET status = "CANCELLED" WHERE id = ? AND user_id = ?', [orderId, userId], function (err) {
+        if (err) return reject(err);
+        if (this.changes === 0) return resolve({ code: 404, message: 'Order not found' });
+        resolve({ code: 0, message: 'Order cancelled' });
+      });
+    });
   }
 };
 

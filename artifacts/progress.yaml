@@ -89,8 +89,16 @@
 - id: REQ-4
   parentId: ROOT
   childrenIds: []
-  status: PENDING_CONTRACT
-  artifacts: {}
+  status: PENDING_IMPL
+  artifacts:
+    func_ids:
+      - FUNC-ORDER-CANCEL
+    api_ids:
+      - API-ORDER-CANCEL
+      - API-ORDER-PAY
+      - API-ORDER-GET-DETAILS
+    ui_ids:
+      - UI-PAGE-PURCHASE-SUCCESS
 - id: REQ-5
   parentId: ROOT
   childrenIds: []

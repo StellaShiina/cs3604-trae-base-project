@@ -260,3 +260,52 @@ UI-PAGE-PAYMENT:
   upstream_ids:
     - UI-PAGE-ORDER
   downstream_ids: []
+FUNC-ORDER-CANCEL:
+  type: FUNC
+  related_req_id: REQ-4
+  signature: cancelOrder(orderId, userId)
+  path: backend/src/services/orderService.js
+  description: Cancel order logic
+  upstream_ids:
+    - API-ORDER-CANCEL
+  downstream_ids: []
+  db_tables:
+    - orders
+API-ORDER-CANCEL:
+  type: API
+  related_req_id: REQ-4
+  signature: POST /api/v1/orders/:orderId/cancel
+  path: backend/src/routes/orderRoutes.js
+  description: Cancel order endpoint
+  upstream_ids:
+    - UI-PAGE-PAYMENT
+  downstream_ids:
+    - FUNC-ORDER-CANCEL
+API-ORDER-PAY:
+  type: API
+  related_req_id: REQ-4
+  signature: POST /api/v1/orders/:orderId/pay
+  path: backend/src/routes/orderRoutes.js
+  description: Pay order endpoint
+  upstream_ids:
+    - UI-PAGE-PAYMENT
+  downstream_ids:
+    - FUNC-ORDER-CREATE
+API-ORDER-GET-DETAILS:
+  type: API
+  related_req_id: REQ-4
+  signature: GET /api/v1/orders/:orderId
+  path: backend/src/routes/orderRoutes.js
+  description: Get order details endpoint
+  upstream_ids:
+    - UI-PAGE-PAYMENT
+  downstream_ids:
+    - FUNC-ORDER-CREATE
+UI-PAGE-PURCHASE-SUCCESS:
+  type: UI
+  related_req_id: REQ-4
+  description: Purchase success page
+  path: frontend/src/pages/PurchaseSuccessPage.jsx
+  upstream_ids:
+    - UI-PAGE-PAYMENT
+  downstream_ids: []

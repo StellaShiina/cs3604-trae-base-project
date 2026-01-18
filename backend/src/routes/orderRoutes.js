@@ -36,4 +36,40 @@ router.post('/', async (req, res) => {
   }
 });
 
+router.get('/:orderId', async (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'] || req.query.userId;
+    if (!userId) return res.status(401).json({ code: 401, message: 'Unauthorized' });
+
+    const result = await orderService.getOrder(req.params.orderId, userId);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ code: 500, message: error.message });
+  }
+});
+
+router.post('/:orderId/pay', async (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'] || req.body.userId;
+    if (!userId) return res.status(401).json({ code: 401, message: 'Unauthorized' });
+
+    const result = await orderService.payOrder(req.params.orderId, userId);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ code: 500, message: error.message });
+  }
+});
+
+router.post('/:orderId/cancel', async (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'] || req.body.userId;
+    if (!userId) return res.status(401).json({ code: 401, message: 'Unauthorized' });
+
+    const result = await orderService.cancelOrder(req.params.orderId, userId);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ code: 500, message: error.message });
+  }
+});
+
 module.exports = router;
