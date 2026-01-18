@@ -5,9 +5,13 @@ UI-PAGE-HOME:
   path: frontend/src/pages/Home.tsx
 UI-PAGE-LOGIN:
   type: UI
-  related_req_id: REQ-1
-  description: Login Page
-  path: frontend/src/pages/Login.tsx
+  related_req_id: REQ-1-2
+  description: User Login Page
+  path: frontend/src/pages/Login.jsx
+  upstream_ids: []
+  downstream_ids:
+    - API-AUTH-LOGIN
+    - API-AUTH-SEND-LOGIN-SMS
 UI-PAGE-REGISTER:
   type: UI
   related_req_id: REQ-1-1
@@ -97,3 +101,25 @@ API-AUTH-SEND-SMS:
     - UI-PAGE-REGISTER
   downstream_ids: []
   db_tables: []
+API-AUTH-LOGIN:
+  type: API
+  related_req_id: REQ-1-2
+  signature: POST /api/v1/auth/login
+  path: backend/src/routes/authRoutes.js
+  description: Final login with 2FA
+  upstream_ids:
+    - UI-PAGE-LOGIN
+  downstream_ids: []
+  db_tables:
+    - users
+API-AUTH-SEND-LOGIN-SMS:
+  type: API
+  related_req_id: REQ-1-2
+  signature: POST /api/v1/auth/send-login-sms
+  path: backend/src/routes/authRoutes.js
+  description: Send SMS for login (validates ID last 4)
+  upstream_ids:
+    - UI-PAGE-LOGIN
+  downstream_ids: []
+  db_tables:
+    - users

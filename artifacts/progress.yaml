@@ -43,8 +43,13 @@
 - id: REQ-1-2
   parentId: REQ-1
   childrenIds: []
-  status: PENDING_CONTRACT
-  artifacts: {}
+  status: PENDING_IMPL
+  artifacts:
+    ui_ids:
+      - UI-PAGE-LOGIN
+    api_ids:
+      - API-AUTH-LOGIN
+      - API-AUTH-SEND-LOGIN-SMS
 - id: REQ-1-3
   parentId: REQ-1
   childrenIds: []

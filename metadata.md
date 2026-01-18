@@ -135,3 +135,5 @@ Every Playwright test MUST verify three things:
 - `POST /api/v1/auth/register` - Register new user
 - `GET /api/v1/auth/check-username` - Check username availability
 - `POST /api/v1/auth/send-sms-code` - Send verification code
+- `POST /api/v1/auth/login` - Final login with 2FA
+- `POST /api/v1/auth/send-login-sms` - Send SMS for login (validates ID last 4)
