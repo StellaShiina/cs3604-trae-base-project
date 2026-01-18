@@ -126,8 +126,9 @@ const ForgotPassword = () => {
             />
           </div>
           <div style={{ marginBottom: 10 }}>
+            <label style={{ display: 'block', marginBottom: 5 }}>证件类型</label>
             <select
-              value={formData.idType}
+              value={formData.idType} 
               onChange={e => setFormData({ ...formData, idType: e.target.value })}
               style={{ width: '100%', padding: 8 }}
             >
@@ -135,9 +136,10 @@ const ForgotPassword = () => {
             </select>
           </div>
           <div style={{ marginBottom: 10 }}>
+            <label style={{ display: 'block', marginBottom: 5 }}>证件号码</label>
             <input
               placeholder="证件号码"
-              value={formData.idNumber}
+              value={formData.idNumber} 
               onChange={e => setFormData({ ...formData, idNumber: e.target.value })}
               style={{ width: '100%', padding: 8 }}
             />

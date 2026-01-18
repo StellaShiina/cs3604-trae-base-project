@@ -82,7 +82,10 @@ const Login = () => {
 
   return (
     <div className="login-page">
-      {/* Include Header if needed, but maybe just simple one */}
+      <div className="header" style={{ padding: '10px 20px', display: 'flex', alignItems: 'center', background: 'white' }}>
+        <div style={{ fontSize: 24, fontWeight: 'bold', marginRight: 20, color: '#333' }}>中国铁路12306</div>
+        <div style={{ fontSize: 20, color: '#333' }}>欢迎登录12306</div>
+      </div>
       <div className="login-box" style={{ maxWidth: 400, margin: '50px auto', padding: 20, border: '1px solid #ccc' }}>
         <div className="tabs" style={{ display: 'flex', marginBottom: 20 }}>
           <button style={{ flex: 1, padding: 10, background: tab === 'scan' ? '#eee' : 'white' }} onClick={() => setTab('scan')}>扫码登录</button>

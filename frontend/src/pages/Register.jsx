@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../api/index';
+import Header from '../components/Header';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -203,10 +204,12 @@ const Register = () => {
   };
 
   return (
-    <div className="register-page" style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
-      <h2>账号注册</h2>
-      <form>
-        {/* Username */}
+    <div className="register-page" style={{ paddingBottom: 20 }}>
+      <Header />
+      <div style={{ maxWidth: '920px', margin: '10px auto', border: '1px solid #2F86D9' }}>
+        <div style={{ padding: '10px', background: 'linear-gradient(to right, #2F86D9, #1E6FBF)', color: 'white' }}>账户信息</div>
+        <form style={{ padding: 20 }}>
+          {/* Username */}
         <div className="form-group">
           <label>用户名</label>
           <input 
@@ -329,6 +332,7 @@ const Register = () => {
 
         <button type="button" onClick={handleSubmit}>下一步</button>
       </form>
+      </div>
     </div>
   );
 };

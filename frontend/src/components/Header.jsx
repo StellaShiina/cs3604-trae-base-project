@@ -25,7 +25,7 @@ const Header = () => {
   return (
     <div className="header" style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 20px', background: '#f0f0f0', borderBottom: '1px solid #ccc' }}>
       <div className="logo" style={{ fontWeight: 'bold', fontSize: '20px' }}>
-        <Link to="/" style={{ textDecoration: 'none', color: '#333' }}>12306</Link>
+        <Link to="/" style={{ textDecoration: 'none', color: '#333' }}>中国铁路12306</Link>
       </div>
       <div className="user-nav">
         {user ? (
