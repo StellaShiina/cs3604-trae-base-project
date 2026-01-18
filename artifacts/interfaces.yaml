@@ -1,0 +1,5 @@
+UI-PAGE-HOME:
+  type: UI
+  related_req_id: ROOT
+  description: Home Page with Header, Nav, Hero, Booking Card, and Promo Tiles
+  path: frontend/src/pages/Home.tsx

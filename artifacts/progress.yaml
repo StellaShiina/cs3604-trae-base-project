@@ -6,8 +6,10 @@
     - REQ-3
     - REQ-4
     - REQ-5
-  status: PENDING_CONTRACT
-  artifacts: {}
+  status: PENDING_IMPL
+  artifacts:
+    ui_ids:
+      - UI-PAGE-HOME
 - id: REQ-1
   parentId: ROOT
   childrenIds:
