@@ -309,3 +309,34 @@ UI-PAGE-PURCHASE-SUCCESS:
   upstream_ids:
     - UI-PAGE-PAYMENT
   downstream_ids: []
+FUNC-ORDER-GET-MY:
+  type: FUNC
+  related_req_id: REQ-5
+  signature: getMyOrders(userId)
+  path: backend/src/services/orderService.js
+  description: Get my orders logic
+  upstream_ids:
+    - API-ORDER-GET-MY
+  downstream_ids: []
+  db_tables:
+    - orders
+    - order_items
+API-ORDER-GET-MY:
+  type: API
+  related_req_id: REQ-5
+  signature: GET /api/v1/orders
+  path: backend/src/routes/orderRoutes.js
+  description: Get my orders endpoint
+  upstream_ids:
+    - UI-PAGE-PERSONAL-CENTER
+  downstream_ids:
+    - FUNC-ORDER-GET-MY
+UI-PAGE-PERSONAL-CENTER:
+  type: UI
+  related_req_id: REQ-5
+  description: Personal Center Page
+  path: frontend/src/pages/PersonalCenterPage.jsx
+  upstream_ids:
+    - UI-PAGE-HOME
+  downstream_ids:
+    - API-ORDER-GET-MY

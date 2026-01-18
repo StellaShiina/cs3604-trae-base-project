@@ -195,6 +195,16 @@ const authService = {
         resolve({ code: 0, message: '密码重置成功' });
       });
     });
+  },
+
+  getUserById: (userId) => {
+    return new Promise((resolve, reject) => {
+      db.get('SELECT id, username, name, phone, id_type, id_number FROM users WHERE id = ?', [userId], (err, user) => {
+        if (err) return reject(err);
+        if (!user) return resolve({ code: 404, message: 'User not found' });
+        resolve({ code: 0, data: user });
+      });
+    });
   }
 };
 

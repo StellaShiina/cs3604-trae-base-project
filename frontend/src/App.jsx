@@ -8,6 +8,7 @@ import SearchPage from './pages/SearchPage';
 import OrderPage from './pages/OrderPage';
 import PaymentPage from './pages/PaymentPage';
 import PurchaseSuccessPage from './pages/PurchaseSuccessPage';
+import PersonalCenterPage from './pages/PersonalCenterPage';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
       <Route path="/order" element={<OrderPage />} />
       <Route path="/payment/:orderId" element={<PaymentPage />} />
       <Route path="/purchase-success/:orderId" element={<PurchaseSuccessPage />} />
+      <Route path="/personal-center" element={<PersonalCenterPage />} />
     </Routes>
   );
 }

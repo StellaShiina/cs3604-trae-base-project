@@ -85,6 +85,26 @@ const orderService = {
         resolve({ code: 0, message: 'Order cancelled' });
       });
     });
+  },
+
+  getMyOrders: (userId) => {
+    return new Promise((resolve, reject) => {
+      db.all('SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC', [userId], async (err, orders) => {
+        if (err) return reject(err);
+
+        // Populate items for each order
+        const ordersWithItems = await Promise.all(orders.map(async (order) => {
+          return new Promise((resolveItem, rejectItem) => {
+            db.all('SELECT * FROM order_items WHERE order_id = ?', [order.id], (err, items) => {
+              if (err) return rejectItem(err);
+              resolveItem({ ...order, items });
+            });
+          });
+        }));
+
+        resolve({ code: 0, data: ordersWithItems });
+      });
+    });
   }
 };
 

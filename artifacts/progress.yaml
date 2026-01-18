@@ -102,5 +102,11 @@
 - id: REQ-5
   parentId: ROOT
   childrenIds: []
-  status: PENDING_CONTRACT
-  artifacts: {}
+  status: PENDING_IMPL
+  artifacts:
+    func_ids:
+      - FUNC-ORDER-GET-MY
+    api_ids:
+      - API-ORDER-GET-MY
+    ui_ids:
+      - UI-PAGE-PERSONAL-CENTER

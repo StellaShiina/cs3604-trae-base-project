@@ -72,4 +72,16 @@ router.post('/:orderId/cancel', async (req, res) => {
   }
 });
 
+router.get('/', async (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'] || req.query.userId;
+    if (!userId) return res.status(401).json({ code: 401, message: 'Unauthorized' });
+
+    const result = await orderService.getMyOrders(userId);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ code: 500, message: error.message });
+  }
+});
+
 module.exports = router;
