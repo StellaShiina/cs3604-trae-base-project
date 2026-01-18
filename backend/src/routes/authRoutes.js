@@ -34,4 +34,26 @@ router.post('/send-sms-code', async (req, res) => {
   }
 });
 
+// POST /api/v1/auth/send-login-sms
+router.post('/send-login-sms', async (req, res) => {
+  try {
+    const { username, idLast4 } = req.body;
+    const result = await authService.sendLoginSms(username, idLast4);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ code: 500, message: error.message });
+  }
+});
+
+// POST /api/v1/auth/login
+router.post('/login', async (req, res) => {
+  try {
+    const { username, password, idLast4, smsCode } = req.body;
+    const result = await authService.login(username, password, idLast4, smsCode);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ code: 500, message: error.message });
+  }
+});
+
 module.exports = router;

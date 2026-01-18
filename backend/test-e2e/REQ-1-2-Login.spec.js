@@ -63,9 +63,10 @@ test.describe('REQ-1-2: User Login', () => {
     await expect(page.locator('text=您好，login_test_user')).toBeVisible();
     
     // 7. Check LocalStorage
-    const localStorage = await page.evaluate(() => window.localStorage);
-    expect(localStorage.getItem('token')).toBeTruthy();
-    expect(localStorage.getItem('username')).toBe(testUser);
+    const token = await page.evaluate(() => localStorage.getItem('token'));
+    const username = await page.evaluate(() => localStorage.getItem('username'));
+    expect(token).toBeTruthy();
+    expect(username).toBe(testUser);
   });
 
   test('Login Failure - Wrong Password', async ({ page }) => {

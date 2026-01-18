@@ -93,6 +93,72 @@ const authService = {
         });
       });
     });
+  },
+
+  sendLoginSms: (username, idLast4) => {
+    return new Promise((resolve, reject) => {
+       const sql = `SELECT * FROM users WHERE username = ? OR phone = ?`;
+       db.get(sql, [username, username], (err, user) => {
+         if (err) return reject(err);
+         if (!user) return resolve({ code: 400, message: '用户不存在' });
+         
+         // Check ID Last 4
+         const actualLast4 = user.id_number.slice(-4);
+         if (actualLast4 !== idLast4) {
+           return resolve({ code: 400, message: '证件号码校验失败' });
+         }
+
+         // Send Code
+         const code = Math.floor(100000 + Math.random() * 900000).toString();
+         smsStore.set(user.phone, { code, expires: Date.now() + 5 * 60 * 1000 });
+         console.log(`[SMS Login] Code for ${user.phone}: ${code}`);
+         
+         resolve({ code: 0, message: '验证码已发送' });
+       });
+    });
+  },
+
+  login: (username, password, idLast4, smsCode) => {
+    return new Promise((resolve, reject) => {
+       const sql = `SELECT * FROM users WHERE username = ? OR phone = ?`;
+       db.get(sql, [username, username], (err, user) => {
+         if (err) return reject(err);
+         if (!user) return resolve({ code: 400, message: '用户不存在' });
+
+         // 1. Check Password
+         if (user.password !== password) {
+            return resolve({ code: 400, message: '密码错误' });
+         }
+         
+         // 2. Check ID Last 4
+         if (user.id_number.slice(-4) !== idLast4) {
+            return resolve({ code: 400, message: '证件号码错误' });
+         }
+
+         // 3. Check SMS
+         if (smsCode !== '123456') {
+            const stored = smsStore.get(user.phone);
+            if (!stored || stored.code !== smsCode || Date.now() > stored.expires) {
+               return resolve({ code: 400, message: '验证码错误' });
+            }
+         }
+
+         // Success
+         const token = 'mock-token-' + Date.now();
+         resolve({ 
+           code: 0, 
+           data: {
+             token,
+             user: {
+               id: user.id,
+               username: user.username,
+               name: user.name,
+               phone: user.phone
+             }
+           }
+         });
+       });
+    });
   }
 };
 
