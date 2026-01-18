@@ -75,7 +75,7 @@
 - id: REQ-3
   parentId: ROOT
   childrenIds: []
-  status: PENDING_IMPL
+  status: COMPLETED
   artifacts:
     func_ids:
       - FUNC-ORDER-CREATE
