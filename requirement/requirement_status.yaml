@@ -1,0 +1,98 @@
+ROOT:
+  name: "12306购票系统复刻"
+  status:
+    interfaces_generated: true
+    tests_generated: true
+    implemented: true
+  artifacts:
+    ui_ids: ["UI-PAGE-HOME"]
+    api_ids: []
+    func_ids: []
+
+REQ-1:
+  name: "用户认证模块"
+  status:
+    interfaces_generated: true
+    tests_generated: true
+    implemented: true
+  artifacts:
+    ui_ids: ["UI-PAGE-LOGIN", "UI-PAGE-REGISTER", "UI-PAGE-FORGOT-PASSWORD"]
+    api_ids: ["API-POST-AUTH-LOGIN", "API-POST-AUTH-REGISTER", "API-POST-AUTH-FORGOT-PASSWORD"]
+    func_ids: ["FUNC-AUTH-LOGIN", "FUNC-AUTH-REGISTER", "FUNC-AUTH-RESET-PASSWORD"]
+
+REQ-1-1:
+  name: "用户注册"
+  status:
+    interfaces_generated: true
+    tests_generated: true
+    implemented: true
+  artifacts:
+    ui_ids: ["UI-PAGE-REGISTER"]
+    api_ids: ["API-POST-AUTH-REGISTER", "API-GET-AUTH-CHECK-USERNAME", "API-POST-AUTH-SEND-SMS"]
+    func_ids: ["FUNC-AUTH-REGISTER", "FUNC-AUTH-CHECK-USERNAME", "FUNC-AUTH-SEND-SMS"]
+
+REQ-1-2:
+  name: "用户登录"
+  status:
+    interfaces_generated: true
+    tests_generated: true
+    implemented: true
+  artifacts:
+    ui_ids: ["UI-PAGE-LOGIN"]
+    api_ids: ["API-POST-AUTH-LOGIN", "API-POST-AUTH-SEND-LOGIN-SMS"]
+    func_ids: ["FUNC-AUTH-LOGIN", "FUNC-AUTH-SEND-LOGIN-SMS"]
+
+REQ-1-3:
+  name: "找回密码"
+  status:
+    interfaces_generated: true
+    tests_generated: true
+    implemented: true
+  artifacts:
+    ui_ids: ["UI-PAGE-FORGOT-PASSWORD"]
+    api_ids: ["API-POST-AUTH-VERIFY-USER-INFO", "API-POST-AUTH-SEND-RESET-SMS", "API-POST-AUTH-RESET-PASSWORD"]
+    func_ids: ["FUNC-AUTH-VERIFY-USER-INFO", "FUNC-AUTH-SEND-RESET-SMS", "FUNC-AUTH-RESET-PASSWORD"]
+
+REQ-2:
+  name: "车票查询模块"
+  status:
+    interfaces_generated: true
+    tests_generated: true
+    implemented: true
+  artifacts:
+    ui_ids: ["UI-PAGE-SEARCH"]
+    api_ids: ["API-GET-TRAINS-SEARCH", "API-GET-STATIONS", "API-GET-STATIONS-HOT"]
+    func_ids: ["FUNC-TRAIN-SEARCH", "FUNC-STATION-GET", "FUNC-STATION-GET-HOT"]
+
+REQ-3:
+  name: "订单填写与提交"
+  status:
+    interfaces_generated: true
+    tests_generated: true
+    implemented: true
+  artifacts:
+    ui_ids: ["UI-PAGE-ORDER"]
+    api_ids: ["API-GET-PASSENGERS", "API-POST-PASSENGERS", "API-POST-ORDERS", "API-GET-ORDER-BY-ID"]
+    func_ids: ["FUNC-PASSENGER-GET", "FUNC-PASSENGER-CREATE", "FUNC-ORDER-CREATE", "FUNC-ORDER-GET"]
+
+REQ-4:
+  name: "支付与购票成功"
+  status:
+    interfaces_generated: true
+    tests_generated: true
+    implemented: true
+  artifacts:
+    ui_ids: ["UI-PAGE-PAYMENT", "UI-PAGE-PURCHASE-SUCCESS"]
+    api_ids: ["API-POST-ORDER-PAY", "API-POST-ORDER-CANCEL"]
+    func_ids: ["FUNC-ORDER-PAY", "FUNC-ORDER-CANCEL"]
+
+REQ-5:
+  name: "个人中心"
+  status:
+    interfaces_generated: true
+    tests_generated: true
+    implemented: true
+  artifacts:
+    ui_ids: ["UI-PAGE-PERSONAL-CENTER"]
+    api_ids: ["API-GET-USER-ORDERS", "API-POST-ORDER-REFUND", "API-DELETE-PASSENGER", "API-UPDATE-PASSENGER", "API-GET-USER-INFO"]
+    func_ids: ["FUNC-ORDER-GET-USER", "FUNC-ORDER-REFUND", "FUNC-PASSENGER-DELETE", "FUNC-PASSENGER-UPDATE", "FUNC-USER-GET-INFO"]
