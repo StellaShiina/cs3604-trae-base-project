@@ -81,7 +81,7 @@ test.describe('REQ-1-1: User Registration', () => {
     // 3. Valid (Medium strength)
     await pwd.fill('abc123456');
     await pwd.blur();
-    await expect(page.locator('text=中')).toBeVisible(); // Strength indicator
+    await expect(page.locator('text=强度: 中')).toBeVisible(); // Strength indicator
   });
 
   test('Confirm Password validation', async ({ page }) => {
@@ -128,7 +128,10 @@ test.describe('REQ-1-1: User Registration', () => {
 
     // Get Code
     await getCodeBtn.click();
-    await expect(getCodeBtn).toBeDisabled(); // Check countdown state
+    // Check countdown state (text changes and button disabled)
+    const countdownBtn = page.locator('button', { hasText: '秒后重发' });
+    await expect(countdownBtn).toBeVisible();
+    await expect(countdownBtn).toBeDisabled();
     // Note: Can't easily check backend console output in E2E, but we verify button state
   });
 

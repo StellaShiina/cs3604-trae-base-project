@@ -25,7 +25,7 @@
 - id: REQ-1-1
   parentId: REQ-1
   childrenIds: []
-  status: PENDING_IMPL
+  status: COMPLETED
   artifacts:
     api_ids:
       - API-POST-AUTH-REGISTER
