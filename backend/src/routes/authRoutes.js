@@ -56,4 +56,37 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// POST /api/v1/auth/verify-user
+router.post('/verify-user', async (req, res) => {
+  try {
+    const { phone, idType, idNumber } = req.body;
+    const result = await authService.verifyUser(phone, idType, idNumber);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ code: 500, message: error.message });
+  }
+});
+
+// POST /api/v1/auth/send-forgot-sms
+router.post('/send-forgot-sms', async (req, res) => {
+  try {
+    const { phone } = req.body;
+    const result = await authService.sendForgotSms(phone);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ code: 500, message: error.message });
+  }
+});
+
+// POST /api/v1/auth/reset-password
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { phone, smsCode, newPassword } = req.body;
+    const result = await authService.resetPassword(phone, smsCode, newPassword);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ code: 500, message: error.message });
+  }
+});
+
 module.exports = router;

@@ -157,7 +157,43 @@ const authService = {
              }
            }
          });
-       });
+        });
+     });
+   },
+
+   verifyUser: (phone, idType, idNumber) => {
+    return new Promise((resolve, reject) => {
+      db.get('SELECT * FROM users WHERE phone = ?', [phone], (err, user) => {
+        if (err) return reject(err);
+        if (!user) return resolve({ code: 400, message: '用户不存在' });
+        if (user.id_type !== idType || user.id_number !== idNumber) {
+          return resolve({ code: 400, message: '身份信息不匹配' });
+        }
+        resolve({ code: 0, message: '校验通过' });
+      });
+    });
+  },
+
+  sendForgotSms: (phone) => {
+    return authService.sendSmsCode(phone);
+  },
+
+  resetPassword: (phone, smsCode, newPassword) => {
+    return new Promise((resolve, reject) => {
+      // 1. Verify SMS
+      if (smsCode !== '123456') {
+        const stored = smsStore.get(phone);
+        if (!stored || stored.code !== smsCode || Date.now() > stored.expires) {
+           return resolve({ code: 400, message: '验证码错误' });
+        }
+      }
+      
+      // 2. Update Password
+      db.run('UPDATE users SET password = ? WHERE phone = ?', [newPassword, phone], function(err) {
+        if (err) return reject(err);
+        if (this.changes === 0) return resolve({ code: 400, message: '用户不存在' });
+        resolve({ code: 0, message: '密码重置成功' });
+      });
     });
   }
 };

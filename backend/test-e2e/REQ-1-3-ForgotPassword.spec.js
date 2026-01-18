@@ -70,7 +70,7 @@ test.describe('REQ-1-3: Forgot Password', () => {
     // I'll check for URL or Text.
     // Ideally redirects to login after a delay or manual click.
     // Let's expect "成功" text.
-    await expect(page.locator('text=成功')).toBeVisible();
+    await expect(page.locator('h3', { hasText: '重置成功' })).toBeVisible();
 
     // Verify Login with New Password
     await page.goto('http://localhost:5173/login');
