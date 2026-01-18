@@ -3,3 +3,18 @@ UI-PAGE-HOME:
   related_req_id: ROOT
   description: Home Page with Header, Nav, Hero, Booking Card, and Promo Tiles
   path: frontend/src/pages/Home.tsx
+UI-PAGE-LOGIN:
+  type: UI
+  related_req_id: REQ-1
+  description: Login Page
+  path: frontend/src/pages/Login.tsx
+UI-PAGE-REGISTER:
+  type: UI
+  related_req_id: REQ-1
+  description: Register Page
+  path: frontend/src/pages/Register.tsx
+UI-PAGE-FORGOT-PASSWORD:
+  type: UI
+  related_req_id: REQ-1
+  description: Forgot Password Page
+  path: frontend/src/pages/ForgotPassword.tsx
