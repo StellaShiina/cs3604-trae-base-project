@@ -125,6 +125,31 @@ Every Playwright test MUST verify three things:
 | type | TEXT | DEFAULT '成人' | Passenger Type |
 | created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | |
 
+### `stations`
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| id | INTEGER | PK, AutoInc | Station ID |
+| name | TEXT | UNIQUE, NOT NULL | Station Name |
+| pinyin | TEXT | | Pinyin |
+
+### `trains`
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| id | INTEGER | PK, AutoInc | Train ID |
+| code | TEXT | UNIQUE, NOT NULL | Train Code (G27) |
+| type | TEXT | NOT NULL | Type (G, D, Z...) |
+
+### `routes`
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| id | INTEGER | PK, AutoInc | Route ID |
+| train_id | INTEGER | FK(trains.id) | Train ID |
+| station_id | INTEGER | FK(stations.id) | Station ID |
+| station_name | TEXT | | Redundant but fast |
+| arrival_time | TEXT | | HH:MM |
+| departure_time | TEXT | | HH:MM |
+| stop_order | INTEGER | | Sequence |
+
 ## 6. API Registry [DYNAMIC]
 
 > **Instruction for Agent**: During RED Phase, when you design a new Route, verify it follows the Wrapper and list it here.
@@ -140,3 +165,6 @@ Every Playwright test MUST verify three things:
 - `POST /api/v1/auth/verify-user` - Verify user info for password reset
 - `POST /api/v1/auth/send-forgot-sms` - Send SMS for password reset
 - `POST /api/v1/auth/reset-password` - Reset password
+
+### Tickets
+- `GET /api/v1/tickets` - Search tickets (params: from, to, date)

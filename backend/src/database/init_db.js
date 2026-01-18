@@ -34,7 +34,31 @@ db.serialize(() => {
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(user_id) REFERENCES users(id)
   )`);
-  
+
+  db.run(`CREATE TABLE IF NOT EXISTS stations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT UNIQUE NOT NULL,
+    pinyin TEXT
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS trains (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    code TEXT UNIQUE NOT NULL,
+    type TEXT NOT NULL
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS routes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    train_id INTEGER NOT NULL,
+    station_id INTEGER NOT NULL,
+    station_name TEXT NOT NULL,
+    arrival_time TEXT,
+    departure_time TEXT,
+    stop_order INTEGER NOT NULL,
+    FOREIGN KEY(train_id) REFERENCES trains(id),
+    FOREIGN KEY(station_id) REFERENCES stations(id)
+  )`);
+
   // [ALTER TABLE statements for incremental evolution added by the model as needed here]
 });
 

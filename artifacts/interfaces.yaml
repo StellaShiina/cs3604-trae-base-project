@@ -161,3 +161,25 @@ API-AUTH-RESET-PASSWORD:
   downstream_ids: []
   db_tables:
     - users
+UI-PAGE-SEARCH:
+  type: UI
+  related_req_id: REQ-2
+  description: Search Result Page
+  path: frontend/src/pages/SearchPage.jsx
+  upstream_ids: []
+  downstream_ids:
+    - API-TICKET-SEARCH
+  db_tables: []
+API-TICKET-SEARCH:
+  type: API
+  related_req_id: REQ-2
+  signature: GET /api/v1/tickets
+  path: backend/src/routes/ticketRoutes.js
+  description: Search tickets
+  upstream_ids:
+    - UI-PAGE-SEARCH
+  downstream_ids: []
+  db_tables:
+    - stations
+    - trains
+    - routes

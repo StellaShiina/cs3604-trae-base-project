@@ -64,8 +64,12 @@
 - id: REQ-2
   parentId: ROOT
   childrenIds: []
-  status: PENDING_CONTRACT
-  artifacts: {}
+  status: PENDING_IMPL
+  artifacts:
+    ui_ids:
+      - UI-PAGE-SEARCH
+    api_ids:
+      - API-TICKET-SEARCH
 - id: REQ-3
   parentId: ROOT
   childrenIds: []
