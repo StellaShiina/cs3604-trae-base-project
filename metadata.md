@@ -102,9 +102,36 @@ Every Playwright test MUST verify three things:
 
 *Current Models:*
 
+### `users`
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| id | INTEGER | PK, AutoInc | User ID |
+| username | TEXT | UNIQUE, NOT NULL | Login Username |
+| password | TEXT | NOT NULL | Login Password |
+| name | TEXT | NOT NULL | Real Name |
+| id_type | TEXT | NOT NULL | ID Type (e.g. "1" for ID Card) |
+| id_number | TEXT | UNIQUE, NOT NULL | ID Number |
+| phone | TEXT | UNIQUE, NOT NULL | Mobile Phone |
+| created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | |
+
+### `passengers`
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| id | INTEGER | PK, AutoInc | Passenger ID |
+| user_id | INTEGER | FK(users.id), NOT NULL | Owner User ID |
+| name | TEXT | NOT NULL | Passenger Name |
+| id_type | TEXT | NOT NULL | ID Type |
+| id_number | TEXT | NOT NULL | ID Number |
+| type | TEXT | DEFAULT '成人' | Passenger Type |
+| created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | |
 
 ## 6. API Registry [DYNAMIC]
 
 > **Instruction for Agent**: During RED Phase, when you design a new Route, verify it follows the Wrapper and list it here.
 
 *Current Endpoints:*
+
+### Auth
+- `POST /api/v1/auth/register` - Register new user
+- `GET /api/v1/auth/check-username` - Check username availability
+- `POST /api/v1/auth/send-sms-code` - Send verification code

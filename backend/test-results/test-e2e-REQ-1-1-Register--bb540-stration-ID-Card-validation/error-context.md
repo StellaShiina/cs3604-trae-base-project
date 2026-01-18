@@ -1,0 +1,43 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - heading "账号注册" [level=2] [ref=e4]
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - text: 用户名
+      - textbox "用户名设置成功后不可修改" [ref=e7]
+    - generic [ref=e8]:
+      - text: 登录密码
+      - textbox "6-20位字母、数字或符号" [ref=e9]
+    - generic [ref=e10]:
+      - text: 确认密码
+      - textbox "再次输入您的登录密码" [ref=e11]
+    - generic [ref=e12]:
+      - text: 姓名
+      - textbox "请输入姓名" [ref=e13]
+    - generic [ref=e14]:
+      - text: 证件类型
+      - combobox [ref=e15]:
+        - option "居民身份证" [selected]
+        - option "港澳台居民居住证"
+        - option "港澳居民来往内地通行证"
+        - option "台湾居民来往大陆通行证"
+        - option "护照"
+    - generic [ref=e16]:
+      - text: 证件号码
+      - textbox "请输入您的证件号码" [ref=e17]: "123"
+    - generic [ref=e18]:
+      - text: 手机号码
+      - combobox [ref=e19]:
+        - option "+86 中国" [selected]
+      - textbox "手机号码" [ref=e20]
+    - generic [ref=e21]:
+      - text: 验证码
+      - textbox "输入验证码" [ref=e22]
+      - button "获取验证码" [ref=e23]
+    - generic [ref=e25]:
+      - checkbox "我已阅读并同意《服务条款》" [ref=e26]
+      - text: 我已阅读并同意《服务条款》
+    - button "下一步" [ref=e27]
+```

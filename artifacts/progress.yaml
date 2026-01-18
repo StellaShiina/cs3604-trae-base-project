@@ -25,8 +25,21 @@
 - id: REQ-1-1
   parentId: REQ-1
   childrenIds: []
-  status: PENDING_CONTRACT
-  artifacts: {}
+  status: PENDING_IMPL
+  artifacts:
+    api_ids:
+      - API-POST-AUTH-REGISTER
+      - API-GET-AUTH-CHECK-USERNAME
+      - API-POST-AUTH-SEND-SMS
+      - API-AUTH-REGISTER
+      - API-AUTH-CHECK-USERNAME
+      - API-AUTH-SEND-SMS
+    func_ids:
+      - FUNC-AUTH-REGISTER
+      - FUNC-AUTH-CHECK-USERNAME
+      - FUNC-AUTH-SEND-SMS
+    ui_ids:
+      - UI-PAGE-REGISTER
 - id: REQ-1-2
   parentId: REQ-1
   childrenIds: []

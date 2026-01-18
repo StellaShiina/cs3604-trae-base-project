@@ -10,11 +10,90 @@ UI-PAGE-LOGIN:
   path: frontend/src/pages/Login.tsx
 UI-PAGE-REGISTER:
   type: UI
-  related_req_id: REQ-1
-  description: Register Page
-  path: frontend/src/pages/Register.tsx
+  related_req_id: REQ-1-1
+  description: User Registration Page
+  path: frontend/src/pages/Register.jsx
+  upstream_ids: []
+  downstream_ids:
+    - API-AUTH-REGISTER
+    - API-AUTH-CHECK-USERNAME
+    - API-AUTH-SEND-SMS
 UI-PAGE-FORGOT-PASSWORD:
   type: UI
   related_req_id: REQ-1
   description: Forgot Password Page
   path: frontend/src/pages/ForgotPassword.tsx
+API-POST-AUTH-REGISTER:
+  type: API
+  related_req_id: REQ-1-1
+  signature: POST /api/v1/auth/register
+  path: backend/src/routes/auth.ts
+  description: User Registration Endpoint
+API-GET-AUTH-CHECK-USERNAME:
+  type: API
+  related_req_id: REQ-1-1
+  signature: GET /api/v1/auth/check-username
+  path: backend/src/routes/auth.ts
+  description: Check Username Availability Endpoint
+API-POST-AUTH-SEND-SMS:
+  type: API
+  related_req_id: REQ-1-1
+  signature: POST /api/v1/auth/send-sms-code
+  path: backend/src/routes/auth.ts
+  description: Send SMS Code Endpoint
+FUNC-AUTH-REGISTER:
+  type: FUNC
+  related_req_id: REQ-1-1
+  signature: register(userData)
+  path: backend/src/services/authService.ts
+  description: User Registration Logic
+  db_tables:
+    - users
+    - passengers
+FUNC-AUTH-CHECK-USERNAME:
+  type: FUNC
+  related_req_id: REQ-1-1
+  signature: checkUsername(username)
+  path: backend/src/services/authService.ts
+  description: Check Username Logic
+  db_tables:
+    - users
+FUNC-AUTH-SEND-SMS:
+  type: FUNC
+  related_req_id: REQ-1-1
+  signature: sendSmsCode(phone)
+  path: backend/src/services/authService.ts
+  description: Send SMS Logic
+API-AUTH-REGISTER:
+  type: API
+  related_req_id: REQ-1-1
+  signature: POST /api/v1/auth/register
+  path: backend/src/routes/authRoutes.js
+  description: Register new user and create passenger
+  upstream_ids:
+    - UI-PAGE-REGISTER
+  downstream_ids: []
+  db_tables:
+    - users
+    - passengers
+API-AUTH-CHECK-USERNAME:
+  type: API
+  related_req_id: REQ-1-1
+  signature: GET /api/v1/auth/check-username
+  path: backend/src/routes/authRoutes.js
+  description: Check if username is available
+  upstream_ids:
+    - UI-PAGE-REGISTER
+  downstream_ids: []
+  db_tables:
+    - users
+API-AUTH-SEND-SMS:
+  type: API
+  related_req_id: REQ-1-1
+  signature: POST /api/v1/auth/send-sms-code
+  path: backend/src/routes/authRoutes.js
+  description: Send SMS verification code
+  upstream_ids:
+    - UI-PAGE-REGISTER
+  downstream_ids: []
+  db_tables: []

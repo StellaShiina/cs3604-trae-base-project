@@ -1,0 +1,37 @@
+const express = require('express');
+const router = express.Router();
+const authService = require('../services/authService');
+
+// POST /api/v1/auth/register
+router.post('/register', async (req, res) => {
+  try {
+    const result = await authService.register(req.body);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ code: 500, message: error.message });
+  }
+});
+
+// GET /api/v1/auth/check-username
+router.get('/check-username', async (req, res) => {
+  try {
+    const { username } = req.query;
+    const result = await authService.checkUsername(username);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ code: 500, message: error.message });
+  }
+});
+
+// POST /api/v1/auth/send-sms-code
+router.post('/send-sms-code', async (req, res) => {
+  try {
+    const { phone } = req.body;
+    const result = await authService.sendSmsCode(phone);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ code: 500, message: error.message });
+  }
+});
+
+module.exports = router;
