@@ -48,6 +48,22 @@ const PaymentPage = () => {
       }
   };
 
+    const handleCancel = async () => {
+        if (window.confirm('确定要取消订单吗？')) {
+            try {
+                const res = await apiClient.post(`/v1/orders/${orderId}/cancel`);
+                if (res.data.code === 0) {
+                    alert('订单已取消');
+                    navigate('/search');
+                } else {
+                    alert(res.data.message);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+    };
+
   const formatTime = (s) => {
       const m = Math.floor(s / 60);
       const sec = s % 60;
@@ -82,6 +98,12 @@ const PaymentPage = () => {
                 剩余支付时间: {formatTime(timeLeft)}
             </div>
             <button 
+                      onClick={handleCancel}
+                      style={{ background: '#ccc', color: '#333', padding: '10px 40px', border: 'none', borderRadius: 4, fontSize: 18, marginRight: 20 }}
+                  >
+                      取消订单
+                  </button>
+                  <button 
                 onClick={handlePay}
                 disabled={order.status !== 'PENDING' || timeLeft === 0}
                 style={{ background: '#F57C00', color: 'white', padding: '10px 40px', border: 'none', borderRadius: 4, fontSize: 18 }}
