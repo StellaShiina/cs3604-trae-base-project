@@ -91,18 +91,40 @@ const orderService = {
     return new Promise((resolve, reject) => {
       db.all('SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC', [userId], async (err, orders) => {
         if (err) return reject(err);
-
+        
         // Populate items for each order
         const ordersWithItems = await Promise.all(orders.map(async (order) => {
-          return new Promise((resolveItem, rejectItem) => {
-            db.all('SELECT * FROM order_items WHERE order_id = ?', [order.id], (err, items) => {
-              if (err) return rejectItem(err);
-              resolveItem({ ...order, items });
-            });
-          });
+           return new Promise((resolveItem, rejectItem) => {
+              db.all('SELECT * FROM order_items WHERE order_id = ?', [order.id], (err, items) => {
+                 if (err) return rejectItem(err);
+                 resolveItem({ ...order, items });
+              });
+           });
         }));
-
+        
         resolve({ code: 0, data: ordersWithItems });
+      });
+    });
+  },
+
+  addPassenger: (userId, passengerData) => {
+    return new Promise((resolve, reject) => {
+      const { name, idType, idNumber, type } = passengerData;
+      db.run('INSERT INTO passengers (user_id, name, id_type, id_number, type) VALUES (?, ?, ?, ?, ?)', 
+        [userId, name, idType, idNumber, type || '成人'], 
+        function(err) {
+          if (err) return reject(err);
+          resolve({ code: 0, data: { id: this.lastID } });
+        }
+      );
+    });
+  },
+
+  deletePassenger: (userId, passengerId) => {
+    return new Promise((resolve, reject) => {
+      db.run('DELETE FROM passengers WHERE id = ? AND user_id = ?', [passengerId, userId], function(err) {
+        if (err) return reject(err);
+        resolve({ code: 0, message: 'Passenger deleted' });
       });
     });
   }

@@ -8,11 +8,16 @@ const PersonalCenterPage = () => {
   const activeTab = searchParams.get('tab') || 'dashboard'; // dashboard, orders, passengers
   const [user, setUser] = useState(null);
   const [orders, setOrders] = useState([]);
+    const [passengers, setPassengers] = useState([]);
+    const [newPassenger, setNewPassenger] = useState({ name: '', idType: '1', idNumber: '', type: '成人' });
+    const [showAddPassenger, setShowAddPassenger] = useState(false);
   
   useEffect(() => {
     fetchUser();
     if (activeTab === 'orders') {
         fetchOrders();
+    } else if (activeTab === 'passengers') {
+        fetchPassengers();
     }
   }, [activeTab]);
 
@@ -39,6 +44,52 @@ const PersonalCenterPage = () => {
         console.error(e);
     }
   };
+
+    const fetchPassengers = async () => {
+        try {
+            const res = await apiClient.get('/v1/orders/passengers');
+            if (res.data.code === 0) {
+                setPassengers(res.data.data);
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    const handleAddPassenger = async () => {
+        if (!newPassenger.name || !newPassenger.idNumber) {
+            alert('请填写完整信息');
+            return;
+        }
+        try {
+            const res = await apiClient.post('/v1/orders/passengers', newPassenger);
+            if (res.data.code === 0) {
+                alert('添加成功');
+                setShowAddPassenger(false);
+                fetchPassengers();
+                setNewPassenger({ name: '', idType: '1', idNumber: '', type: '成人' });
+            } else {
+                alert(res.data.message);
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    const handleDeletePassenger = async (id) => {
+        if (!window.confirm('确定删除吗？')) return;
+        try {
+            const res = await apiClient.delete(`/v1/orders/passengers/${id}`);
+            if (res.data.code === 0) {
+                alert('删除成功');
+                fetchPassengers();
+            } else {
+                alert(res.data.message);
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
 
   return (
     <div style={{ background: '#F5F7FA', minHeight: '100vh' }}>
@@ -86,8 +137,11 @@ const PersonalCenterPage = () => {
                  <div 
                    style={{ 
                        padding: '5px 10px', 
+                              background: activeTab === 'passengers' ? '#2F86E6' : 'transparent',
+                              color: activeTab === 'passengers' ? 'white' : '#333',
                        cursor: 'pointer'
                    }}
+                          onClick={() => window.location.href = '/personal-center?tab=passengers'}
                 >
                     乘车人
                 </div>
@@ -149,6 +203,60 @@ const PersonalCenterPage = () => {
                    </div>
                </div>
            )}
+
+                  {/* Passengers View */}
+                  {activeTab === 'passengers' && (
+                      <div style={{ background: 'white', minHeight: 600, padding: 20 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
+                              <div style={{ fontSize: 18, fontWeight: 'bold' }}>乘车人管理</div>
+                              <button onClick={() => setShowAddPassenger(true)} style={{ background: '#F57C00', color: 'white', border: 'none', padding: '5px 15px', borderRadius: 4 }}>
+                                  + 添加乘车人
+                              </button>
+                          </div>
+
+                          {showAddPassenger && (
+                              <div style={{ background: '#F9F9F9', padding: 15, marginBottom: 20, border: '1px solid #eee' }}>
+                                  <div style={{ marginBottom: 10 }}>
+                                      <label style={{ marginRight: 10 }}>姓名</label>
+                                      <input value={newPassenger.name} onChange={e => setNewPassenger({ ...newPassenger, name: e.target.value })} />
+                                  </div>
+                                  <div style={{ marginBottom: 10 }}>
+                                      <label style={{ marginRight: 10 }}>证件号码</label>
+                                      <input value={newPassenger.idNumber} onChange={e => setNewPassenger({ ...newPassenger, idNumber: e.target.value })} />
+                                  </div>
+                                  <button onClick={handleAddPassenger} style={{ background: '#2F86E6', color: 'white', border: 'none', padding: '5px 15px', borderRadius: 4, marginRight: 10 }}>保存</button>
+                                  <button onClick={() => setShowAddPassenger(false)}>取消</button>
+                              </div>
+                          )}
+
+                          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                              <thead>
+                                  <tr style={{ background: '#eee' }}>
+                                      <th style={{ padding: 10 }}>姓名</th>
+                                      <th>证件类型</th>
+                                      <th>证件号码</th>
+                                      <th>旅客类型</th>
+                                      <th>操作</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  {passengers.map(p => (
+                                      <tr key={p.id} style={{ borderBottom: '1px solid #eee', textAlign: 'center' }}>
+                                          <td style={{ padding: 10 }}>{p.name}</td>
+                                          <td>{p.id_type === '1' ? '中国居民身份证' : p.id_type}</td>
+                                          <td>{p.id_number}</td>
+                                          <td>{p.type}</td>
+                                          <td>
+                                              <button onClick={() => handleDeletePassenger(p.id)} style={{ color: 'red', border: 'none', background: 'none', cursor: 'pointer' }}>
+                                                  删除
+                                              </button>
+                                          </td>
+                                      </tr>
+                                  ))}
+                              </tbody>
+                          </table>
+                      </div>
+                  )}
 
         </div>
       </div>

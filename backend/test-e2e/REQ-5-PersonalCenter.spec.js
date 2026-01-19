@@ -85,4 +85,30 @@ test.describe('REQ-5: Personal Center', () => {
     await expect(page.locator('text=G27').first()).toBeVisible();
     await expect(page.locator('text=PAID').first()).toBeVisible(); // Status
   });
+
+  test('Passenger Management', async ({ page }) => {
+    await page.goto('http://localhost:5173/personal-center?tab=passengers');
+
+    // Handle alerts
+    page.on('dialog', async dialog => {
+      console.log(`Dialog message: ${dialog.message()}`);
+      await dialog.accept();
+    });
+
+    // 1. Add Passenger
+    await page.click('button:has-text("添加乘车人")');
+    await page.locator('text=姓名').locator('..').locator('input').fill('Test Pass');
+    await page.locator('text=证件号码').locator('..').locator('input').fill('110101199001011234');
+    await page.click('button:has-text("保存")');
+
+    // 2. Verify existence
+    await expect(page.locator('text=Test Pass')).toBeVisible();
+    await expect(page.locator('text=110101199001011234')).toBeVisible();
+
+    // 3. Delete Passenger
+    await page.locator('tr:has-text("Test Pass")').locator('button:has-text("删除")').click();
+
+    // 4. Verify removal
+    await expect(page.locator('text=Test Pass')).not.toBeVisible();
+  });
 });

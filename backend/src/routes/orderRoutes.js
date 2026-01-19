@@ -24,6 +24,30 @@ router.get('/passengers', async (req, res) => {
   }
 });
 
+router.post('/passengers', async (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'] || req.body.userId;
+    if (!userId) return res.status(401).json({ code: 401, message: 'Unauthorized' });
+
+    const result = await orderService.addPassenger(userId, req.body);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ code: 500, message: error.message });
+  }
+});
+
+router.delete('/passengers/:id', async (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'] || req.query.userId;
+    if (!userId) return res.status(401).json({ code: 401, message: 'Unauthorized' });
+
+    const result = await orderService.deletePassenger(userId, req.params.id);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ code: 500, message: error.message });
+  }
+});
+
 router.post('/', async (req, res) => {
   try {
     const userId = req.headers['x-user-id'] || req.body.userId;

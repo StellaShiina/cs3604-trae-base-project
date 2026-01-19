@@ -102,7 +102,7 @@
 - id: REQ-5
   parentId: ROOT
   childrenIds: []
-  status: PENDING_IMPL
+  status: COMPLETED
   artifacts:
     func_ids:
       - FUNC-ORDER-GET-MY
