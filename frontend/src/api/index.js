@@ -21,5 +21,8 @@ export const sendLoginSms = (loginId) => api.post('/auth/send-login-sms', { logi
 export const register = (data) => api.post('/auth/register', data);
 export const checkAvailability = (field, value) => api.get('/auth/check-availability', { params: { field, value } });
 export const sendSms = (phone) => api.post('/auth/send-sms', { phone });
+export const verifyUserForReset = (data) => api.post('/auth/forgot-password/verify-user', data);
+export const sendForgotSms = (phone) => api.post('/auth/forgot-password/send-sms', { phone });
+export const resetPassword = (data) => api.post('/auth/forgot-password/reset', data);
 
 export default api;

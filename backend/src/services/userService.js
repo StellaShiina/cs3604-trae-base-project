@@ -143,12 +143,44 @@ const verifyLogin2FA = async (loginId, password, idLast4, code) => {
     return userWithoutPassword;
 };
 
+const verifyUserForReset = (phone, idType, idNumber) => {
+    return new Promise((resolve, reject) => {
+        db.get('SELECT * FROM users WHERE phone = ? AND id_type = ? AND id_number = ?', 
+            [phone, idType, idNumber], 
+            (err, row) => {
+                if (err) reject(err);
+                else resolve(!!row);
+            }
+        );
+    });
+};
+
+const resetPassword = async (phone, code, newPassword) => {
+    const isCodeValid = await verifyCode(phone, code);
+    if (!isCodeValid) throw new Error('验证码错误或已失效');
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    return new Promise((resolve, reject) => {
+        db.run('UPDATE users SET password = ? WHERE phone = ?', 
+            [hashedPassword, phone], 
+            function(err) {
+                if (err) reject(err);
+                else if (this.changes === 0) reject(new Error('用户不存在'));
+                else resolve(true);
+            }
+        );
+    });
+};
+
 module.exports = {
   createUser,
   findUserByUsername,
   findUserByLoginId,
   validateUser,
   verifyLogin2FA,
+  verifyUserForReset,
+  resetPassword,
   checkAvailability,
   createVerificationCode,
   verifyCode

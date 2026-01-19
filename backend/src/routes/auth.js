@@ -65,6 +65,44 @@ router.post('/login-verify', async (req, res) => {
     }
 });
 
+// POST /api/auth/forgot-password/verify-user
+router.post('/forgot-password/verify-user', async (req, res) => {
+    try {
+        const { phone, idType, idNumber } = req.body;
+        const exists = await userService.verifyUserForReset(phone, idType, idNumber);
+        if (exists) {
+            res.json({ success: true });
+        } else {
+            res.status(404).json({ success: false, error: { message: '用户信息不匹配' } });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, error: { message: error.message } });
+    }
+});
+
+// POST /api/auth/forgot-password/send-sms
+router.post('/forgot-password/send-sms', async (req, res) => {
+    try {
+        const { phone } = req.body;
+        const code = await userService.createVerificationCode(phone);
+        console.log(`[Mock SMS] Forgot Password Code for ${phone}: ${code}`);
+        res.json({ success: true, message: 'Code sent' });
+    } catch (error) {
+        res.status(500).json({ success: false, error: { message: error.message } });
+    }
+});
+
+// POST /api/auth/forgot-password/reset
+router.post('/forgot-password/reset', async (req, res) => {
+    try {
+        const { phone, code, newPassword } = req.body;
+        await userService.resetPassword(phone, code, newPassword);
+        res.json({ success: true });
+    } catch (error) {
+        res.status(400).json({ success: false, error: { message: error.message } });
+    }
+});
+
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {

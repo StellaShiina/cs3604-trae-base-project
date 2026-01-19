@@ -201,3 +201,70 @@ FUNC-USER-VERIFY-LOGIN-2FA:
   db_tables:
     - users
     - verification_codes
+UI-PAGE-FORGOT-PASSWORD:
+  type: UI
+  related_req_id: REQ-1-3
+  description: Forgot Password Page with 3-step wizard (Verify User -> Verify SMS -> Set Password)
+  path: frontend/src/pages/ForgotPasswordPage.jsx
+  upstream_ids: []
+  downstream_ids:
+    - API-AUTH-VERIFY-RESET
+    - API-AUTH-FORGOT-SMS
+    - API-AUTH-RESET-PWD
+  db_tables: []
+API-AUTH-VERIFY-RESET:
+  type: API
+  related_req_id: REQ-1-3
+  signature: POST /api/auth/forgot-password/verify-user
+  path: backend/src/routes/auth.js
+  description: API to verify user identity (phone, id_type, id_number) before password reset
+  upstream_ids:
+    - UI-PAGE-FORGOT-PASSWORD
+  downstream_ids:
+    - FUNC-USER-VERIFY-RESET
+  db_tables: []
+API-AUTH-FORGOT-SMS:
+  type: API
+  related_req_id: REQ-1-3
+  signature: POST /api/auth/forgot-password/send-sms
+  path: backend/src/routes/auth.js
+  description: API to send SMS code for password reset flow
+  upstream_ids:
+    - UI-PAGE-FORGOT-PASSWORD
+  downstream_ids:
+    - FUNC-USER-CREATE-CODE
+  db_tables: []
+API-AUTH-RESET-PWD:
+  type: API
+  related_req_id: REQ-1-3
+  signature: POST /api/auth/forgot-password/reset
+  path: backend/src/routes/auth.js
+  description: API to reset password using verified code
+  upstream_ids:
+    - UI-PAGE-FORGOT-PASSWORD
+  downstream_ids:
+    - FUNC-USER-RESET-PWD
+  db_tables: []
+FUNC-USER-VERIFY-RESET:
+  type: FUNC
+  related_req_id: REQ-1-3
+  signature: verifyUserForReset(phone, idType, idNumber)
+  path: backend/src/services/userService.js
+  description: Service function to verify user existence by phone and ID info
+  upstream_ids:
+    - API-AUTH-VERIFY-RESET
+  downstream_ids: []
+  db_tables:
+    - users
+FUNC-USER-RESET-PWD:
+  type: FUNC
+  related_req_id: REQ-1-3
+  signature: resetPassword(phone, code, newPassword)
+  path: backend/src/services/userService.js
+  description: Service function to reset password after validating SMS code
+  upstream_ids:
+    - API-AUTH-RESET-PWD
+  downstream_ids: []
+  db_tables:
+    - users
+    - verification_codes
