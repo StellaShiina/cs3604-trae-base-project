@@ -366,9 +366,55 @@ UI-ORDER-PAGE:
     - API-ORDER-CREATE
 UI-PAYMENT-PAGE:
   type: UI
-  related_req_id: REQ-3
-  description: Payment success page
+  related_req_id: REQ-4
+  description: 'UI Component: Payment Page with Countdown'
   path: frontend/src/pages/PaymentPage.jsx
   upstream_ids:
     - UI-ORDER-PAGE
+  downstream_ids:
+    - API-ORDER-PAY
+    - API-ORDER-CANCEL
+  signature: PaymentPage
+FUNC-ORDER-MGMT:
+  type: FUNC
+  related_req_id: REQ-4
+  signature: getOrderById, payOrder, cancelOrder
+  path: backend/src/services/orderService.js
+  description: 'Order Service Logic: Get, Pay, Cancel'
+  upstream_ids: []
+  db_tables:
+    - orders
+    - order_items
+    - passengers
+    - daily_train_tickets
+API-ORDER-PAY:
+  type: API
+  related_req_id: REQ-4
+  signature: POST /api/orders/:id/pay
+  path: backend/src/routes/orders.js
+  description: 'API Endpoint: Pay for an order'
+  upstream_ids:
+    - UI-PAYMENT-PAGE
+  downstream_ids:
+    - FUNC-ORDER-MGMT
+  db_tables: []
+API-ORDER-CANCEL:
+  type: API
+  related_req_id: REQ-4
+  signature: POST /api/orders/:id/cancel
+  path: backend/src/routes/orders.js
+  description: 'API Endpoint: Cancel an order'
+  upstream_ids:
+    - UI-PAYMENT-PAGE
+  downstream_ids:
+    - FUNC-ORDER-MGMT
+  db_tables: []
+UI-PURCHASE-SUCCESS-PAGE:
+  type: UI
+  related_req_id: REQ-4
+  description: 'UI Component: Purchase Success Page'
+  path: frontend/src/pages/PurchaseSuccessPage.jsx
+  signature: PurchaseSuccessPage
+  upstream_ids: []
   downstream_ids: []
+  db_tables: []

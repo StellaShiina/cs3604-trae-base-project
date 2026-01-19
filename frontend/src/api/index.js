@@ -39,5 +39,8 @@ export const resetPassword = (data) => api.post('/auth/forgot-password/reset', d
 export const queryTickets = (params) => api.get('/tickets/query', { params });
 export const listPassengers = () => api.get('/passengers');
 export const createOrder = (data) => api.post('/orders', data);
+export const getOrder = (id) => api.get(`/orders/${id}`);
+export const payOrder = (id) => api.post(`/orders/${id}/pay`);
+export const cancelOrder = (id) => api.post(`/orders/${id}/cancel`);
 
 export default api;

@@ -119,6 +119,146 @@ const createOrder = async (userId, orderData) => {
   });
 };
 
+const getOrderById = (orderId, userId) => {
+  return new Promise((resolve, reject) => {
+    const sql = `
+      SELECT 
+        o.id as order_id, o.status, o.total_amount, o.created_at,
+        oi.id as item_id, oi.train_no, oi.seat_type, oi.price, oi.departure_date, oi.from_station, oi.to_station,
+        p.real_name, p.id_number, p.passenger_type
+      FROM orders o
+      JOIN order_items oi ON o.id = oi.order_id
+      JOIN passengers p ON oi.passenger_id = p.id
+      WHERE o.id = ? AND o.user_id = ?
+    `;
+    
+    db.all(sql, [orderId, userId], (err, rows) => {
+      if (err) return reject(err);
+      if (!rows || rows.length === 0) return resolve(null);
+      
+      // Group items
+      const order = {
+        id: rows[0].order_id,
+        status: rows[0].status,
+        totalAmount: rows[0].total_amount,
+        createdAt: rows[0].created_at,
+        items: rows.map(r => ({
+          id: r.item_id,
+          trainNo: r.train_no,
+          seatType: r.seat_type,
+          price: r.price,
+          departureDate: r.departure_date,
+          fromStation: r.from_station,
+          toStation: r.to_station,
+          passengerName: r.real_name,
+          idNumber: r.id_number,
+          passengerType: r.passenger_type
+        }))
+      };
+      resolve(order);
+    });
+  });
+};
+
+const payOrder = (orderId, userId) => {
+  return new Promise((resolve, reject) => {
+    db.run(
+      `UPDATE orders SET status = 'PAID' WHERE id = ? AND user_id = ? AND status = 'PENDING'`,
+      [orderId, userId],
+      function(err) {
+        if (err) return reject(err);
+        if (this.changes === 0) return reject(new Error('Order not found or not pending'));
+        resolve({ success: true });
+      }
+    );
+  });
+};
+
+const cancelOrder = (orderId, userId) => {
+  return new Promise((resolve, reject) => {
+    // 1. Get Order Items to restore inventory
+    db.all(
+      `SELECT oi.train_no, oi.seat_type, oi.departure_date 
+       FROM order_items oi
+       JOIN orders o ON o.id = oi.order_id
+       WHERE o.id = ? AND o.user_id = ? AND o.status = 'PENDING'`,
+      [orderId, userId],
+      (err, rows) => {
+        if (err) return reject(err);
+        if (!rows || rows.length === 0) return reject(new Error('Order not found or not pending'));
+        
+        // Aggregate
+        const seatCounts = {}; // Key: "trainNo|date|seatType" -> count
+        rows.forEach(r => {
+            const key = `${r.train_no}|${r.departure_date}|${r.seat_type}`;
+            if (!seatCounts[key]) seatCounts[key] = 0;
+            seatCounts[key]++;
+        });
+
+        db.serialize(() => {
+          db.run('BEGIN TRANSACTION');
+          
+          // 2. Update Status
+          db.run(`UPDATE orders SET status = 'CANCELLED' WHERE id = ?`, [orderId], (err) => {
+              if (err) {
+                  db.run('ROLLBACK');
+                  return reject(err);
+              }
+              
+              // 3. Restore Inventory
+              const keys = Object.keys(seatCounts);
+              let completed = 0;
+              let hasError = false;
+              
+              if (keys.length === 0) { // Should not happen
+                  db.run('COMMIT');
+                  return resolve({ success: true });
+              }
+
+              const checkDone = () => {
+                  completed++;
+                  if (completed === keys.length) {
+                      db.run('COMMIT');
+                      resolve({ success: true });
+                  }
+              };
+
+              keys.forEach(key => {
+                  if (hasError) return;
+                  const [trainNo, date, seatType] = key.split('|');
+                  const count = seatCounts[key];
+                  
+                  // Validate seatType column
+                  const validSeats = ['business_seat', 'first_class', 'second_class', 'hard_sleeper', 'hard_seat', 'no_seat'];
+                  if (!validSeats.includes(seatType)) {
+                       checkDone(); // Skip invalid?
+                       return;
+                  }
+
+                  db.run(
+                      `UPDATE daily_train_tickets SET ${seatType} = ${seatType} + ? WHERE train_no = ? AND date = ?`,
+                      [count, trainNo, date],
+                      (err) => {
+                          if (hasError) return;
+                          if (err) {
+                              hasError = true;
+                              db.run('ROLLBACK');
+                              return reject(err);
+                          }
+                          checkDone();
+                      }
+                  );
+              });
+          });
+        });
+      }
+    );
+  });
+};
+
 module.exports = {
-  createOrder
+  createOrder,
+  getOrderById,
+  payOrder,
+  cancelOrder
 };

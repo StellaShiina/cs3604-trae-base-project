@@ -1,0 +1,92 @@
+.payment-container {
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.success-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.success-icon {
+  font-size: 48px;
+  color: #4CAF50;
+}
+
+.order-info-box {
+  background: #f8f9fa;
+  padding: 20px;
+  border: 1px solid #e9ecef;
+  margin-bottom: 20px;
+}
+
+.train-info-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed #ddd;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+}
+
+.train-no {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+.passenger-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.passenger-table th, .passenger-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.action-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.countdown {
+  color: #f60;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.btn-group {
+  display: flex;
+  gap: 15px;
+}
+
+.cancel-btn {
+  padding: 10px 20px;
+  background: #fff;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.pay-btn {
+  padding: 10px 30px;
+  background: #F39A21;
+  color: white;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.pay-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
