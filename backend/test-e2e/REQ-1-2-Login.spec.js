@@ -22,11 +22,9 @@ test.describe('REQ-1-2: User Login', () => {
   const testPhone = '13900139999';
 
   test.beforeAll(async () => {
-    // Clean up
-    await runSQL('DELETE FROM users WHERE username = ?', [testUser]);
-    // Insert user
+    // Use REPLACE INTO
     await runSQL(`
-      INSERT INTO users (username, password, name, id_type, id_number, phone)
+      REPLACE INTO users (username, password, name, id_type, id_number, phone)
       VALUES (?, ?, ?, ?, ?, ?)
     `, [testUser, testPwd, 'Login User', '1', testID, testPhone]);
   });

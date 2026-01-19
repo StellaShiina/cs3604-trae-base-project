@@ -23,9 +23,9 @@ test.describe('REQ-1-3: Forgot Password', () => {
   const testPhone = '13900137777';
 
   test.beforeAll(async () => {
-    await runSQL('DELETE FROM users WHERE username = ?', [testUser]);
+    // Use REPLACE INTO to ensure the user exists with these exact credentials, replacing any conflict
     await runSQL(`
-      INSERT INTO users (username, password, name, id_type, id_number, phone)
+      REPLACE INTO users (username, password, name, id_type, id_number, phone)
       VALUES (?, ?, ?, ?, ?, ?)
     `, [testUser, oldPwd, 'Forgot User', '1', testID, testPhone]);
   });

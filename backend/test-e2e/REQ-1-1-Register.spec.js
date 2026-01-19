@@ -22,11 +22,9 @@ test.describe('REQ-1-1: User Registration', () => {
   const existingPhone = '13800138000';
 
   test.beforeAll(async () => {
-    // Clean up
-    await runSQL('DELETE FROM users WHERE username = ? OR id_number = ?', [existingUser, existingID]);
-    // Insert existing user
+    // Use REPLACE INTO
     await runSQL(`
-      INSERT INTO users (username, password, name, id_type, id_number, phone)
+      REPLACE INTO users (username, password, name, id_type, id_number, phone)
       VALUES (?, ?, ?, ?, ?, ?)
     `, [existingUser, 'password123', 'Existing User', '1', existingID, existingPhone]);
   });
@@ -159,12 +157,13 @@ test.describe('REQ-1-1: User Registration', () => {
   });
 
   test('Successful Registration', async ({ page }) => {
-    const newUser = 'new_success_user';
-    const newID = '110101199001016666';
-    const newPhone = '13900139002';
+    const timestamp = Date.now();
+    const newUser = `user_${timestamp}`;
+    const newID = `110101199001${timestamp.toString().slice(-6)}`;
+    const newPhone = `139${timestamp.toString().slice(-8)}`;
 
-    // Clean up first
-    await runSQL('DELETE FROM users WHERE username = ?', [newUser]);
+    // Clean up first (optional since random)
+    // await runSQL('DELETE FROM users WHERE username = ?', [newUser]);
 
     await page.locator('input[placeholder*="用户名"]').fill(newUser);
     await page.locator('input[placeholder="6-20位字母、数字或符号"]').fill('Password123');

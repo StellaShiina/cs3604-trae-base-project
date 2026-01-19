@@ -16,10 +16,10 @@ test.describe('REQ-4: Payment & Success', () => {
       await new Promise((resolve, reject) => {
          db.serialize(() => {
              // Cleanup
-             db.run('DELETE FROM users WHERE username = ? OR id_number = ?', [testUser, testID]);
+           db.run('DELETE FROM users WHERE username = ? OR id_number = ? OR phone = ?', [testUser, testID, testPhone]);
              
              // Insert User
-             db.run('INSERT INTO users (username, password, name, id_type, id_number, phone) VALUES (?, ?, ?, ?, ?, ?)', 
+           db.run('REPLACE INTO users (username, password, name, id_type, id_number, phone) VALUES (?, ?, ?, ?, ?, ?)', 
                  [testUser, testPwd, 'Pay User', '1', testID, testPhone]);
                  
              // Get User ID and Create Order

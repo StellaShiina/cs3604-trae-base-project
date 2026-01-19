@@ -14,8 +14,8 @@ test.describe('REQ-3: Order Submission', () => {
       const db = new sqlite3.Database(dbPath);
       await new Promise((resolve, reject) => {
           db.serialize(() => {
-              db.run('DELETE FROM users WHERE username = ? OR id_number = ?', [testUser, testID]);
-              db.run('INSERT INTO users (username, password, name, id_type, id_number, phone) VALUES (?, ?, ?, ?, ?, ?)', 
+              db.run('DELETE FROM users WHERE username = ? OR id_number = ? OR phone = ?', [testUser, testID, testPhone]);
+              db.run('REPLACE INTO users (username, password, name, id_type, id_number, phone) VALUES (?, ?, ?, ?, ?, ?)', 
                   [testUser, testPwd, 'Order User', '1', testID, testPhone]);
              db.get('SELECT id FROM users WHERE username = ?', [testUser], (err, row) => {
                  if (row) {
