@@ -315,7 +315,7 @@ FUNC-PASSENGER-LIST:
   related_req_id: REQ-3
   signature: listPassengers(userId)
   path: backend/src/services/passengerService.js
-  description: Service to list passengers for a user
+  description: List Passengers Logic
   upstream_ids:
     - API-PASSENGER-LIST
   downstream_ids: []
@@ -326,19 +326,20 @@ FUNC-ORDER-CREATE:
   related_req_id: REQ-3
   signature: createOrder(userId, orderData)
   path: backend/src/services/orderService.js
-  description: Service to create order and items
+  description: Order Creation Logic (Transactional)
   upstream_ids:
     - API-ORDER-CREATE
   downstream_ids: []
   db_tables:
     - orders
     - order_items
+    - daily_train_tickets
 API-PASSENGER-LIST:
   type: API
   related_req_id: REQ-3
   signature: GET /api/passengers
   path: backend/src/routes/passengers.js
-  description: API to list passengers
+  description: List Passengers API Endpoint
   upstream_ids:
     - UI-ORDER-PAGE
   downstream_ids:
@@ -348,7 +349,7 @@ API-ORDER-CREATE:
   related_req_id: REQ-3
   signature: POST /api/orders
   path: backend/src/routes/orders.js
-  description: API to create order
+  description: Create Order API Endpoint
   upstream_ids:
     - UI-ORDER-PAGE
   downstream_ids:
@@ -356,7 +357,7 @@ API-ORDER-CREATE:
 UI-ORDER-PAGE:
   type: UI
   related_req_id: REQ-3
-  description: Order filling page
+  description: Order Filling and Submission Page
   path: frontend/src/pages/OrderPage.jsx
   upstream_ids:
     - UI-TICKET-SEARCH

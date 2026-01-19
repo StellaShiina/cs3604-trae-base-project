@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import NavBar from '../components/NavBar';
+import LoginModal from '../components/LoginModal';
 import { queryTickets } from '../api';
 import './TicketSearchPage.css';
 
@@ -14,6 +15,9 @@ const TicketSearchPage = () => {
   const [filters, setFilters] = useState({
     trainType: { G: true, D: true, Z: true, T: true, K: true, Other: true }
   });
+  
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [pendingBooking, setPendingBooking] = useState(null);
 
   const query = {
     from: searchParams.get('from') || '北京',
@@ -56,6 +60,13 @@ const TicketSearchPage = () => {
   }, [searchParams]);
 
   const handleBook = (ticket) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setPendingBooking(ticket);
+      setShowLoginModal(true);
+      return;
+    }
+
     // Navigate to Order Page with ticket info
     const params = new URLSearchParams({
       trainNo: ticket.train_no,
@@ -69,10 +80,26 @@ const TicketSearchPage = () => {
     navigate(`/order?${params}`);
   };
 
+  const handleLoginSuccess = (user) => {
+    setShowLoginModal(false);
+    if (pendingBooking) {
+      handleBook(pendingBooking);
+      setPendingBooking(null);
+    }
+  };
+
   return (
     <div className="ticket-search-page">
       <Header />
       <NavBar />
+      
+      {/* Login Modal */}
+      {showLoginModal && (
+        <LoginModal 
+          onClose={() => setShowLoginModal(false)} 
+          onSuccess={handleLoginSuccess} 
+        />
+      )}
       
       {/* Query Bar */}
       <div className="search-bar-container">

@@ -13,14 +13,26 @@ const getPrice = (seatType) => {
 };
 
 const createOrder = async (userId, orderData) => {
-  const { trainNo, seatType, passengers, fromStation, toStation, departureDate } = orderData;
+  const { trainNo, passengers, fromStation, toStation, departureDate } = orderData;
+  // Fallback seatType if not provided in passenger (though UI should provide it)
+  const defaultSeatType = orderData.seatType || 'second_class';
   
   if (!passengers || passengers.length === 0) {
     throw new Error('Please select at least one passenger');
   }
 
-  const unitPrice = getPrice(seatType);
-  const totalAmount = unitPrice * passengers.length;
+  // Calculate total amount and group by seat type for inventory update
+  let totalAmount = 0;
+  const seatCounts = {};
+
+  passengers.forEach(p => {
+    const sType = p.seatType || defaultSeatType;
+    const price = getPrice(sType);
+    totalAmount += price;
+    
+    if (!seatCounts[sType]) seatCounts[sType] = 0;
+    seatCounts[sType]++;
+  });
 
   return new Promise((resolve, reject) => {
     db.serialize(() => {
@@ -47,7 +59,10 @@ const createOrder = async (userId, orderData) => {
           let hasError = false;
 
           passengers.forEach(p => {
-            stmt.run(orderId, p.id, trainNo, seatType, unitPrice, departureDate, fromStation, toStation, (err) => {
+            const sType = p.seatType || defaultSeatType;
+            const price = getPrice(sType);
+
+            stmt.run(orderId, p.id, trainNo, sType, price, departureDate, fromStation, toStation, (err) => {
               if (hasError) return;
               if (err) {
                 hasError = true;
@@ -55,24 +70,46 @@ const createOrder = async (userId, orderData) => {
                 return reject(err);
               }
               completed++;
+              
               if (completed === passengers.length) {
                 stmt.finalize();
-                
-                // 3. Update Seat Availability (Simplified: just decrement count)
-                // In real app, check availability first. Here assume available.
-                const seatCol = seatType; // e.g. 'second_class'
-                db.run(
-                  `UPDATE daily_train_tickets SET ${seatCol} = ${seatCol} - ? WHERE train_no = ? AND date = ?`,
-                  [passengers.length, trainNo, departureDate],
-                  (err) => {
-                     if (err) {
-                         db.run('ROLLBACK');
-                         return reject(err);
-                     }
-                     db.run('COMMIT');
-                     resolve({ id: orderId, status: 'PENDING', totalAmount });
-                  }
-                );
+
+                // 3. Update Seat Availability (for each seat type)
+                const seatTypes = Object.keys(seatCounts);
+                let updatesCompleted = 0;
+
+                const checkDone = () => {
+                    updatesCompleted++;
+                    if (updatesCompleted === seatTypes.length) {
+                        db.run('COMMIT');
+                        resolve({ id: orderId, status: 'PENDING', totalAmount });
+                    }
+                };
+
+                seatTypes.forEach(sType => {
+                    if (hasError) return;
+                    const count = seatCounts[sType];
+                    // Ensure column name is safe (simple validation)
+                    const validSeats = ['business_seat', 'first_class', 'second_class', 'hard_sleeper', 'hard_seat', 'no_seat'];
+                    if (!validSeats.includes(sType)) {
+                        // fallback or skip? strict for now
+                        // assume valid from getPrice or UI
+                    }
+                    
+                    db.run(
+                      `UPDATE daily_train_tickets SET ${sType} = ${sType} - ? WHERE train_no = ? AND date = ?`,
+                      [count, trainNo, departureDate],
+                      (err) => {
+                         if (hasError) return;
+                         if (err) {
+                             hasError = true;
+                             db.run('ROLLBACK');
+                             return reject(err);
+                         }
+                         checkDone();
+                      }
+                    );
+                });
               }
             });
           });

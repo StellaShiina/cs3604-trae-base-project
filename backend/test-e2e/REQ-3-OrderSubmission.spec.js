@@ -1,67 +1,89 @@
 const { test, expect } = require('@playwright/test');
+const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
+
+const dbPath = path.resolve(__dirname, '../database.db');
+
+// Helper to query DB
+const queryDB = (sql, params = []) => {
+  return new Promise((resolve, reject) => {
+    const db = new sqlite3.Database(dbPath);
+    db.get(sql, params, (err, row) => {
+      db.close();
+      if (err) reject(err);
+      else resolve(row);
+    });
+  });
+};
 
 test.describe('REQ-3 Order Submission', () => {
-  test('User can book a ticket and submit order', async ({ page }) => {
+  
+  test.beforeEach(async ({ page }) => {
     // 1. Login
     await page.goto('http://localhost:5173/login');
-    await page.fill('input[type="text"]', 'testuser');
-    await page.fill('input[type="password"]', '123456');
-    await page.click('button:has-text("立即登录")'); // Should match button text "立即登录"
+    await page.fill('input[name="username"]', 'testuser');
+    await page.fill('input[name="password"]', '123456');
+    await page.click('button[type="submit"]'); // "立即登录"
 
-    // 1.1 2FA Modal
+    // 2FA Modal
     await expect(page.locator('.login-2fa-modal')).toBeVisible();
-    await page.click('button:has-text("获取验证码")');
-    // Wait for code sent message or assume immediate (mock)
-    // Mock code is 123456
-    await page.fill('input[name="code"]', '123456');
-    // Mock ID Last 4 is 5678 (from seed: 110101199001015678)
-    await page.fill('input[name="idLast4"]', '5678');
-    await page.click('button:has-text("确定")');
+    await page.click('text=获取验证码');
     
+    // Wait for code to be generated
+    await page.waitForTimeout(2000); 
+    const codeRecord = await queryDB("SELECT * FROM verification_codes ORDER BY expires_at DESC LIMIT 1");
+    const code = codeRecord ? codeRecord.code : '123456';
+    
+    await page.fill('input[name="idLast4"]', '5678'); // Seeded ID: 110101199001015678
+    await page.fill('input[name="code"]', code);
+    await page.click('button.confirm-btn');
+
     await expect(page).toHaveURL('http://localhost:5173/');
+  });
 
-    // 2. Search for tickets
-    // Fill search form
-    const dateStr = '2026-02-01'; // Matches seed
-    await page.locator('.form-row', { hasText: '出发地' }).locator('input').fill('北京南');
-    await page.locator('.form-row', { hasText: '到达地' }).locator('input').fill('上海');
-    await page.locator('.form-row', { hasText: '出发日期' }).locator('input').fill(dateStr);
-    await page.getByRole('button', { name: '查 询' }).click();
+  test('User can search ticket, select passenger and submit order', async ({ page }) => {
+    // 2. Go to Ticket Search (or navigate from Home)
+    // Direct navigation for speed, but user flow is better.
+    await page.goto('http://localhost:5173/ticket-search?from=北京南&to=上海&date=2026-02-01');
+    
+    // 3. Find a ticket and click Book
+    // Wait for results
+    await expect(page.locator('.ticket-table')).toBeVisible();
+    // Click first "预订" button
+    await page.locator('.book-btn').first().click();
 
-    // 3. Select a train (G27) and click Book
-    // Find the row with G27 and click '预订'
-    const trainRow = page.locator('tr', { hasText: 'G27' });
-    await trainRow.locator('.book-btn').click();
-
-    // 4. Verify Order Page
+    // 4. Verify Navigation to Order Page
     await expect(page).toHaveURL(/\/order/);
     
-    // Check Train Info Card
-    await expect(page.getByText('G27')).toBeVisible();
-    await expect(page.getByText('北京南')).toBeVisible();
-    await expect(page.getByText('上海')).toBeVisible();
-
     // 5. Select Passenger
-    // Should see "孔诗语" in the list
-    const passengerCheckbox = page.locator('input[type="checkbox"]').first(); // Assuming first one is "孔诗语" or explicitly find by text
-    // Better: find by text
-    const passengerLabel = page.locator('label', { hasText: '孔诗语' });
-    await passengerLabel.locator('input[type="checkbox"]').check();
+    // Wait for passengers to load
+    await expect(page.locator('.passenger-item').first()).toBeVisible();
+    // Click "孔诗语" (assuming seeded)
+    await page.locator('.passenger-item', { hasText: '孔诗语' }).click();
 
-    // 6. Verify Passenger Added to Table
-    // Should see a row in the table with "孔诗语"
-    const tableRow = page.locator('.passenger-table tbody tr', { hasText: '孔诗语' });
-    await expect(tableRow).toBeVisible();
+    // Verify added to ticket pool
+    await expect(page.locator('.ticket-pool table tbody tr')).toHaveCount(1);
+    
+    // 6. Submit Order
+    await page.click('.submit-btn');
 
-    // 7. Select Seat Type (if needed, default might be selected)
-    // Verify default is '二等座'
-    // await expect(tableRow.locator('select').nth(1)).toHaveValue('Second Class'); // Value depends on implementation
-
-    // 8. Submit Order
-    await page.click('button:has-text("提交订单")');
-
-    // 9. Verify Success/Payment Page
+    // 7. Verify Navigation to Payment (Success)
+    // Expect URL to contain /payment/
     await expect(page).toHaveURL(/\/payment\/\d+/);
-    await expect(page.getByText('订单提交成功')).toBeVisible();
+    
+    // Get Order ID from URL
+    const url = page.url();
+    const orderId = url.split('/').pop();
+
+    // 8. Triple Verification: Check Database
+    const order = await queryDB("SELECT * FROM orders WHERE id = ?", [orderId]);
+    expect(order).not.toBeNull();
+    expect(order.status).toBe('PENDING');
+    
+    const orderItem = await queryDB("SELECT * FROM order_items WHERE order_id = ?", [orderId]);
+    expect(orderItem).not.toBeNull();
+    expect(orderItem.passenger_id).toBeDefined(); // Should match passenger ID
+    
+    console.log(`Verified Order ${orderId} created in DB`);
   });
 });

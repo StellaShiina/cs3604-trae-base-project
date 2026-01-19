@@ -1,0 +1,41 @@
+.login-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-modal-container {
+  background: white;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  position: relative;
+}
+
+.login-modal-container .login-card {
+  position: static !important;
+  right: auto !important;
+  top: auto !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+}
+
+.login-modal-close-btn {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.login-modal-close-btn:hover {
+  color: #333;
+}
