@@ -173,10 +173,20 @@ const resetPassword = async (phone, code, newPassword) => {
     });
 };
 
+const getUserById = (id) => {
+  return new Promise((resolve, reject) => {
+    db.get('SELECT id, username, real_name, id_type, id_number, phone, email, user_type, created_at FROM users WHERE id = ?', [id], (err, row) => {
+      if (err) reject(err);
+      else resolve(row);
+    });
+  });
+};
+
 module.exports = {
   createUser,
   findUserByUsername,
   findUserByLoginId,
+  getUserById,
   validateUser,
   verifyLogin2FA,
   verifyUserForReset,

@@ -10,6 +10,30 @@ const listPassengers = (userId) => {
   });
 };
 
+const addPassenger = (userId, passengerData) => {
+  const { realName, idType, idNumber, phone, passengerType } = passengerData;
+  return new Promise((resolve, reject) => {
+    const query = `INSERT INTO passengers (user_id, real_name, id_type, id_number, phone, passenger_type) VALUES (?, ?, ?, ?, ?, ?)`;
+    db.run(query, [userId, realName, idType, idNumber, phone, passengerType || 'adult'], function(err) {
+      if (err) reject(err);
+      else resolve({ id: this.lastID, ...passengerData });
+    });
+  });
+};
+
+const deletePassenger = (userId, passengerId) => {
+  return new Promise((resolve, reject) => {
+    const query = `DELETE FROM passengers WHERE id = ? AND user_id = ?`;
+    db.run(query, [passengerId, userId], function(err) {
+      if (err) reject(err);
+      else if (this.changes === 0) reject(new Error('Passenger not found or not authorized'));
+      else resolve({ success: true });
+    });
+  });
+};
+
 module.exports = {
-  listPassengers
+  listPassengers,
+  addPassenger,
+  deletePassenger
 };

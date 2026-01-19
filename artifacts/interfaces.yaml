@@ -505,3 +505,48 @@ API-ORDER-LIST:
   downstream_ids: []
   db_tables:
     - orders
+FUNC-USER-GET:
+  type: FUNC
+  related_req_id: REQ-5
+  signature: getUserById(id)
+  path: backend/src/services/userService.js
+  description: Get user by ID
+  upstream_ids:
+    - API-USER-INFO
+  downstream_ids: []
+  db_tables:
+    - users
+FUNC-PASSENGER-ADD:
+  type: FUNC
+  related_req_id: REQ-5
+  signature: addPassenger(userId, passengerData)
+  path: backend/src/services/passengerService.js
+  description: Add a new passenger
+  upstream_ids:
+    - API-PASSENGER-ADD
+  downstream_ids: []
+  db_tables:
+    - passengers
+FUNC-PASSENGER-DEL:
+  type: FUNC
+  related_req_id: REQ-5
+  signature: deletePassenger(userId, passengerId)
+  path: backend/src/services/passengerService.js
+  description: Delete a passenger
+  upstream_ids:
+    - API-PASSENGER-DEL
+  downstream_ids: []
+  db_tables:
+    - passengers
+FUNC-ORDER-LIST:
+  type: FUNC
+  related_req_id: REQ-5
+  signature: listOrders(userId)
+  path: backend/src/services/orderService.js
+  description: List user orders
+  upstream_ids:
+    - API-ORDER-LIST
+  downstream_ids: []
+  db_tables:
+    - orders
+    - order_items

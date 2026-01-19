@@ -49,7 +49,7 @@ test.describe('REQ-5 Personal Center', () => {
     // Actually, greeting might depend on time. Let's just check name.
     
     // Verify Sidebar
-    await expect(page.locator('text=个人中心')).toBeVisible();
+    await expect(page.locator('.sidebar .menu-item', { hasText: '个人中心' })).toBeVisible();
     await expect(page.locator('text=订单中心')).toBeVisible();
     await expect(page.locator('text=常用信息管理')).toBeVisible();
   });

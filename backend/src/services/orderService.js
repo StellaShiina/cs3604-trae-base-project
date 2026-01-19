@@ -256,9 +256,38 @@ const cancelOrder = (orderId, userId) => {
   });
 };
 
+const listOrders = (userId) => {
+  return new Promise((resolve, reject) => {
+    const sql = `
+      SELECT 
+        o.id as order_id, o.status, o.total_amount, o.created_at,
+        oi.train_no, oi.from_station, oi.to_station, oi.departure_date
+      FROM orders o
+      JOIN order_items oi ON o.id = oi.order_id
+      WHERE o.user_id = ?
+      GROUP BY o.id -- Only show one item summary per order for list view?
+      ORDER BY o.created_at DESC
+    `;
+    db.all(sql, [userId], (err, rows) => {
+        if (err) return reject(err);
+        resolve(rows.map(r => ({
+            id: r.order_id,
+            status: r.status,
+            totalAmount: r.total_amount,
+            createdAt: r.created_at,
+            trainNo: r.train_no,
+            fromStation: r.from_station,
+            toStation: r.to_station,
+            departureDate: r.departure_date
+        })));
+    });
+  });
+};
+
 module.exports = {
   createOrder,
   getOrderById,
   payOrder,
-  cancelOrder
+  cancelOrder,
+  listOrders
 };

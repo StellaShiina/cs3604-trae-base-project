@@ -8,6 +8,7 @@ const authRoutes = require('./routes/auth');
 const ticketRoutes = require('./routes/tickets');
 const orderRoutes = require('./routes/orders');
 const passengerRoutes = require('./routes/passengers');
+const userRoutes = require('./routes/users');
 
 // middleware imports
 app.use(cors());
@@ -21,6 +22,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/tickets', ticketRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/passengers', passengerRoutes);
+app.use('/api/users', userRoutes);
 
 app.get('/', (req, res) => {
   res.json({ code: 200, message: 'Backend Ready' });

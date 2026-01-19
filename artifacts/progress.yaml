@@ -111,7 +111,7 @@
 - id: REQ-5
   parentId: ROOT
   childrenIds: []
-  status: PENDING_IMPL
+  status: COMPLETED
   artifacts:
     api_ids:
       - API-USER-INFO
@@ -123,3 +123,8 @@
       - UI-PERSONAL-INFO
       - UI-ORDER-LIST
       - UI-PASSENGER-LIST
+    func_ids:
+      - FUNC-USER-GET
+      - FUNC-PASSENGER-ADD
+      - FUNC-PASSENGER-DEL
+      - FUNC-ORDER-LIST

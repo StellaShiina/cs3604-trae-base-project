@@ -8,6 +8,7 @@ import TicketSearchPage from './pages/TicketSearchPage';
 import OrderPage from './pages/OrderPage';
 import PaymentPage from './pages/PaymentPage';
 import PurchaseSuccessPage from './pages/PurchaseSuccessPage';
+import PersonalPage from './pages/PersonalPage';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
       <Route path="/order" element={<OrderPage />} />
       <Route path="/payment/:id" element={<PaymentPage />} />
       <Route path="/purchase-success/:id" element={<PurchaseSuccessPage />} />
+      <Route path="/personal/*" element={<PersonalPage />} />
     </Routes>
   );
 }

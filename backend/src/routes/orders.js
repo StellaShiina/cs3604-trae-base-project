@@ -2,6 +2,20 @@ const express = require('express');
 const router = express.Router();
 const orderService = require('../services/orderService');
 
+// GET /api/orders
+router.get('/', async (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'];
+    if (!userId) {
+        return res.status(401).json({ success: false, error: { message: 'Unauthorized' } });
+    }
+    const orders = await orderService.listOrders(userId);
+    res.json({ success: true, data: orders });
+  } catch (error) {
+    res.status(500).json({ success: false, error: { message: error.message } });
+  }
+});
+
 // POST /api/orders
 router.post('/', async (req, res) => {
   try {
