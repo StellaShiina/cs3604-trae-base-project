@@ -6,7 +6,7 @@
     - REQ-3
     - REQ-4
     - REQ-5
-  status: PENDING_IMPL
+  status: COMPLETED
   artifacts:
     ui_ids:
       - UI-PAGE-HOME
