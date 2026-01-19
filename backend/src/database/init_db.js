@@ -54,6 +54,49 @@ db.serialize(() => {
     )
   `, (err) => {
     if (err) console.error('[DB] Error creating verification_codes table:', err);
+    });
+
+  // Trains Table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS trains (
+      train_no TEXT PRIMARY KEY,
+      train_type TEXT NOT NULL
+    )
+  `, (err) => {
+    if (err) console.error('[DB] Error creating trains table:', err);
+  });
+
+  // Train Stations Table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS train_stations (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      train_no TEXT NOT NULL,
+      station_name TEXT NOT NULL,
+      arrival_time TEXT,
+      departure_time TEXT,
+      sequence_no INTEGER NOT NULL,
+      FOREIGN KEY(train_no) REFERENCES trains(train_no)
+    )
+  `, (err) => {
+    if (err) console.error('[DB] Error creating train_stations table:', err);
+  });
+
+  // Daily Train Tickets Table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS daily_train_tickets (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      train_no TEXT NOT NULL,
+      date TEXT NOT NULL,
+      business_seat INTEGER DEFAULT 0,
+      first_class INTEGER DEFAULT 0,
+      second_class INTEGER DEFAULT 0,
+      hard_sleeper INTEGER DEFAULT 0,
+      hard_seat INTEGER DEFAULT 0,
+      no_seat INTEGER DEFAULT 0,
+      FOREIGN KEY(train_no) REFERENCES trains(train_no)
+    )
+  `, (err) => {
+    if (err) console.error('[DB] Error creating daily_train_tickets table:', err);
   });
 });
 

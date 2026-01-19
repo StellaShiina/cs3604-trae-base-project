@@ -268,3 +268,35 @@ FUNC-USER-RESET-PWD:
   db_tables:
     - users
     - verification_codes
+FUNC-TICKET-SEARCH:
+  type: FUNC
+  related_req_id: REQ-2
+  signature: searchTickets(from, to, date, options)
+  path: backend/src/services/ticketService.js
+  description: Search trains by from/to/date with seat availability
+  upstream_ids:
+    - API-TICKET-QUERY
+  downstream_ids: []
+  db_tables:
+    - trains
+    - train_stations
+    - daily_train_tickets
+UI-PAGE-TICKET-SEARCH:
+  type: UI
+  related_req_id: REQ-2
+  description: Search page for train tickets
+  path: frontend/src/pages/TicketSearchPage.jsx
+  upstream_ids:
+    - UI-PAGE-HOME
+  downstream_ids:
+    - API-TICKET-QUERY
+API-TICKET-QUERY:
+  type: API
+  related_req_id: REQ-2
+  signature: GET /api/tickets/query
+  path: backend/src/routes/tickets.js
+  description: API to query ticket list
+  upstream_ids:
+    - UI-PAGE-TICKET-SEARCH
+  downstream_ids:
+    - FUNC-TICKET-SEARCH

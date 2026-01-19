@@ -24,5 +24,6 @@ export const sendSms = (phone) => api.post('/auth/send-sms', { phone });
 export const verifyUserForReset = (data) => api.post('/auth/forgot-password/verify-user', data);
 export const sendForgotSms = (phone) => api.post('/auth/forgot-password/send-sms', { phone });
 export const resetPassword = (data) => api.post('/auth/forgot-password/reset', data);
+export const queryTickets = (params) => api.get('/tickets/query', { params });
 
 export default api;

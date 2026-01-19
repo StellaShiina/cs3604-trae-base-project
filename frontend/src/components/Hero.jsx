@@ -1,8 +1,29 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Hero.css';
 
 const Hero = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('tickets'); // tickets, query, food
+  const [formData, setFormData] = useState({
+    from: '北京',
+    to: '上海',
+    date: '2025-12-21'
+  });
+
+  const handleQuery = () => {
+    const searchParams = new URLSearchParams({
+      from: formData.from,
+      to: formData.to,
+      date: formData.date
+    });
+    navigate(`/ticket-search?${searchParams.toString()}`);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
   return (
     <div className="hero-section">
@@ -56,15 +77,33 @@ const Hero = () => {
             <div className="booking-form">
               <div className="form-row">
                 <span className="form-label">出发地</span>
-                <input type="text" defaultValue="北京" className="form-input" />
+                <input 
+                  type="text" 
+                  name="from"
+                  value={formData.from}
+                  onChange={handleChange}
+                  className="form-input" 
+                />
               </div>
               <div className="form-row">
                 <span className="form-label">到达地</span>
-                <input type="text" defaultValue="北京" className="form-input" />
+                <input 
+                  type="text" 
+                  name="to"
+                  value={formData.to}
+                  onChange={handleChange}
+                  className="form-input" 
+                />
               </div>
               <div className="form-row">
                 <span className="form-label">出发日期</span>
-                <input type="text" defaultValue="2025-12-21" className="form-input" />
+                <input 
+                  type="text" 
+                  name="date"
+                  value={formData.date}
+                  onChange={handleChange}
+                  className="form-input" 
+                />
                 <span className="calendar-icon">📅</span>
               </div>
 
@@ -79,7 +118,7 @@ const Hero = () => {
               </div>
 
               {/* Submit Button */}
-              <button className="submit-btn">查 询</button>
+              <button className="submit-btn" onClick={handleQuery}>查 询</button>
 
               {/* Footer Links */}
               <div className="panel-footer">

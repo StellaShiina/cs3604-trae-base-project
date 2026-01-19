@@ -102,6 +102,15 @@ Every Playwright test MUST verify three things:
 
 *Current Models:*
 
+### Users & Auth
+- `users`: id, username, password, real_name, id_type, id_number, phone, email, user_type, created_at
+- `passengers`: id, user_id, real_name, id_type, id_number, phone, passenger_type, is_self, created_at
+- `verification_codes`: phone, code, expires_at
+
+### Train System
+- `trains`: train_no (PK), train_type
+- `train_stations`: id, train_no, station_name, arrival_time, departure_time, sequence_no
+- `daily_train_tickets`: id, train_no, date, business_seat, first_class, second_class, hard_sleeper, hard_seat, no_seat
 
 ## 6. API Registry [DYNAMIC]
 
