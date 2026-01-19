@@ -21,7 +21,7 @@
     - REQ-1-1
     - REQ-1-2
     - REQ-1-3
-  status: PENDING_IMPL
+  status: COMPLETED
   artifacts:
     ui_ids:
       - UI-PAGE-LOGIN
