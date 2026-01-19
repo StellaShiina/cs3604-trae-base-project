@@ -1,7 +1,31 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Header.css';
 
 const Header = () => {
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (e) {
+        console.error('Failed to parse user from local storage', e);
+      }
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('username');
+    localStorage.removeItem('userId');
+    setUser(null);
+    navigate('/login');
+  };
+
   return (
     <header className="site-header">
       <div className="header-container">
@@ -39,8 +63,17 @@ const Header = () => {
           <span className="separator">|</span>
           <a href="#">我的12306</a>
           <span className="separator">|</span>
-          <a href="#">登录</a>
-          <a href="#">注册</a>
+          {user ? (
+            <>
+              <span className="user-greeting">您好，{user.username}</span>
+              <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }}>退出</a>
+            </>
+          ) : (
+            <>
+              <a href="/login">登录</a>
+              <a href="/register">注册</a>
+            </>
+          )}
         </div>
       </div>
     </header>

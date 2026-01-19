@@ -12,7 +12,7 @@ const checkAvailability = (field, value) => {
 
 const createVerificationCode = (phone) => {
   const code = '123456'; // Mock code
-  const expiresAt = new Date(Date.now() + 60000); // 1 min
+  const expiresAt = Date.now() + 60000; // 1 min (timestamp)
 
   return new Promise((resolve, reject) => {
     db.run(`INSERT OR REPLACE INTO verification_codes (phone, code, expires_at) VALUES (?, ?, ?)`, 
@@ -99,8 +99,21 @@ const findUserByUsername = (username) => {
   });
 };
 
+const findUserByLoginId = (loginId) => {
+  return new Promise((resolve, reject) => {
+    db.get(
+      'SELECT * FROM users WHERE username = ? OR email = ? OR phone = ?', 
+      [loginId, loginId, loginId], 
+      (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      }
+    );
+  });
+};
+
 const validateUser = async (username, password) => {
-  const user = await findUserByUsername(username);
+  const user = await findUserByLoginId(username);
   if (!user) return null;
 
   const match = await bcrypt.compare(password, user.password);
@@ -111,10 +124,31 @@ const validateUser = async (username, password) => {
   return null;
 };
 
+const verifyLogin2FA = async (loginId, password, idLast4, code) => {
+    const user = await findUserByLoginId(loginId);
+    if (!user) throw new Error('用户名或密码错误');
+
+    // 1. Check Code
+    const isCodeValid = await verifyCode(user.phone, code);
+    if (!isCodeValid) throw new Error('验证码错误');
+
+    // 2. Check Password
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) throw new Error('用户名或密码错误');
+
+    // 3. Check ID Last 4
+    if (!user.id_number.endsWith(idLast4)) throw new Error('证件号码后四位错误');
+
+    const { password: _, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+};
+
 module.exports = {
   createUser,
   findUserByUsername,
+  findUserByLoginId,
   validateUser,
+  verifyLogin2FA,
   checkAvailability,
   createVerificationCode,
   verifyCode

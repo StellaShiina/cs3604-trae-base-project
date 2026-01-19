@@ -32,6 +32,39 @@ router.post('/send-sms', async (req, res) => {
   }
 });
 
+// POST /api/auth/send-login-sms
+router.post('/send-login-sms', async (req, res) => {
+  try {
+    const { loginId } = req.body;
+    const user = await userService.findUserByLoginId(loginId);
+    
+    if (!user) {
+        return res.status(404).json({ success: false, error: '用户不存在' });
+    }
+
+    const code = await userService.createVerificationCode(user.phone);
+    console.log(`[Mock SMS] Login Code for ${user.username} (${user.phone}): ${code}`);
+    res.json({ success: true, message: 'Code sent' });
+  } catch (error) {
+    console.error('[API] send-login-sms error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// POST /api/auth/login-verify
+router.post('/login-verify', async (req, res) => {
+    try {
+        const { loginId, password, idLast4, code } = req.body;
+        const user = await userService.verifyLogin2FA(loginId, password, idLast4, code);
+        
+        // Mock JWT
+        res.json({ success: true, data: { user, token: 'mock-jwt-token-2fa' } });
+    } catch (error) {
+        console.error('[API] login-verify error:', error);
+        res.status(401).json({ success: false, error: { message: error.message } });
+    }
+});
+
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {

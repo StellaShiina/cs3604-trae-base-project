@@ -137,3 +137,67 @@ API-AUTH-SEND-SMS:
   upstream_ids:
     - UI-PAGE-REGISTER
   downstream_ids: []
+UI-MODAL-LOGIN-2FA:
+  type: UI
+  related_req_id: REQ-1-2
+  description: Double Factor Authentication Modal for Login
+  path: frontend/src/pages/LoginPage.jsx
+  upstream_ids:
+    - UI-PAGE-LOGIN
+  downstream_ids:
+    - API-AUTH-SEND-LOGIN-SMS
+    - API-AUTH-LOGIN-VERIFY
+  db_tables: []
+API-AUTH-SEND-LOGIN-SMS:
+  type: API
+  related_req_id: REQ-1-2
+  signature: POST /auth/send-login-sms
+  path: backend/src/routes/auth.js
+  description: Send Login SMS Code
+  upstream_ids:
+    - UI-MODAL-LOGIN-2FA
+    - UI-LOGIN-PAGE
+  downstream_ids:
+    - FUNC-USER-CREATE-CODE
+  db_tables:
+    - users
+    - verification_codes
+API-AUTH-LOGIN-VERIFY:
+  type: API
+  related_req_id: REQ-1-2
+  signature: POST /auth/login-verify
+  path: backend/src/routes/auth.js
+  description: Verify Login 2FA Credentials
+  upstream_ids:
+    - UI-MODAL-LOGIN-2FA
+    - UI-LOGIN-PAGE
+  downstream_ids:
+    - FUNC-USER-VERIFY-LOGIN-2FA
+  db_tables:
+    - users
+    - verification_codes
+    - passengers
+UI-LOGIN-PAGE:
+  type: UI
+  related_req_id: REQ-1-2
+  description: User Login Page with 2FA Modal
+  path: frontend/src/pages/LoginPage.jsx
+  upstream_ids: []
+  downstream_ids:
+    - API-AUTH-LOGIN-VERIFY
+    - API-AUTH-SEND-LOGIN-SMS
+  db_tables:
+    - users
+    - verification_codes
+FUNC-USER-VERIFY-LOGIN-2FA:
+  type: FUNC
+  related_req_id: REQ-1-2
+  signature: verifyLogin2FA(loginId, password, idLast4, code)
+  path: backend/src/services/userService.js
+  description: Verify User Login 2FA Logic
+  upstream_ids:
+    - API-AUTH-LOGIN-VERIFY
+  downstream_ids: []
+  db_tables:
+    - users
+    - verification_codes

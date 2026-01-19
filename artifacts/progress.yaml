@@ -45,8 +45,16 @@
 - id: REQ-1-2
   parentId: REQ-1
   childrenIds: []
-  status: PENDING_CONTRACT
-  artifacts: {}
+  status: PENDING_IMPL
+  artifacts:
+    ui_ids:
+      - UI-MODAL-LOGIN-2FA
+      - UI-LOGIN-PAGE
+    api_ids:
+      - API-AUTH-SEND-LOGIN-SMS
+      - API-AUTH-LOGIN-VERIFY
+    func_ids:
+      - FUNC-USER-VERIFY-LOGIN-2FA
 - id: REQ-1-3
   parentId: REQ-1
   childrenIds: []

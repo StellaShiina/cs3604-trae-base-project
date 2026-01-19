@@ -16,6 +16,8 @@ api.interceptors.response.use(
 );
 
 export const login = (data) => api.post('/auth/login', data);
+export const loginVerify = (data) => api.post('/auth/login-verify', data);
+export const sendLoginSms = (loginId) => api.post('/auth/send-login-sms', { loginId });
 export const register = (data) => api.post('/auth/register', data);
 export const checkAvailability = (field, value) => api.get('/auth/check-availability', { params: { field, value } });
 export const sendSms = (phone) => api.post('/auth/send-sms', { phone });
