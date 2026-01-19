@@ -142,6 +142,23 @@ const RegisterPage = () => {
        return;
     }
 
+    // Pre-check availability for ID and Phone
+    try {
+        const idCheck = await checkAvailability('id_number', formData.idNumber);
+        if (idCheck.success && idCheck.exists) {
+            setGlobalError('该证件号码已被注册');
+            return;
+        }
+        
+        const phoneCheck = await checkAvailability('phone', formData.phone);
+        if (phoneCheck.success && phoneCheck.exists) {
+            setGlobalError('该手机号码已被注册');
+            return;
+        }
+    } catch (err) {
+        // Ignore network errors here, let register handle it
+    }
+
     try {
       const res = await register({
         username: formData.username,

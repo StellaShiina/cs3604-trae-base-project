@@ -115,4 +115,30 @@ test.describe('REQ-1-1 User Registration Details', () => {
     // Expect Redirect
     await expect(page).toHaveURL(/.*login/);
   });
+
+  test('Duplicate ID Number Check', async ({ page }) => {
+    // Fill valid form but with existing ID (admin_user's ID: 110101199001011235)
+    await page.fill('input[name="username"]', `unique_user_${Date.now()}`);
+    await page.fill('input[name="password"]', 'Password123!');
+    await page.fill('input[name="confirmPassword"]', 'Password123!');
+    await page.fill('input[name="realName"]', 'Test User');
+    await page.fill('input[name="idNumber"]', '110101199001011235'); // Duplicate
+    await page.fill('input[name="phone"]', `137${Date.now().toString().slice(-8)}`);
+    
+    // Send Code (Mock)
+    const sendBtn = page.locator('.code-btn');
+    await sendBtn.click();
+    await expect(sendBtn).toHaveText(/秒后重发/);
+    await page.fill('input[name="verificationCode"]', '123456');
+
+    // Agree
+    await page.check('input[type="checkbox"]');
+
+    // Submit
+    await page.click('button[type="submit"]');
+
+    // Expect Error
+    await expect(page.getByText('该证件号码已被注册')).toBeVisible();
+  });
+
 });

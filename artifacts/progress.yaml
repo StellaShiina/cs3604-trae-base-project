@@ -35,7 +35,7 @@
 - id: REQ-1-1
   parentId: REQ-1
   childrenIds: []
-  status: PENDING_IMPL
+  status: COMPLETED
   artifacts:
     func_ids:
       - DB-TABLE-PASSENGERS
