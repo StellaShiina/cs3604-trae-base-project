@@ -39,41 +39,63 @@ const seed = async () => {
     const trainStmt = db.prepare(`INSERT OR REPLACE INTO trains (train_no, train_type) VALUES (?, ?)`);
     trainStmt.run('G27', 'G');
     trainStmt.run('D17', 'D');
+    trainStmt.run('D99', 'D'); 
+    trainStmt.run('K101', 'K'); // Added classic train for Beijing -> Shanghai
     trainStmt.finalize();
 
-    // Seed Train Stations (G27: Beijing South -> Shanghai)
+    // Seed Train Stations
     // Clean existing stations for these trains to avoid duplicates on re-seed
-    db.run("DELETE FROM train_stations WHERE train_no IN ('G27', 'D17')");
+    db.run("DELETE FROM train_stations WHERE train_no IN ('G27', 'D17', 'D99', 'K101')");
     
     const stationStmt = db.prepare(`INSERT INTO train_stations (train_no, station_name, arrival_time, departure_time, sequence_no) VALUES (?, ?, ?, ?, ?)`);
     // G27
     stationStmt.run('G27', '北京南', '19:00', '19:00', 1);
     stationStmt.run('G27', '济南西', '20:30', '20:32', 2);
     stationStmt.run('G27', '南京南', '22:30', '22:32', 3);
-    stationStmt.run('G27', '上海', '23:35', '23:35', 4);
+    stationStmt.run('G27', '上海虹桥', '23:35', '23:35', 4); // Usually G trains go to Hongqiao
     
     // D17
     stationStmt.run('D17', '北京', '19:13', '19:13', 1);
     stationStmt.run('D17', '天津西', '20:00', '20:02', 2);
     stationStmt.run('D17', '南京', '06:00', '06:05', 3);
     stationStmt.run('D17', '上海松江', '07:31', '07:31', 4);
+
+    // D99 (Beijing South -> Shanghai Hongqiao)
+    stationStmt.run('D99', '北京南', '08:00', '08:00', 1);
+    stationStmt.run('D99', '上海虹桥', '20:00', '20:00', 2);
+
+    // K101 (Beijing -> Shanghai) - Matches default search
+    stationStmt.run('K101', '北京', '18:00', '18:00', 1);
+    stationStmt.run('K101', '天津西', '19:30', '19:36', 2);
+    stationStmt.run('K101', '南京', '09:00', '09:10', 3);
+    stationStmt.run('K101', '上海', '12:00', '12:00', 4);
+
     stationStmt.finalize();
 
-    // Seed Daily Tickets (Fixed Dates for Testing)
-     const testDate = '2026-02-01';
+    // Seed Daily Tickets (Today and Future)
+    const dates = [
+        '2026-01-19', // Today (from environment)
+        '2026-01-20', // Tomorrow
+        '2026-02-01'  // Future test date
+    ];
      
-     // Clean existing tickets for these dates/trains
-     db.run(`DELETE FROM daily_train_tickets WHERE train_no IN ('G27', 'D17') AND date = ?`, [testDate]);
- 
-     const ticketStmt = db.prepare(`INSERT INTO daily_train_tickets (train_no, date, business_seat, first_class, second_class, hard_sleeper, hard_seat, no_seat) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`);
+    // Clean existing tickets
+    db.run(`DELETE FROM daily_train_tickets`); // Reset all tickets for clean state
+
+    const ticketStmt = db.prepare(`INSERT INTO daily_train_tickets (train_no, date, business_seat, first_class, second_class, hard_sleeper, hard_seat, no_seat) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`);
+    
+    dates.forEach(date => {
+        // G27
+        ticketStmt.run('G27', date, 15, 12, 100, 0, 0, 0);
+        // D17
+        ticketStmt.run('D17', date, 0, 0, 200, 50, 0, 20);
+        // D99
+        ticketStmt.run('D99', date, 0, 0, 200, 0, 100, 0);
+        // K101
+        ticketStmt.run('K101', date, 0, 0, 0, 30, 100, 50);
+    });
      
-     // G27
-     ticketStmt.run('G27', testDate, 15, 12, 100, 0, 0, 0);
-     
-     // D17
-     ticketStmt.run('D17', testDate, 0, 0, 200, 50, 0, 20);
-     
-     ticketStmt.finalize();
+    ticketStmt.finalize();
 
     console.log('Database seeded successfully.');
   });

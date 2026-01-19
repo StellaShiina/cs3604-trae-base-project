@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import './Header.css';
 
 const Header = () => {
@@ -61,7 +61,7 @@ const Header = () => {
           <span className="separator">|</span>
           <a href="#">English</a>
           <span className="separator">|</span>
-          <a href="#">我的12306</a>
+          <Link to="/personal">我的12306</Link>
           <span className="separator">|</span>
           {user ? (
             <>
@@ -70,8 +70,8 @@ const Header = () => {
             </>
           ) : (
             <>
-              <a href="/login">登录</a>
-              <a href="/register">注册</a>
+              <Link to="/login">登录</Link>
+              <Link to="/register">注册</Link>
             </>
           )}
         </div>

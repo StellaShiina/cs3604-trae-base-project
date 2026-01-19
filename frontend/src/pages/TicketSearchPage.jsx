@@ -88,6 +88,17 @@ const TicketSearchPage = () => {
     }
   };
 
+  const changeDate = (days) => {
+    const currentDate = new Date(query.date);
+    currentDate.setDate(currentDate.getDate() + days);
+    const newDateStr = currentDate.toISOString().split('T')[0];
+    
+    // Update params
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('date', newDateStr);
+    navigate(`/ticket-search?${newParams.toString()}`);
+  };
+
   return (
     <div className="ticket-search-page">
       <Header />
@@ -123,10 +134,11 @@ const TicketSearchPage = () => {
 
       {/* Date Tabs */}
       <div className="date-tabs">
+        <div className="date-tab" onClick={() => changeDate(-1)}>前一天</div>
         <div className="date-tab active">
           {query.date} (查询日期)
         </div>
-        <div className="date-tab">后一天</div>
+        <div className="date-tab" onClick={() => changeDate(1)}>后一天</div>
       </div>
 
       {/* Filter Section */}

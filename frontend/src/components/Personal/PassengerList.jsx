@@ -47,6 +47,7 @@ const PassengerList = () => {
               fetchPassengers();
               setNewPassenger({ realName: '', idType: '1', idNumber: '', phone: '', passengerType: 'adult' });
           } else {
+              // Show backend error explicitly (e.g., duplicate passenger)
               alert(res.error?.message || '添加失败');
           }
       } catch (err) {

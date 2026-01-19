@@ -15,14 +15,26 @@ test('Home Page Renders Correctly', async ({ page }) => {
   // Utility Links
   await expect(page.getByText('登录')).toBeVisible();
   await expect(page.getByText('注册')).toBeVisible();
-  await expect(page.getByText('我的12306')).toBeVisible();
+  const my12306 = page.getByText('我的12306');
+  await expect(my12306).toBeVisible();
+  
+  // Verify My 12306 Link Navigation
+  await my12306.click();
+  await expect(page).toHaveURL(/.*\/personal/);
+  await page.goBack(); // Go back to continue other checks
 
   // 3. Check Nav Bar
   // Assuming a nav element or checking text in the header area
   const navItems = ['首页', '车票', '团购服务', '会员服务', '站车服务', '商旅服务', '出行指南', '信息查询'];
   for (const item of navItems) {
-    await expect(page.getByText(item).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: item }).first()).toBeVisible();
   }
+
+  // Verify Ticket Link Navigation
+  await page.getByRole('link', { name: '车票' }).first().click();
+  await expect(page).toHaveURL(/.*\/ticket-search/);
+  await page.goBack();
+
 
   // 4. Check Hero Section (Booking Panel)
   await expect(page.getByText('出发地')).toBeVisible();

@@ -13,10 +13,19 @@ const listPassengers = (userId) => {
 const addPassenger = (userId, passengerData) => {
   const { realName, idType, idNumber, phone, passengerType } = passengerData;
   return new Promise((resolve, reject) => {
-    const query = `INSERT INTO passengers (user_id, real_name, id_type, id_number, phone, passenger_type) VALUES (?, ?, ?, ?, ?, ?)`;
-    db.run(query, [userId, realName, idType, idNumber, phone, passengerType || 'adult'], function(err) {
-      if (err) reject(err);
-      else resolve({ id: this.lastID, ...passengerData });
+    // Check for duplicates first
+    const checkQuery = `SELECT id FROM passengers WHERE user_id = ? AND (id_number = ? OR phone = ?)`;
+    db.get(checkQuery, [userId, idNumber, phone], (err, row) => {
+        if (err) return reject(err);
+        if (row) {
+            return reject(new Error('该联系人已存在，请使用不同的姓名和证件'));
+        }
+
+        const query = `INSERT INTO passengers (user_id, real_name, id_type, id_number, phone, passenger_type) VALUES (?, ?, ?, ?, ?, ?)`;
+        db.run(query, [userId, realName, idType, idNumber, phone, passengerType || 'adult'], function(err) {
+            if (err) reject(err);
+            else resolve({ id: this.lastID, ...passengerData });
+        });
     });
   });
 };

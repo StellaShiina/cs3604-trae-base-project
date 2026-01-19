@@ -131,13 +131,32 @@ const RegisterPage = () => {
     e.preventDefault();
     setGlobalError('');
     
-    // Check all fields
+    // Check all fields explicitly
+    const newErrors = {};
+    if (!formData.username) newErrors.username = '请输入用户名';
+    if (!formData.password) newErrors.password = '密码不能为空'; // Matches generic requirement, specific text can be tuned
+    else if (formData.password.length < 6) newErrors.password = '密码长度不能少于6位';
+    
+    if (!formData.confirmPassword) newErrors.confirmPassword = '请再次输入密码';
+    else if (formData.confirmPassword !== formData.password) newErrors.confirmPassword = '两次密码输入不一致';
+
+    if (!formData.realName) newErrors.realName = '请输入姓名';
+    if (!formData.idNumber) newErrors.idNumber = '请输入证件号码';
+    
+    if (!formData.phone) newErrors.phone = '请输入手机号，以完成用户校验'; // Requirement: register-phone-validation.json
+    else if (!/^1[3-9]\d{9}$/.test(formData.phone)) newErrors.phone = '手机号码格式错误';
+
+    if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        return;
+    }
+
     if (!agreed) {
-       setGlobalError('请先同意服务条款');
+       setGlobalError('请先同意服务条款'); // Might be triggered by "Next" in requirement
        return;
     }
 
-    if (Object.values(errors).some(e => e) || !formData.username || !formData.password) {
+    if (Object.values(errors).some(e => e)) {
        setGlobalError('请修正表单错误');
        return;
     }
