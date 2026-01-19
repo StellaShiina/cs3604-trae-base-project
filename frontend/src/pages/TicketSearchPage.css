@@ -68,9 +68,36 @@
   color: white;
 }
 
+.filter-section {
+  width: 1200px;
+  margin: 10px auto 0;
+  background: #fff;
+  border: 1px solid #bfd7ea;
+  padding: 10px;
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 12px;
+}
+
+.filter-label {
+  color: #666;
+  font-weight: bold;
+}
+
+.filter-row label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
 .results-container {
   width: 1200px;
-  margin: 20px auto;
+  margin: 10px auto;
   background: #fff;
   border: 1px solid #8db9dd;
 }

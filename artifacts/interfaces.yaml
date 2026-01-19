@@ -271,9 +271,9 @@ FUNC-USER-RESET-PWD:
 FUNC-TICKET-SEARCH:
   type: FUNC
   related_req_id: REQ-2
-  signature: searchTickets(from, to, date, options)
+  signature: searchTickets(from, to, date)
   path: backend/src/services/ticketService.js
-  description: Search trains by from/to/date with seat availability
+  description: Backend logic to search tickets with database joins
   upstream_ids:
     - API-TICKET-QUERY
   downstream_ids: []
@@ -295,8 +295,18 @@ API-TICKET-QUERY:
   related_req_id: REQ-2
   signature: GET /api/tickets/query
   path: backend/src/routes/tickets.js
-  description: API to query ticket list
+  description: API Endpoint for ticket query
   upstream_ids:
     - UI-PAGE-TICKET-SEARCH
+    - UI-TICKET-SEARCH
   downstream_ids:
     - FUNC-TICKET-SEARCH
+UI-TICKET-SEARCH:
+  type: UI
+  related_req_id: REQ-2
+  description: Ticket Search Result Page with filters
+  path: frontend/src/pages/TicketSearchPage.jsx
+  upstream_ids:
+    - UI-HOME-PAGE
+  downstream_ids:
+    - API-TICKET-QUERY

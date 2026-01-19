@@ -72,12 +72,13 @@
 - id: REQ-2
   parentId: ROOT
   childrenIds: []
-  status: PENDING_IMPL
+  status: COMPLETED
   artifacts:
     func_ids:
       - FUNC-TICKET-SEARCH
     ui_ids:
       - UI-PAGE-TICKET-SEARCH
+      - UI-TICKET-SEARCH
     api_ids:
       - API-TICKET-QUERY
 - id: REQ-3

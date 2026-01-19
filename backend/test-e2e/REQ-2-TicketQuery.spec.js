@@ -38,8 +38,16 @@ test.describe('REQ-2 Ticket Query', () => {
     // Should show times
     await expect(page.getByText('19:00')).toBeVisible(); // Start time
     await expect(page.getByText('23:35')).toBeVisible(); // End time
+
+    // 5. Verify Filter Functionality
+    // Uncheck "GC-高铁/城际"
+    await page.getByLabel('GC-高铁/城际').uncheck();
+    // G27 should disappear
+    await expect(page.getByText('G27')).toBeHidden();
     
-    // 5. Verify Database Interaction (Implicit via API response displayed)
-    // The page must have fetched data from API.
+    // Check "GC-高铁/城际"
+    await page.getByLabel('GC-高铁/城际').check();
+    // G27 should reappear
+    await expect(page.getByText('G27')).toBeVisible();
   });
 });

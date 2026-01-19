@@ -10,12 +10,28 @@ const TicketSearchPage = () => {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [filters, setFilters] = useState({
+    trainType: { G: true, D: true, Z: true, T: true, K: true, Other: true }
+  });
 
   const query = {
     from: searchParams.get('from') || '北京',
     to: searchParams.get('to') || '上海',
     date: searchParams.get('date') || new Date().toISOString().split('T')[0]
   };
+
+  const handleFilterChange = (type, checked) => {
+    setFilters(prev => ({
+      ...prev,
+      trainType: { ...prev.trainType, [type]: checked }
+    }));
+  };
+
+  const filteredTickets = tickets.filter(t => {
+    const typeChar = t.train_no.charAt(0);
+    const typeKey = ['G', 'D', 'Z', 'T', 'K'].includes(typeChar) ? typeChar : 'Other';
+    return filters.trainType[typeKey];
+  });
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -68,8 +84,20 @@ const TicketSearchPage = () => {
         <div className="date-tab active">
           {query.date} (查询日期)
         </div>
-        {/* Placeholder for other dates */}
         <div className="date-tab">后一天</div>
+      </div>
+
+      {/* Filter Section */}
+      <div className="filter-section">
+        <div className="filter-row">
+          <span className="filter-label">车次类型：</span>
+          <label><input type="checkbox" checked={filters.trainType.G} onChange={e => handleFilterChange('G', e.target.checked)} />GC-高铁/城际</label>
+          <label><input type="checkbox" checked={filters.trainType.D} onChange={e => handleFilterChange('D', e.target.checked)} />D-动车</label>
+          <label><input type="checkbox" checked={filters.trainType.Z} onChange={e => handleFilterChange('Z', e.target.checked)} />Z-直达</label>
+          <label><input type="checkbox" checked={filters.trainType.T} onChange={e => handleFilterChange('T', e.target.checked)} />T-特快</label>
+          <label><input type="checkbox" checked={filters.trainType.K} onChange={e => handleFilterChange('K', e.target.checked)} />K-快速</label>
+          <label><input type="checkbox" checked={filters.trainType.Other} onChange={e => handleFilterChange('Other', e.target.checked)} />其他</label>
+        </div>
       </div>
 
       {/* Results Table */}
@@ -96,7 +124,7 @@ const TicketSearchPage = () => {
               </tr>
             </thead>
             <tbody>
-              {tickets.map((ticket, index) => (
+              {filteredTickets.map((ticket, index) => (
                 <tr key={index} className={index % 2 === 0 ? 'even' : 'odd'}>
                   <td className="train-no">{ticket.train_no}</td>
                   <td>
@@ -120,7 +148,7 @@ const TicketSearchPage = () => {
                   </td>
                 </tr>
               ))}
-              {tickets.length === 0 && !loading && (
+              {filteredTickets.length === 0 && !loading && (
                 <tr>
                   <td colSpan="12" className="no-data">暂无车次信息</td>
                 </tr>
