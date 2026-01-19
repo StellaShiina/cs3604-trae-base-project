@@ -109,3 +109,31 @@ FUNC-USER-CREATE:
     - API-AUTH-REGISTER
   downstream_ids:
     - DB-TABLE-USERS
+DB-TABLE-PASSENGERS:
+  type: FUNC
+  related_req_id: REQ-1-1
+  signature: TABLE passengers
+  path: backend/src/database/init_db.js
+  description: Passengers Table
+  upstream_ids:
+    - FUNC-USER-CREATE
+  downstream_ids: []
+API-AUTH-CHECK-AVAILABILITY:
+  type: API
+  related_req_id: REQ-1-1
+  signature: GET /check-availability
+  path: backend/src/routes/auth.js
+  description: Check Username/Phone Availability
+  upstream_ids:
+    - UI-PAGE-REGISTER
+  downstream_ids:
+    - DB-TABLE-USERS
+API-AUTH-SEND-SMS:
+  type: API
+  related_req_id: REQ-1-1
+  signature: POST /send-sms
+  path: backend/src/routes/auth.js
+  description: Send SMS Verification Code
+  upstream_ids:
+    - UI-PAGE-REGISTER
+  downstream_ids: []

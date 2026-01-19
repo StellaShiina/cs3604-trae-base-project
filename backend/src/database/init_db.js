@@ -1,16 +1,13 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-// Database file stored in the root directory
-const dbPath = path.resolve(process.cwd(), 'database.db');
+// Use __dirname to ensure consistent DB path regardless of where node is run from
+// src/database/init_db.js -> ../../database.db
+const dbPath = path.resolve(__dirname, '../../database.db');
+console.log(`[DB] Using database at: ${dbPath}`);
+
 const db = new sqlite3.Database(dbPath);
 
-/**
- * Guide model instructions:
- * 1. Use CREATE TABLE IF NOT EXISTS to create new tables.
- * 2. When adding fields, use ALTER TABLE ... ADD COLUMN ... and wrap it in try/catch logic, or check if the field exists via PRAGMA table_info.
- * 3. Always execute within db.serialize to ensure DDL order.
- */
 db.serialize(() => {
   // Users Table
   db.run(`
@@ -26,7 +23,38 @@ db.serialize(() => {
       user_type TEXT DEFAULT 'normal',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
-  `);
+  `, (err) => {
+    if (err) console.error('[DB] Error creating users table:', err);
+  });
+
+  // Passengers Table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS passengers (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      real_name TEXT NOT NULL,
+      id_type TEXT NOT NULL,
+      id_number TEXT NOT NULL,
+      phone TEXT,
+      passenger_type TEXT DEFAULT 'adult',
+      is_self BOOLEAN DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(user_id) REFERENCES users(id)
+    )
+  `, (err) => {
+    if (err) console.error('[DB] Error creating passengers table:', err);
+  });
+
+  // Verification Codes Table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS verification_codes (
+      phone TEXT PRIMARY KEY,
+      code TEXT NOT NULL,
+      expires_at DATETIME NOT NULL
+    )
+  `, (err) => {
+    if (err) console.error('[DB] Error creating verification_codes table:', err);
+  });
 });
 
 module.exports = db;

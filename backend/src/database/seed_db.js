@@ -10,12 +10,15 @@ const seed = async () => {
 
   db.serialize(() => {
     // Seed Admin/Test User
+    // Use 'admin_user' instead of 'admin' to meet length requirement (6 chars)
+    // Ensure phone/id_number are unique and do not conflict with old 'admin'
     const stmt = db.prepare(`
       INSERT OR IGNORE INTO users (username, password, real_name, id_type, id_number, phone, email, user_type)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
-    stmt.run('admin', passwordHash, 'Admin User', '1', '110101199001011234', '13800138000', 'admin@12306.com', 'admin');
+    // Changed phone to 13800138999 and ID to ...12345 (different from admin's ...1234)
+    stmt.run('admin_user', passwordHash, 'Admin User', '1', '110101199001011235', '13800138999', 'admin_new@12306.com', 'admin');
     stmt.run('testuser', passwordHash, 'Test User', '1', '110101199001015678', '13900139000', 'test@12306.com', 'normal');
 
     stmt.finalize();

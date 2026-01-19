@@ -35,8 +35,13 @@
 - id: REQ-1-1
   parentId: REQ-1
   childrenIds: []
-  status: PENDING_CONTRACT
-  artifacts: {}
+  status: PENDING_IMPL
+  artifacts:
+    func_ids:
+      - DB-TABLE-PASSENGERS
+    api_ids:
+      - API-AUTH-CHECK-AVAILABILITY
+      - API-AUTH-SEND-SMS
 - id: REQ-1-2
   parentId: REQ-1
   childrenIds: []

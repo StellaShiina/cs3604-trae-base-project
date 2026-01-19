@@ -1,26 +1,92 @@
 const db = require('../database/init_db');
 const bcrypt = require('bcrypt');
 
+const checkAvailability = (field, value) => {
+  return new Promise((resolve, reject) => {
+    db.get(`SELECT id FROM users WHERE ${field} = ?`, [value], (err, row) => {
+      if (err) reject(err);
+      else resolve(!!row);
+    });
+  });
+};
+
+const createVerificationCode = (phone) => {
+  const code = '123456'; // Mock code
+  const expiresAt = new Date(Date.now() + 60000); // 1 min
+
+  return new Promise((resolve, reject) => {
+    db.run(`INSERT OR REPLACE INTO verification_codes (phone, code, expires_at) VALUES (?, ?, ?)`, 
+      [phone, code, expiresAt], 
+      function(err) {
+        if (err) reject(err);
+        else resolve(code);
+      }
+    );
+  });
+};
+
+const verifyCode = (phone, code) => {
+  return new Promise((resolve, reject) => {
+    db.get(`SELECT * FROM verification_codes WHERE phone = ?`, [phone], (err, row) => {
+      if (err) reject(err);
+      else if (!row) resolve(false);
+      else {
+        if (new Date(row.expires_at) < new Date()) resolve(false);
+        else if (row.code !== code) resolve(false);
+        else resolve(true);
+      }
+    });
+  });
+};
+
 const createUser = async (userData) => {
-  const { username, password, real_name, id_type, id_number, phone, email, user_type } = userData;
+  const { username, password, real_name, id_type, id_number, phone, email, user_type, verificationCode } = userData;
+
+  // Verify code first
+  if (verificationCode) {
+      const isValid = await verifyCode(phone, verificationCode);
+      if (!isValid) throw new Error('验证码错误或已失效');
+  }
   
   // Hash password
   const hashedPassword = await bcrypt.hash(password, 10);
 
   return new Promise((resolve, reject) => {
-    const stmt = db.prepare(`
-      INSERT INTO users (username, password, real_name, id_type, id_number, phone, email, user_type)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `);
+    db.serialize(() => {
+      db.run('BEGIN TRANSACTION');
 
-    stmt.run(username, hashedPassword, real_name, id_type, id_number, phone, email, user_type || 'normal', function(err) {
-      if (err) {
-        reject(err);
-      } else {
-        resolve({ id: this.lastID, username });
-      }
+      const stmt = db.prepare(`
+        INSERT INTO users (username, password, real_name, id_type, id_number, phone, email, user_type)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `);
+
+      stmt.run(username, hashedPassword, real_name, id_type, id_number, phone, email, user_type || 'normal', function(err) {
+        if (err) {
+          db.run('ROLLBACK');
+          return reject(err);
+        }
+        
+        const userId = this.lastID;
+
+        // Create Passenger
+        const passengerStmt = db.prepare(`
+          INSERT INTO passengers (user_id, real_name, id_type, id_number, phone, passenger_type, is_self)
+          VALUES (?, ?, ?, ?, ?, ?, ?)
+        `);
+
+        passengerStmt.run(userId, real_name, id_type, id_number, phone, 'adult', 1, function(err) {
+          if (err) {
+             db.run('ROLLBACK');
+             return reject(err);
+          }
+          
+          db.run('COMMIT');
+          resolve({ id: userId, username });
+        });
+        passengerStmt.finalize();
+      });
+      stmt.finalize();
     });
-    stmt.finalize();
   });
 };
 
@@ -48,5 +114,8 @@ const validateUser = async (username, password) => {
 module.exports = {
   createUser,
   findUserByUsername,
-  validateUser
+  validateUser,
+  checkAvailability,
+  createVerificationCode,
+  verifyCode
 };
