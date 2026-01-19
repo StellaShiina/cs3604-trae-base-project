@@ -45,7 +45,7 @@
 - id: REQ-1-2
   parentId: REQ-1
   childrenIds: []
-  status: PENDING_IMPL
+  status: COMPLETED
   artifacts:
     ui_ids:
       - UI-MODAL-LOGIN-2FA

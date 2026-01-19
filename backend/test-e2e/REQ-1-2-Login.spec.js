@@ -62,6 +62,40 @@ test.describe('REQ-1-2 User Login', () => {
     expect(localStorage.user).toBeTruthy();
   });
 
+  test('Logout Flow', async ({ page }) => {
+    // Login first (simplified, reusing previous logic or mocking state if possible, but let's just do full flow for robustness)
+    await page.fill('input[placeholder*="用户名"]', 'admin_user');
+    await page.fill('input[placeholder*="密码"]', '123456');
+    await page.click('button:has-text("立即登录")');
+    
+    const popup = page.locator('.login-2fa-modal');
+    await popup.locator('input[placeholder*="证件号后四位"]').fill('1235');
+    await popup.locator('input[placeholder*="验证码"]').fill('123456');
+    await popup.locator('button:has-text("确定")').click();
+    
+    await expect(page).toHaveURL('http://localhost:5173/');
+    
+    // Check Header State
+    await expect(page.getByText('您好，admin_user')).toBeVisible();
+    await expect(page.getByText('退出')).toBeVisible();
+
+    // Click Logout
+    await page.click('text=退出');
+
+    // Verify Logout
+    await expect(page).toHaveURL('http://localhost:5173/login');
+    const localStorage = await page.evaluate(() => window.localStorage);
+    expect(localStorage.token).toBeFalsy();
+    expect(localStorage.user).toBeFalsy();
+    
+    // Verify Header Reset (Go to home to check header if needed, but we are at login page which doesn't show same header usually? 
+    // Actually Header is global. Let's check if we can see login link again.
+    // But we are on /login page, so we won't see "Login" link in header if we hide it on login page? 
+    // Header.jsx shows "Login" link if !user.
+    // NOTE: LoginPage has its own header, not the global Header component. So we check for Login Page specific elements.
+    await expect(page.getByRole('tab', { name: '账号登录' })).toBeVisible();
+  });
+
   test('2FA Error Handling - Wrong Code', async ({ page }) => {
     await page.fill('input[placeholder*="用户名"]', 'admin_user');
     await page.fill('input[placeholder*="密码"]', '123456');
