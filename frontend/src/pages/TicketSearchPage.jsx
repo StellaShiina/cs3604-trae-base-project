@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import NavBar from '../components/NavBar';
 import { queryTickets } from '../api';
@@ -7,6 +7,7 @@ import './TicketSearchPage.css';
 
 const TicketSearchPage = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -53,6 +54,20 @@ const TicketSearchPage = () => {
 
     fetchTickets();
   }, [searchParams]);
+
+  const handleBook = (ticket) => {
+    // Navigate to Order Page with ticket info
+    const params = new URLSearchParams({
+      trainNo: ticket.train_no,
+      fromStation: ticket.from_station,
+      toStation: ticket.to_station,
+      date: query.date,
+      departureTime: ticket.departure_time,
+      arrivalTime: ticket.arrival_time,
+      duration: ticket.duration
+    }).toString();
+    navigate(`/order?${params}`);
+  };
 
   return (
     <div className="ticket-search-page">
@@ -144,7 +159,7 @@ const TicketSearchPage = () => {
                   <td>{ticket.hard_seat || '--'}</td>
                   <td>{ticket.no_seat || '--'}</td>
                   <td>
-                    <button className="book-btn">预订</button>
+                    <button className="book-btn" onClick={() => handleBook(ticket)}>预订</button>
                   </td>
                 </tr>
               ))}

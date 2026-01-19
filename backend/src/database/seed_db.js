@@ -12,8 +12,28 @@ const seed = async () => {
     // Seed Users
     const stmt = db.prepare(`INSERT OR REPLACE INTO users (username, password, real_name, id_type, id_number, phone, email, user_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`);
     stmt.run('admin_user', passwordHash, 'Admin User', '1', '110101199001011235', '13800138999', 'admin_new@12306.com', 'admin');
-    stmt.run('testuser', passwordHash, 'Test User', '1', '110101199001015678', '13900139000', 'test@12306.com', 'normal');
+    stmt.run('testuser', passwordHash, '孔诗语', '1', '110101199001015678', '13900139000', 'test@12306.com', 'normal');
     stmt.finalize();
+
+    // Seed Passengers for testuser
+    // We need to get testuser ID. Since we just inserted/replaced, we can query it.
+    db.get("SELECT id FROM users WHERE username = 'testuser'", (err, row) => {
+        if (err || !row) {
+            console.error('Failed to find testuser for passenger seeding');
+            return;
+        }
+        const userId = row.id;
+        const psgStmt = db.prepare(`INSERT OR REPLACE INTO passengers (user_id, real_name, id_type, id_number, phone, passenger_type, is_self) VALUES (?, ?, ?, ?, ?, ?, ?)`);
+        
+        // Self
+        psgStmt.run(userId, '孔诗语', '1', '110101199001015678', '13900139000', 'adult', 1);
+        
+        // Others
+        psgStmt.run(userId, '杨璐', '1', '110101199502021234', '13912345678', 'adult', 0);
+        psgStmt.run(userId, '张育宁', '1', '110101199803035678', '13987654321', 'student', 0);
+        
+        psgStmt.finalize();
+    });
 
     // Seed Trains
     const trainStmt = db.prepare(`INSERT OR REPLACE INTO trains (train_no, train_type) VALUES (?, ?)`);

@@ -98,6 +98,39 @@ db.serialize(() => {
   `, (err) => {
     if (err) console.error('[DB] Error creating daily_train_tickets table:', err);
   });
+
+  // Orders Table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS orders (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      status TEXT DEFAULT 'PENDING',
+      total_amount REAL NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(user_id) REFERENCES users(id)
+    )
+  `, (err) => {
+    if (err) console.error('[DB] Error creating orders table:', err);
+  });
+
+  // Order Items Table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS order_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      order_id INTEGER NOT NULL,
+      passenger_id INTEGER NOT NULL,
+      train_no TEXT NOT NULL,
+      seat_type TEXT NOT NULL,
+      price REAL NOT NULL,
+      departure_date TEXT NOT NULL,
+      from_station TEXT NOT NULL,
+      to_station TEXT NOT NULL,
+      FOREIGN KEY(order_id) REFERENCES orders(id),
+      FOREIGN KEY(passenger_id) REFERENCES passengers(id)
+    )
+  `, (err) => {
+    if (err) console.error('[DB] Error creating order_items table:', err);
+  });
 });
 
 module.exports = db;

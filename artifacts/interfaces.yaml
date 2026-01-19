@@ -310,3 +310,64 @@ UI-TICKET-SEARCH:
     - UI-HOME-PAGE
   downstream_ids:
     - API-TICKET-QUERY
+FUNC-PASSENGER-LIST:
+  type: FUNC
+  related_req_id: REQ-3
+  signature: listPassengers(userId)
+  path: backend/src/services/passengerService.js
+  description: Service to list passengers for a user
+  upstream_ids:
+    - API-PASSENGER-LIST
+  downstream_ids: []
+  db_tables:
+    - passengers
+FUNC-ORDER-CREATE:
+  type: FUNC
+  related_req_id: REQ-3
+  signature: createOrder(userId, orderData)
+  path: backend/src/services/orderService.js
+  description: Service to create order and items
+  upstream_ids:
+    - API-ORDER-CREATE
+  downstream_ids: []
+  db_tables:
+    - orders
+    - order_items
+API-PASSENGER-LIST:
+  type: API
+  related_req_id: REQ-3
+  signature: GET /api/passengers
+  path: backend/src/routes/passengers.js
+  description: API to list passengers
+  upstream_ids:
+    - UI-ORDER-PAGE
+  downstream_ids:
+    - FUNC-PASSENGER-LIST
+API-ORDER-CREATE:
+  type: API
+  related_req_id: REQ-3
+  signature: POST /api/orders
+  path: backend/src/routes/orders.js
+  description: API to create order
+  upstream_ids:
+    - UI-ORDER-PAGE
+  downstream_ids:
+    - FUNC-ORDER-CREATE
+UI-ORDER-PAGE:
+  type: UI
+  related_req_id: REQ-3
+  description: Order filling page
+  path: frontend/src/pages/OrderPage.jsx
+  upstream_ids:
+    - UI-TICKET-SEARCH
+  downstream_ids:
+    - API-PASSENGER-LIST
+    - API-ORDER-CREATE
+UI-PAYMENT-PAGE:
+  type: UI
+  related_req_id: REQ-3
+  description: Payment success page
+  path: frontend/src/pages/PaymentPage.jsx
+  upstream_ids:
+    - UI-ORDER-PAGE
+  downstream_ids: []

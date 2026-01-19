@@ -5,6 +5,18 @@ const api = axios.create({
   timeout: 10000,
 });
 
+// Request interceptor to add user info
+api.interceptors.request.use(
+  (config) => {
+    const userId = localStorage.getItem('userId');
+    if (userId) {
+      config.headers['x-user-id'] = userId;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 // Response interceptor for error handling
 api.interceptors.response.use(
   (response) => response.data,
@@ -25,5 +37,7 @@ export const verifyUserForReset = (data) => api.post('/auth/forgot-password/veri
 export const sendForgotSms = (phone) => api.post('/auth/forgot-password/send-sms', { phone });
 export const resetPassword = (data) => api.post('/auth/forgot-password/reset', data);
 export const queryTickets = (params) => api.get('/tickets/query', { params });
+export const listPassengers = () => api.get('/passengers');
+export const createOrder = (data) => api.post('/orders', data);
 
 export default api;
