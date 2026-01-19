@@ -51,3 +51,61 @@ UI-COMP-PROMOGRID:
   upstream_ids:
     - UI-PAGE-HOME
   downstream_ids: []
+UI-PAGE-LOGIN:
+  type: UI
+  related_req_id: REQ-1
+  description: User Login Page
+  path: frontend/src/pages/LoginPage.jsx
+  signature: LoginPage
+  upstream_ids: []
+  downstream_ids:
+    - API-AUTH-LOGIN
+UI-PAGE-REGISTER:
+  type: UI
+  related_req_id: REQ-1
+  description: User Registration Page
+  path: frontend/src/pages/RegisterPage.jsx
+  signature: RegisterPage
+  upstream_ids: []
+  downstream_ids:
+    - API-AUTH-REGISTER
+API-AUTH-LOGIN:
+  type: API
+  related_req_id: REQ-1
+  signature: POST /login
+  path: backend/src/routes/auth.js
+  description: Login API Endpoint
+  upstream_ids:
+    - UI-PAGE-LOGIN
+  downstream_ids:
+    - FUNC-USER-VALIDATE
+API-AUTH-REGISTER:
+  type: API
+  related_req_id: REQ-1
+  signature: POST /register
+  path: backend/src/routes/auth.js
+  description: Register API Endpoint
+  upstream_ids:
+    - UI-PAGE-REGISTER
+  downstream_ids:
+    - FUNC-USER-CREATE
+FUNC-USER-VALIDATE:
+  type: FUNC
+  related_req_id: REQ-1
+  signature: validateUser(username, password)
+  path: backend/src/services/userService.js
+  description: User Validation Function
+  upstream_ids:
+    - API-AUTH-LOGIN
+  downstream_ids:
+    - DB-TABLE-USERS
+FUNC-USER-CREATE:
+  type: FUNC
+  related_req_id: REQ-1
+  signature: createUser(userData)
+  path: backend/src/services/userService.js
+  description: User Creation Function
+  upstream_ids:
+    - API-AUTH-REGISTER
+  downstream_ids:
+    - DB-TABLE-USERS

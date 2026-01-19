@@ -1,0 +1,226 @@
+.login-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #fff;
+}
+
+/* Header */
+.login-header {
+  height: 70px;
+  background-color: #fff;
+  border-bottom: 1px solid #eee;
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon-circle {
+  width: 36px;
+  height: 36px;
+  background-color: #F54B25;
+  border-radius: 50%;
+}
+
+.brand-text .cn {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+}
+
+.brand-text .en {
+  font-size: 11px;
+  color: #999;
+}
+
+.page-title {
+  margin-left: 20px;
+  font-size: 20px;
+  color: #333;
+  padding-left: 20px;
+  border-left: 1px solid #ddd;
+  height: 30px;
+  line-height: 30px;
+}
+
+/* Hero */
+.login-hero {
+  height: 520px;
+  background-color: #3C8FE6; /* Fallback */
+  background: linear-gradient(135deg, #6FA0F8 0%, #3C8FE6 100%);
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.hero-content {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  padding: 40px 16px;
+  position: relative;
+}
+
+.marketing-block {
+  margin-top: 40px;
+  margin-left: 40px;
+  color: white;
+}
+
+.market-title {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.market-subtitle {
+  font-size: 34px;
+  font-weight: bold;
+  color: #D7F06A;
+  margin-bottom: 30px;
+}
+
+.feature-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.feature-item {
+  font-size: 22px;
+}
+
+/* Login Card */
+.login-card {
+  width: 360px;
+  background-color: white;
+  position: absolute;
+  right: 60px;
+  top: 40px;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding-bottom: 10px;
+}
+
+.card-tabs {
+  display: flex;
+  height: 48px;
+  border-bottom: 1px solid #E6E6E6;
+}
+
+.card-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: #777;
+}
+
+.card-tab.active {
+  color: #2F80ED;
+  font-weight: bold;
+  border-bottom: 2px solid #2F80ED;
+}
+
+.tab-divider {
+  width: 1px;
+  background-color: #E6E6E6;
+  height: 24px;
+  align-self: center;
+}
+
+.login-form {
+  padding: 24px;
+}
+
+.input-group {
+  margin-bottom: 16px;
+}
+
+.input-group input {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid #E6E6E6;
+  border-radius: 2px;
+  outline: none;
+}
+
+.input-group input:focus {
+  border-color: #2F80ED;
+}
+
+.login-btn {
+  width: 100%;
+  height: 40px;
+  background-color: #F57C00;
+  color: white;
+  border: none;
+  border-radius: 2px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.login-btn:hover {
+  background-color: #E67300;
+}
+
+.card-links {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+  font-size: 12px;
+  gap: 8px;
+}
+
+.card-links a {
+  color: #2F80ED;
+}
+
+.card-footer-text {
+  font-size: 12px;
+  color: #666;
+  padding: 16px 24px;
+  line-height: 1.5;
+  background-color: #fcfcfc;
+  border-top: 1px solid #f0f0f0;
+}
+
+.error-msg {
+  color: red;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+/* Footer */
+.login-footer {
+  background-color: #6B6B6B;
+  color: #E6E6E6;
+  padding: 20px;
+  text-align: center;
+  margin-top: auto;
+}
+
+.footer-links {
+  margin-bottom: 10px;
+  font-size: 12px;
+}
+
+.copyright {
+  font-size: 12px;
+}

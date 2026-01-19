@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const app = express();
 
 // route modules imports
+const authRoutes = require('./routes/auth');
 
 // middleware imports
 app.use(cors());
@@ -13,7 +14,7 @@ app.use(bodyParser.json());
 require('./database/init_db');
 
 // register routes
-// app.use()
+app.use('/api/auth', authRoutes);
 
 app.get('/', (req, res) => {
   res.json({ code: 200, message: 'Backend Ready' });

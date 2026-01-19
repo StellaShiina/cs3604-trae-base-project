@@ -12,9 +12,21 @@ const db = new sqlite3.Database(dbPath);
  * 3. Always execute within db.serialize to ensure DDL order.
  */
 db.serialize(() => {
-  // [CREATE TABLE statements added by the model as needed here]
-  
-  // [ALTER TABLE statements for incremental evolution added by the model as needed here]
+  // Users Table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT UNIQUE,
+      password TEXT NOT NULL,
+      real_name TEXT,
+      id_type TEXT,
+      id_number TEXT UNIQUE,
+      phone TEXT UNIQUE,
+      email TEXT,
+      user_type TEXT DEFAULT 'normal',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
 });
 
 module.exports = db;
