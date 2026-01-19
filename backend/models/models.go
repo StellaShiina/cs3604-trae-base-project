@@ -36,6 +36,7 @@ type Passenger struct {
 	CardNo        string    `gorm:"not null" json:"card_no"`
 	Mobile        string    `json:"phone"` // Mapped to 'phone' for frontend compatibility
 	PassengerType string    `gorm:"not null;type:ticket_type_enum" json:"passenger_type"`
+	IsDefault     bool      `gorm:"not null;default:false" json:"is_default"`
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
 }

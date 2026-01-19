@@ -67,7 +67,7 @@ func TestAddPassenger(t *testing.T) {
 		
 		// Verify DB mapping
 		var p models.Passenger
-		db.GetDB().Last(&p)
+		db.GetDB().First(&p, "card_no = ?", "110101200001015678")
 		assert.Equal(t, "id_card", p.CardType)
 		assert.Equal(t, "adult", p.PassengerType)
 		assert.Equal(t, "13800000009", p.Mobile)
@@ -136,6 +136,16 @@ func TestDeletePassenger(t *testing.T) {
 	}
 	db.GetDB().Create(&p)
 
+	defaultP := models.Passenger{
+		UserID:        userID,
+		Name:          "Default",
+		CardType:      "id_card",
+		CardNo:        "110101200001018888",
+		PassengerType: "adult",
+		IsDefault:     true,
+	}
+	db.GetDB().Create(&defaultP)
+
 	t.Run("Success", func(t *testing.T) {
 		req, _ := http.NewRequest("DELETE", "/api/v1/passengers/"+p.ID.String(), nil)
 		req.AddCookie(&http.Cookie{Name: "sid", Value: "dummy-session-00000000-0000-0000-0000-000000000000"})
@@ -149,6 +159,17 @@ func TestDeletePassenger(t *testing.T) {
 		var count int64
 		db.GetDB().Model(&models.Passenger{}).Where("id = ?", p.ID).Count(&count)
 		assert.Equal(t, int64(0), count)
+	})
+
+	t.Run("Forbidden_DefaultPassenger", func(t *testing.T) {
+		req, _ := http.NewRequest("DELETE", "/api/v1/passengers/"+defaultP.ID.String(), nil)
+		req.AddCookie(&http.Cookie{Name: "sid", Value: "dummy-session-00000000-0000-0000-0000-000000000000"})
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+		assert.Equal(t, http.StatusForbidden, w.Code)
+		var count int64
+		db.GetDB().Model(&models.Passenger{}).Where("id = ?", defaultP.ID).Count(&count)
+		assert.Equal(t, int64(1), count)
 	})
 
 	t.Run("NotFound", func(t *testing.T) {
@@ -177,6 +198,16 @@ func TestEditPassenger(t *testing.T) {
 	}
 	db.GetDB().Create(&p)
 
+	defaultP := models.Passenger{
+		UserID:        userID,
+		Name:          "Default",
+		CardType:      "id_card",
+		CardNo:        "110101200001018888",
+		PassengerType: "adult",
+		IsDefault:     true,
+	}
+	db.GetDB().Create(&defaultP)
+
 	t.Run("Success", func(t *testing.T) {
 		payload := map[string]string{
 			"name":      "Updated Name",
@@ -202,6 +233,28 @@ func TestEditPassenger(t *testing.T) {
 		assert.Equal(t, "student", updatedP.PassengerType)
 		assert.Equal(t, "13800000000", updatedP.Mobile)
 	})
+
+	t.Run("Forbidden_DefaultPassenger", func(t *testing.T) {
+		payload := map[string]string{
+			"name":      "Should Not Update",
+			"card_type": "居民身份证",
+			"card_no":   "110101200001018888",
+			"type":      "学生",
+			"phone":     "13800000000",
+		}
+		body, _ := json.Marshal(payload)
+		req, _ := http.NewRequest("PUT", "/api/v1/passengers/"+defaultP.ID.String(), bytes.NewBuffer(body))
+		req.AddCookie(&http.Cookie{Name: "sid", Value: "dummy-session-00000000-0000-0000-0000-000000000000"})
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+		assert.Equal(t, http.StatusForbidden, w.Code)
+
+		var unchanged models.Passenger
+		db.GetDB().First(&unchanged, defaultP.ID)
+		assert.Equal(t, "Default", unchanged.Name)
+		assert.Equal(t, "adult", unchanged.PassengerType)
+	})
 }
 
 func TestGetPassengers(t *testing.T) {
@@ -223,6 +276,13 @@ func TestGetPassengers(t *testing.T) {
 		CardNo:        "1234567890",
 		PassengerType: "adult",
 	})
+	db.GetDB().Create(&models.Passenger{
+		UserID:        userID,
+		Name:          "Alice",
+		CardType:      "passport",
+		CardNo:        "P1234567",
+		PassengerType: "student",
+	})
 
 	t.Run("Success_MapBackToChinese", func(t *testing.T) {
 		req, _ := http.NewRequest("GET", "/api/v1/passengers", nil)
@@ -236,11 +296,40 @@ func TestGetPassengers(t *testing.T) {
 		var passengers []map[string]interface{}
 		json.Unmarshal(w.Body.Bytes(), &passengers)
 		
-		assert.Equal(t, 1, len(passengers))
+		assert.Equal(t, 2, len(passengers))
 		p := passengers[0]
 		
 		// Since models.Passenger has JSON tags now
-		assert.Equal(t, "居民身份证", p["card_type"])
-		assert.Equal(t, "成人", p["passenger_type"])
+		assert.Contains(t, []interface{}{"居民身份证", "护照"}, p["card_type"])
+		assert.Contains(t, []interface{}{"成人", "学生"}, p["passenger_type"])
+	})
+
+	t.Run("FilterByName", func(t *testing.T) {
+		req, _ := http.NewRequest("GET", "/api/v1/passengers?name=Test", nil)
+		req.AddCookie(&http.Cookie{Name: "sid", Value: "dummy-session-00000000-0000-0000-0000-000000000000"})
+
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		var passengers []map[string]interface{}
+		json.Unmarshal(w.Body.Bytes(), &passengers)
+		assert.Equal(t, 1, len(passengers))
+		assert.Equal(t, "Test Passenger", passengers[0]["name"])
+	})
+
+	t.Run("FilterByName_NoMatch", func(t *testing.T) {
+		req, _ := http.NewRequest("GET", "/api/v1/passengers?name=NotExist", nil)
+		req.AddCookie(&http.Cookie{Name: "sid", Value: "dummy-session-00000000-0000-0000-0000-000000000000"})
+
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		var passengers []map[string]interface{}
+		json.Unmarshal(w.Body.Bytes(), &passengers)
+		assert.Equal(t, 0, len(passengers))
 	})
 }

@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { login, verifyLogin, sendSms } from '@/api/auth'
+import { login, verifyLogin } from '@/api/auth'
 import TopHeader from '@/components/Common/TopHeader.vue'
 import BottomFooter from '@/components/Common/BottomFooter.vue'
 import LoginBox from '@/components/Auth/LoginBox.vue'

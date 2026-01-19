@@ -322,20 +322,6 @@ const handleTimeRangeChange = () => {
   triggerFilterChange({ departureTimeRange: departureTimeRange.value });
 };
 
-// Clear Filters
-const clearFilters = () => {
-  selectedTrainTypes.value = [];
-  selectedDepartureStations.value = [];
-  selectedArrivalStations.value = [];
-  selectedSeatTypes.value = [];
-  triggerFilterChange({ 
-    trainTypes: [], 
-    departureStations: [], 
-    arrivalStations: [], 
-    seatTypes: [] 
-  });
-};
-
 const toggleCollapse = () => {
   isCollapsed.value = !isCollapsed.value;
 };

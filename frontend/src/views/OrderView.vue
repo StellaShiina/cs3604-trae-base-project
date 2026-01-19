@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { getNewOrderInfo, createOrder } from '@/api/order'
@@ -24,7 +24,7 @@ const seatTypes = computed(() => {
   return Object.keys(fareInfo.value).map(type => ({
     type,
     label: getSeatTypeLabel(type),
-    price: fareInfo.value[type],
+    price: fareInfo.value[type] ?? 0,
     count: availableSeats.value[type] || 0
   }))
 })
@@ -108,6 +108,14 @@ onMounted(async () => {
     }
   } catch (err: any) {
     console.error('Failed to fetch order info', err)
+    if (err.response?.status === 401) {
+      authStore.logout()
+      router.push({
+        path: '/login',
+        query: { redirect: route.fullPath }
+      })
+      return
+    }
     error.value = err.response?.data?.error || '获取订单信息失败'
   } finally {
     loading.value = false
@@ -146,6 +154,14 @@ const handleSubmitOrder = async () => {
     router.push(`/payment/${orderId}`)
   } catch (err: any) {
     console.error('Failed to create order', err)
+    if (err.response?.status === 401) {
+      authStore.logout()
+      router.push({
+        path: '/login',
+        query: { redirect: route.fullPath }
+      })
+      return
+    }
     alert(err.response?.data?.error || '订单提交失败')
   }
 }

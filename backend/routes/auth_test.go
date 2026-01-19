@@ -139,6 +139,25 @@ func TestRegisterFlow(t *testing.T) {
 		var response map[string]interface{}
 		json.Unmarshal(w.Body.Bytes(), &response)
 		assert.Contains(t, response, "userId")
+
+		userID := uuid.MustParse(response["userId"].(string))
+		var passengers []models.Passenger
+		db.GetDB().Where("user_id = ?", userID).Find(&passengers)
+		assert.GreaterOrEqual(t, len(passengers), 1)
+		foundDefault := false
+		var defaultPassenger models.Passenger
+		for _, p := range passengers {
+			if p.IsDefault {
+				foundDefault = true
+				defaultPassenger = p
+				break
+			}
+		}
+		assert.Equal(t, true, foundDefault)
+		assert.Equal(t, "Test Flow User", defaultPassenger.Name)
+		assert.Equal(t, "id_card", defaultPassenger.CardType)
+		assert.Equal(t, "110101199001011235", defaultPassenger.CardNo)
+		assert.Equal(t, "13800000001", defaultPassenger.Mobile)
 	})
 
 	t.Run("ValidateUsername_Duplicate", func(t *testing.T) {
@@ -625,4 +644,3 @@ func TestUnauthorizedAccess(t *testing.T) {
 		// We document the requirement here.
 	})
 }
-

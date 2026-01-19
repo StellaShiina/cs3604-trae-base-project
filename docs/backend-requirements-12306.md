@@ -171,6 +171,22 @@
     And `type` 应映射为 "成人"
     And 当调用 "添加乘车人" API 时，应支持接收中文类型并映射回枚举值
 
+  Scenario: 注册后自动创建默认乘车人
+    Given 用户已完成注册且用户信息已落库
+    When 用户首次进入“乘车人管理”或调用 "获取乘车人列表" API
+    Then 系统应确保存在一名默认乘车人
+    And 该默认乘车人的姓名/证件类型/证件号码/手机号应与注册信息一致
+    And 该默认乘车人应标记为不可编辑、不可删除
+
+  Scenario: 默认乘车人不可编辑、不可删除
+    Given 用户存在默认乘车人记录
+    When 调用 "删除乘车人" API 目标为默认乘车人
+    Then 系统应返回 HTTP 403 Forbidden
+    And 默认乘车人记录应保持不变
+    When 调用 "编辑乘车人" API 目标为默认乘车人
+    Then 系统应返回 HTTP 403 Forbidden
+    And 默认乘车人记录应保持不变
+
 ### Feature: 车站与车票查询
   作为用户
   我希望查询车站之间的火车票
@@ -300,6 +316,19 @@
   我希望支付订单或取消订单
   以便我完成出行计划
 
+  Scenario: 支付订单
+    Given 订单 "ord-001" 状态为 `pending_payment`
+    When 调用 "支付订单" API
+    Then 支付应被处理
+    And 订单状态应更新为 `paid`
+    And 应在 `payments` 表中添加一条记录
+
+  Scenario: 取消未支付订单
+    Given 订单 "ord-001" 状态为 `pending_payment`
+    When 调用 "取消订单" API
+    Then 订单状态应更新为 `canceled`
+    And 库存应立即释放
+
 ### Feature: 系统维护与调度
   作为系统管理员/后台服务
   我希望系统自动维护车次排期
@@ -324,19 +353,6 @@
     Then 系统应扫描所有过期未支付订单
     And 将这些订单的状态更新为 `canceled`
     And 触发器 `trg_order_cancel_release` 应自动释放库存
-
-  Scenario: 支付订单
-    Given 订单 "ord-001" 状态为 `pending_payment`
-    When 调用 "支付订单" API
-    Then 支付应被处理
-    And 订单状态应更新为 `paid`
-    And 应在 `payments` 表中添加一条记录
-
-  Scenario: 取消未支付订单
-    Given 订单 "ord-001" 状态为 `pending_payment`
-    When 调用 "取消订单" API
-    Then 订单状态应更新为 `canceled`
-    And 库存应立即释放
 
   Scenario: 订单状态兼容性映射 (前端适配)
     Given 前端请求订单列表时使用状态参数 `status=cancelled` (双 'l')

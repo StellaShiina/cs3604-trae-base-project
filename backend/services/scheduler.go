@@ -44,26 +44,17 @@ func executeInitScripts(tx *gorm.DB) error {
 		return fmt.Errorf("failed to get working directory: %v", err)
 	}
 
-	// Adjust path based on where the binary is running.
-	// We check multiple locations to be robust.
-	possiblePaths := []string{
-		filepath.Join(baseDir, "db-init"),                         // Current directory
-		filepath.Join(baseDir, "..", "db-init"),                   // Parent directory
-		filepath.Join(baseDir, "database", "db-init"),             // database/db-init
-		filepath.Join(baseDir, "..", "database", "db-init"),       // ../database/db-init
-		filepath.Join(baseDir, "..", "..", "database", "db-init"), // ../../database/db-init (Original)
-	}
-
-	var scriptDir string
-	for _, p := range possiblePaths {
-		if _, err := os.Stat(p); err == nil {
-			scriptDir = p
-			break
+	// Adjust path based on where the binary is running. 
+	// If running via 'go run main.go' in backend/backend, it is ../../database/db-init
+	scriptDir := filepath.Join(baseDir, "..", "..", "database", "db-init")
+	
+	// Verify directory exists
+	if _, err := os.Stat(scriptDir); os.IsNotExist(err) {
+		// Try alternative path (maybe running from project root?)
+		scriptDir = filepath.Join(baseDir, "database", "db-init")
+		if _, err := os.Stat(scriptDir); os.IsNotExist(err) {
+			return fmt.Errorf("db-init directory not found at %s or %s", filepath.Join(baseDir, "..", "..", "database", "db-init"), scriptDir)
 		}
-	}
-
-	if scriptDir == "" {
-		return fmt.Errorf("db-init directory not found in any of the expected locations")
 	}
 
 	log.Printf("Found db-init directory at: %s", scriptDir)

@@ -9,11 +9,15 @@ export interface Passenger {
   card_no: string
   phone?: string
   passenger_type?: string // For response
+  is_default?: boolean
   type?: string // For request
 }
 
-export const getPassengers = async () => {
-  return axios.get(`${API_BASE_URL}/passengers`)
+export const getPassengers = async (params?: { name?: string }) => {
+  const name = params?.name?.trim()
+  return axios.get(`${API_BASE_URL}/passengers`, {
+    params: name ? { name } : undefined
+  })
 }
 
 export const addPassenger = async (passenger: Passenger) => {

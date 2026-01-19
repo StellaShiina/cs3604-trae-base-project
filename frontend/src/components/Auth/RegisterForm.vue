@@ -5,11 +5,8 @@ import SelectDropdown from '@/components/Common/SelectDropdown.vue';
 import RegistrationVerificationModal from './RegistrationVerificationModal.vue';
 import { 
   validateUsername as apiValidateUsername, 
-  validatePhone as apiValidatePhone, 
-  validateEmail as apiValidateEmail,
   startRegistration,
   sendRegisterSms,
-  completeRegistration
 } from '@/api/auth';
 
 // Props and Emits
@@ -49,6 +46,7 @@ const generalError = ref('');
 
 // UI State
 const showVerificationModal = ref(false);
+const showPhonePromptModal = ref(false);
 const isSubmitting = ref(false);
 const sessionId = ref('');
 const serverError = ref('');
@@ -290,16 +288,60 @@ const handlePhoneChange = (e: Event) => {
   const target = e.target as HTMLInputElement;
   const value = target.value.slice(0, 11);
   phone.value = value;
+  if (showPhonePromptModal.value && value.trim()) {
+    showPhonePromptModal.value = false;
+  }
 };
 
-const checkAllFields = () => {
-  validateUsername(username.value);
-  validatePassword(password.value);
-  validateConfirmPassword(confirmPassword.value);
-  validateName(name.value);
-  validateIdCard(idCardNumber.value);
-  validateEmail(email.value);
-  validatePhone(phone.value);
+const checkAllFields = async () => {
+  const trimmedUsername = username.value.trim();
+  const trimmedName = name.value.trim();
+  const trimmedIdCardNumber = idCardNumber.value.trim();
+  const trimmedPhone = phone.value.trim();
+  const trimmedEmail = email.value.trim();
+
+  if (!trimmedUsername) {
+    usernameValidation.value = { isValid: false, errorMessage: '请输入用户名！', showCheckmark: false };
+  } else {
+    await validateUsername(trimmedUsername);
+  }
+
+  if (!password.value) {
+    passwordValidation.value = { isValid: false, errorMessage: '请输入密码！', showCheckmark: false };
+  } else {
+    await validatePassword(password.value);
+  }
+
+  if (!confirmPassword.value) {
+    confirmPasswordValidation.value = { isValid: false, errorMessage: '请输入确认密码！', showCheckmark: false };
+  } else {
+    validateConfirmPassword(confirmPassword.value);
+  }
+
+  if (!trimmedName) {
+    nameValidation.value = { isValid: false, errorMessage: '请输入您的姓名！', showCheckmark: false };
+  } else {
+    validateName(trimmedName);
+  }
+
+  if (!trimmedIdCardNumber) {
+    idCardValidation.value = { isValid: false, errorMessage: '请输入证件号码！', showCheckmark: false };
+  } else {
+    await validateIdCard(trimmedIdCardNumber);
+  }
+
+  if (trimmedEmail) {
+    validateEmail(trimmedEmail);
+  } else {
+    emailValidation.value = { isValid: false, errorMessage: '', showCheckmark: false };
+  }
+
+  if (!trimmedPhone) {
+    phoneValidation.value = { isValid: false, errorMessage: '请输入手机号码！', showCheckmark: false };
+    showPhonePromptModal.value = true;
+  } else {
+    validatePhone(trimmedPhone);
+  }
 
   if (!agreedToTerms.value) {
     generalError.value = '请阅读并同意服务条款、隐私政策和儿童个人信息保护规则';
@@ -311,7 +353,7 @@ const checkAllFields = () => {
       !confirmPasswordValidation.value.isValid ||
       !nameValidation.value.isValid ||
       !idCardValidation.value.isValid ||
-      (email.value && !emailValidation.value.isValid) ||
+      (trimmedEmail && !emailValidation.value.isValid) ||
       !phoneValidation.value.isValid) {
     generalError.value = '请完善页面中的错误信息！';
     return false;
@@ -324,7 +366,7 @@ const checkAllFields = () => {
 const handleSubmit = async (e?: Event) => {
   if (e) e.preventDefault();
 
-  if (!checkAllFields()) return;
+  if (!await checkAllFields()) return;
 
   isSubmitting.value = true;
   generalError.value = '';
@@ -666,6 +708,40 @@ const handleVerificationComplete = async (code: string) => {
       @complete="handleVerificationComplete"
       @back="showVerificationModal = false"
     />
+
+    <Teleport to="body">
+      <div v-if="showPhonePromptModal" class="phone-required-modal-wrapper">
+        <div class="phone-required-modal-backdrop" @click="showPhonePromptModal = false">
+          <div class="phone-required-modal" @click.stop>
+            <div class="phone-required-modal-header">
+              <div class="phone-required-modal-title">提示</div>
+              <button
+                type="button"
+                class="phone-required-modal-close"
+                @click="showPhonePromptModal = false"
+              >
+                ×
+              </button>
+            </div>
+            <div class="phone-required-modal-body">
+              <div class="phone-required-modal-icon">
+                <div class="phone-required-modal-icon-inner">!</div>
+              </div>
+              <div class="phone-required-modal-message">请输入手机号，以完成用户校验。</div>
+            </div>
+            <div class="phone-required-modal-footer">
+              <button
+                type="button"
+                class="phone-required-modal-confirm"
+                @click="showPhonePromptModal = false"
+              >
+                确定
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -926,6 +1002,115 @@ const handleVerificationComplete = async (code: string) => {
   border: 1px solid #ffccc7;
   border-radius: 0px;
   line-height: 1.5;
+}
+
+.phone-required-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1200;
+}
+
+.phone-required-modal {
+  width: 560px;
+  background: #ffffff;
+  border-radius: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.phone-required-modal-header {
+  height: 34px;
+  background: #3a93e6;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+}
+
+.phone-required-modal-title {
+  font-size: 14px;
+  line-height: 34px;
+}
+
+.phone-required-modal-close {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 22px;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.phone-required-modal-body {
+  display: flex;
+  align-items: center;
+  padding: 28px 28px 18px;
+}
+
+.phone-required-modal-icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: 5px solid #ff8001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 18px;
+  box-sizing: border-box;
+}
+
+.phone-required-modal-icon-inner {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #ff8001;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.phone-required-modal-message {
+  font-size: 16px;
+  color: #333;
+}
+
+.phone-required-modal-footer {
+  display: flex;
+  justify-content: center;
+  padding: 0 0 22px;
+}
+
+.phone-required-modal-confirm {
+  min-width: 86px;
+  height: 30px;
+  border: none;
+  background: #ff8001;
+  color: #ffffff;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.phone-required-modal-confirm:hover {
+  background: #ffaa55;
 }
 
 /* Responsive */

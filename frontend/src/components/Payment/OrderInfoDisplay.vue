@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue'
 
 interface Passenger {
   sequence: number
@@ -30,14 +29,6 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['cancelOrder', 'confirmPayment'])
-
-const formatDate = (dateStr: string) => {
-  if (!dateStr) return ''
-  const date = new Date(dateStr)
-  const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
-  const weekday = weekdays[date.getDay()]
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} (${weekday})`
-}
 
 const maskIdCard = (idCard: string) => {
   if (!idCard || idCard.length < 8) return idCard

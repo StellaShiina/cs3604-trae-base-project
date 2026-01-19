@@ -75,7 +75,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import TopHeader from '@/components/Common/TopHeader.vue';
 import MainNavigation from '@/components/Common/MainNavigation.vue';

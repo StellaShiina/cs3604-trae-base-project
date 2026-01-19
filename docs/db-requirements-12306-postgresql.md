@@ -12,10 +12,12 @@ CREATE EXTENSION IF NOT EXISTS citext;
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
 CREATE TYPE train_type_enum AS ENUM ('G','D','C','Z','T','K');
-CREATE TYPE seat_type_enum AS ENUM ('business','first','second','softSleeper','hardSleeper','hardSeat');
+CREATE TYPE seat_type_enum AS ENUM ('business','first','preferredFirst','second','softSleeper','hardSleeper','hardSeat');
 CREATE TYPE ticket_type_enum AS ENUM ('adult','child','student');
 CREATE TYPE card_type_enum AS ENUM ('id_card', 'passport', 'other');
 
+-- 预订单状态：活跃、过期、已取消
+CREATE TYPE preorder_status_enum AS ENUM ('active','expired','canceled');
 -- 订单状态：待支付、已支付、已完成、已取消、已退款、部分退款
 CREATE TYPE order_status_enum AS ENUM ('pending_payment', 'paid', 'completed', 'canceled', 'refunded', 'partially_refunded');
 -- 车票状态：正常、已退票、已改签
@@ -141,7 +143,26 @@ CREATE INDEX idx_segments_depart_time ON service_segments(depart_time);
 CREATE INDEX idx_inv_segment_seat ON segment_seat_inventory(segment_id, seat_type);
 ```
 
-### 3.5 订单与车票（核心交易）
+### 3.5 预订单（库存锁定）
+```sql
+CREATE TABLE preorders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  train_service_id BIGINT NOT NULL REFERENCES train_services(id) ON DELETE CASCADE,
+  from_station_id UUID NOT NULL REFERENCES stations(id),
+  to_station_id UUID NOT NULL REFERENCES stations(id),
+  segment_id BIGINT NOT NULL REFERENCES service_segments(id) ON DELETE CASCADE,
+  seat_type seat_type_enum NOT NULL,
+  hold_quantity INTEGER NOT NULL DEFAULT 1,
+  status preorder_status_enum NOT NULL DEFAULT 'active',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  expires_at TIMESTAMPTZ NOT NULL
+);
+
+CREATE INDEX idx_preorders_active ON preorders(status, expires_at);
+```
+
+### 3.6 订单与车票（核心交易）
 ```sql
 CREATE TABLE orders (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -190,9 +211,9 @@ CREATE INDEX idx_tickets_order ON tickets(order_id);
 ## 4. 约束与触发器
 ```sql
 -- 1. 服务日期限制
-CREATE FUNCTION enforce_service_date_range() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION enforce_service_date_range() RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
-  IF NEW.service_date < current_date OR NEW.service_date > (current_date + INTERVAL '14 days')::date THEN
+  IF NEW.service_date < current_date OR NEW.service_date > (current_date + INTERVAL '15 days')::date THEN
     RAISE EXCEPTION 'service_date out of range';
   END IF;
   RETURN NEW;
@@ -202,17 +223,45 @@ CREATE TRIGGER trg_service_date_range
 BEFORE INSERT OR UPDATE OF service_date ON train_services
 FOR EACH ROW EXECUTE FUNCTION enforce_service_date_range();
 
--- 2. 创建车票时扣减库存
-CREATE FUNCTION decrement_inventory_on_ticket() RETURNS trigger LANGUAGE plpgsql AS $$
+-- 2. 预订单创建时扣减库存
+CREATE OR REPLACE FUNCTION decrement_inventory_on_preorder() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  UPDATE segment_seat_inventory SET left_seats = left_seats - NEW.hold_quantity
+  WHERE segment_id = NEW.segment_id AND seat_type = NEW.seat_type AND left_seats >= NEW.hold_quantity;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'not enough seats';
+  END IF;
+  RETURN NEW;
+END;$$;
+
+CREATE TRIGGER trg_preorder_decrement
+AFTER INSERT ON preorders
+FOR EACH ROW EXECUTE FUNCTION decrement_inventory_on_preorder();
+
+-- 3. 预订单取消/过期释放库存
+CREATE OR REPLACE FUNCTION release_inventory_on_preorder_cancel() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  IF OLD.status = 'active' AND NEW.status IN ('canceled','expired') THEN
+    UPDATE segment_seat_inventory SET left_seats = left_seats + OLD.hold_quantity
+    WHERE segment_id = OLD.segment_id AND seat_type = OLD.seat_type;
+  END IF;
+  RETURN NEW;
+END;$$;
+
+CREATE TRIGGER trg_preorder_release
+AFTER UPDATE OF status ON preorders
+FOR EACH ROW EXECUTE FUNCTION release_inventory_on_preorder_cancel();
+
+-- 4. 出票时扣减库存（实际上预订单已扣减，此处可能是校验或双重保障，视业务逻辑而定，SQL脚本中也有定义）
+-- SQL脚本中定义了 decrement_inventory_on_ticket，但通常预订单转订单时不应再次扣减，除非是无预订单直接下单模式。
+-- 这里保留SQL脚本中的定义以保持一致性。
+CREATE OR REPLACE FUNCTION decrement_inventory_on_ticket() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE
   v_segment_id BIGINT;
 BEGIN
-  -- 获取 segment_id (通过 order)
   SELECT segment_id INTO v_segment_id FROM orders WHERE id = NEW.order_id;
-  
   UPDATE segment_seat_inventory SET left_seats = left_seats - 1
   WHERE segment_id = v_segment_id AND seat_type = NEW.seat_type AND left_seats >= 1;
-  
   IF NOT FOUND THEN
     RAISE EXCEPTION 'not enough seats';
   END IF;
@@ -223,14 +272,10 @@ CREATE TRIGGER trg_ticket_decrement
 AFTER INSERT ON tickets
 FOR EACH ROW EXECUTE FUNCTION decrement_inventory_on_ticket();
 
--- 3. 订单取消/过期时释放库存
-CREATE FUNCTION release_inventory_on_order_cancel() RETURNS trigger LANGUAGE plpgsql AS $$
+-- 5. 订单取消释放库存
+CREATE OR REPLACE FUNCTION release_inventory_on_order_cancel() RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
-  -- 仅当订单从 pending_payment 转为 canceled 时，且关联的 tickets 为 active 状态
   IF OLD.status = 'pending_payment' AND NEW.status = 'canceled' THEN
-    -- 找到所有该订单下的 active 车票，增加对应库存
-    -- 这里简化处理：循环或聚合更新。为性能考虑，通常批量更新。
-    -- 简易逻辑：对每张票执行释放
     UPDATE segment_seat_inventory inv
     SET left_seats = left_seats + 1
     FROM tickets t
@@ -246,14 +291,13 @@ CREATE TRIGGER trg_order_cancel_release
 AFTER UPDATE OF status ON orders
 FOR EACH ROW EXECUTE FUNCTION release_inventory_on_order_cancel();
 
--- 4. 车票退票时释放库存
-CREATE FUNCTION release_inventory_on_ticket_refund() RETURNS trigger LANGUAGE plpgsql AS $$
+-- 6. 退票释放库存
+CREATE OR REPLACE FUNCTION release_inventory_on_ticket_refund() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE
   v_segment_id BIGINT;
 BEGIN
   IF OLD.status = 'active' AND NEW.status = 'refunded' THEN
     SELECT segment_id INTO v_segment_id FROM orders WHERE id = OLD.order_id;
-    
     UPDATE segment_seat_inventory SET left_seats = left_seats + 1
     WHERE segment_id = v_segment_id AND seat_type = OLD.seat_type;
   END IF;
@@ -263,6 +307,7 @@ END;$$;
 CREATE TRIGGER trg_ticket_refund_release
 AFTER UPDATE OF status ON tickets
 FOR EACH ROW EXECUTE FUNCTION release_inventory_on_ticket_refund();
+
 ```
 
 ## 5. 视图与查询

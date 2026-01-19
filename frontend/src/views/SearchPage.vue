@@ -68,7 +68,6 @@ import BottomFooter from '@/components/Common/BottomFooter.vue';
 import TrainSearchBar from '@/components/Train/TrainSearchBar.vue';
 import TrainFilterPanel from '@/components/Train/TrainFilterPanel.vue';
 import TrainList from '@/components/Train/TrainList.vue';
-import ConfirmModal from '@/components/Train/ConfirmModal.vue';
 import LoginModal from '@/components/Auth/LoginModal.vue';
 import { searchTrains } from '@/api/train';
 import { getTodayString } from '@/utils/date';
@@ -92,11 +91,15 @@ const pendingReserve = ref<{
   departureDate: string;
 } | null>(null);
 
+const normalizeTripType = (value: unknown): 'single' | 'round' => {
+  return value === 'round' ? 'round' : 'single'
+}
+
 const searchParams = ref({
   departureStation: (route.query.departureStation as string) || (route.query.from as string) || '北京',
   arrivalStation: (route.query.arrivalStation as string) || (route.query.to as string) || '上海',
   departureDate: (route.query.departureDate as string) || (route.query.date as string) || getTodayString(),
-  tripType: (route.query.tripType as string) || 'single',
+  tripType: normalizeTripType(route.query.tripType),
   ticketType: 'normal'
 });
 
@@ -138,6 +141,8 @@ const filteredTrains = computed(() => {
       const isMatch = filters.value.trainTypes.some(type => {
         if (type === 'OTHER') return !['G', 'D', 'C', 'Z', 'T', 'K'].includes(typeCode);
         if (type === 'GC') return ['G', 'C'].includes(typeCode);
+        if (type === 'FUXING') return ['G', 'C'].includes(typeCode);
+        if (type === 'SMART') return ['G', 'C'].includes(typeCode);
         return typeCode === type; // D, Z, T, K
       });
       if (!isMatch) return false;
@@ -167,6 +172,7 @@ const filteredTrains = computed(() => {
     if (filters.value.seatTypes.length > 0) {
       const hasSeat = filters.value.seatTypes.some(type => {
         const count = train.availableSeats[type];
+        if (typeof count === 'number') return count > 0;
         return count !== undefined && count !== '--' && count !== '无';
       });
       if (!hasSeat) return false;
@@ -282,7 +288,7 @@ watch(
     }
     
     if (newQuery.tripType) {
-      searchParams.value.tripType = newQuery.tripType as string;
+      searchParams.value.tripType = normalizeTripType(newQuery.tripType);
     }
 
     // Trigger search
