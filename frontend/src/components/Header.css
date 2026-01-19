@@ -1,0 +1,98 @@
+.site-header {
+  height: 70px;
+  background-color: #fff;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-container {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+
+.logo-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rail-icon {
+  width: 32px;
+  height: 32px;
+  background-color: #E60000; /* Approximate logo color */
+  border-radius: 4px;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-cn {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  line-height: 1.2;
+}
+
+.logo-en {
+  font-size: 11px;
+  color: #333;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.search-input {
+  width: 420px;
+  height: 36px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px 0 0 4px;
+  padding: 0 12px;
+  outline: none;
+  font-size: 14px;
+}
+
+.search-input:focus {
+  border-color: var(--primary-blue);
+}
+
+.search-btn {
+  width: 40px;
+  height: 36px;
+  background-color: var(--primary-blue);
+  border: none;
+  border-radius: 0 4px 4px 0;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.utility-links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.utility-links a:hover {
+  color: var(--primary-blue);
+}
+
+.separator {
+  color: #ccc;
+}

@@ -1,0 +1,53 @@
+UI-PAGE-HOME:
+  type: UI
+  related_req_id: ROOT
+  description: Home Page Main View
+  path: frontend/src/pages/HomePage.jsx
+  signature: HomePage
+  upstream_ids: []
+  downstream_ids: []
+UI-COMP-HEADER:
+  type: UI
+  related_req_id: ROOT
+  description: Top Header Component
+  path: frontend/src/components/Header.jsx
+  signature: Header
+  upstream_ids:
+    - UI-PAGE-HOME
+  downstream_ids: []
+UI-COMP-NAVBAR:
+  type: UI
+  related_req_id: ROOT
+  description: Main Navigation Bar
+  path: frontend/src/components/NavBar.jsx
+  signature: NavBar
+  upstream_ids:
+    - UI-PAGE-HOME
+  downstream_ids: []
+UI-COMP-HERO:
+  type: UI
+  related_req_id: ROOT
+  description: Hero Section with Booking Form
+  path: frontend/src/components/Hero.jsx
+  signature: Hero
+  upstream_ids:
+    - UI-PAGE-HOME
+  downstream_ids: []
+UI-COMP-QUICKACCESS:
+  type: UI
+  related_req_id: ROOT
+  description: Quick Access Icons
+  path: frontend/src/components/QuickAccess.jsx
+  signature: QuickAccess
+  upstream_ids:
+    - UI-PAGE-HOME
+  downstream_ids: []
+UI-COMP-PROMOGRID:
+  type: UI
+  related_req_id: ROOT
+  description: Promo Cards Grid
+  path: frontend/src/components/PromoGrid.jsx
+  signature: PromoGrid
+  upstream_ids:
+    - UI-PAGE-HOME
+  downstream_ids: []
