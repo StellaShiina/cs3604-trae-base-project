@@ -111,5 +111,15 @@
 - id: REQ-5
   parentId: ROOT
   childrenIds: []
-  status: PENDING_CONTRACT
-  artifacts: {}
+  status: PENDING_IMPL
+  artifacts:
+    api_ids:
+      - API-USER-INFO
+      - API-PASSENGER-ADD
+      - API-PASSENGER-DEL
+      - API-ORDER-LIST
+    ui_ids:
+      - UI-PERSONAL-PAGE
+      - UI-PERSONAL-INFO
+      - UI-ORDER-LIST
+      - UI-PASSENGER-LIST

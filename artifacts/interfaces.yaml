@@ -418,3 +418,90 @@ UI-PURCHASE-SUCCESS-PAGE:
   upstream_ids: []
   downstream_ids: []
   db_tables: []
+API-USER-INFO:
+  type: API
+  related_req_id: REQ-5
+  signature: GET /api/users/me
+  path: backend/src/routes/users.js
+  description: 'API Endpoint: Get current user info'
+  upstream_ids:
+    - UI-PERSONAL-INFO
+  downstream_ids: []
+  db_tables:
+    - users
+API-PASSENGER-ADD:
+  type: API
+  related_req_id: REQ-5
+  signature: POST /api/passengers
+  path: backend/src/routes/passengers.js
+  description: 'API Endpoint: Add passenger'
+  upstream_ids:
+    - UI-PASSENGER-LIST
+  downstream_ids: []
+  db_tables:
+    - passengers
+API-PASSENGER-DEL:
+  type: API
+  related_req_id: REQ-5
+  signature: DELETE /api/passengers/:id
+  path: backend/src/routes/passengers.js
+  description: 'API Endpoint: Delete passenger'
+  upstream_ids:
+    - UI-PASSENGER-LIST
+  downstream_ids: []
+  db_tables:
+    - passengers
+UI-PERSONAL-PAGE:
+  type: UI
+  related_req_id: REQ-5
+  description: 'UI Component: Personal Center Layout'
+  path: frontend/src/pages/PersonalPage.jsx
+  signature: PersonalPage
+  upstream_ids: []
+  downstream_ids: []
+  db_tables: []
+UI-PERSONAL-INFO:
+  type: UI
+  related_req_id: REQ-5
+  description: 'UI Component: Personal Info View'
+  path: frontend/src/components/Personal/PersonalInfo.jsx
+  signature: PersonalInfo
+  upstream_ids:
+    - UI-PERSONAL-PAGE
+  downstream_ids:
+    - API-USER-INFO
+  db_tables: []
+UI-ORDER-LIST:
+  type: UI
+  related_req_id: REQ-5
+  description: 'UI Component: Order List View'
+  path: frontend/src/components/Personal/OrderList.jsx
+  signature: OrderList
+  upstream_ids:
+    - UI-PERSONAL-PAGE
+  downstream_ids:
+    - API-ORDER-LIST
+  db_tables: []
+UI-PASSENGER-LIST:
+  type: UI
+  related_req_id: REQ-5
+  description: 'UI Component: Passenger List View'
+  path: frontend/src/components/Personal/PassengerList.jsx
+  signature: PassengerList
+  upstream_ids:
+    - UI-PERSONAL-PAGE
+  downstream_ids:
+    - API-PASSENGER-ADD
+    - API-PASSENGER-DEL
+  db_tables: []
+API-ORDER-LIST:
+  type: API
+  related_req_id: REQ-5
+  signature: GET /api/orders
+  path: backend/src/routes/orders.js
+  description: 'API Endpoint: List orders'
+  upstream_ids:
+    - UI-ORDER-LIST
+  downstream_ids: []
+  db_tables:
+    - orders
