@@ -2,7 +2,7 @@
 
 ## 1. 总览
 - 目标：支撑 `Home`, `Booking`, `Login`, `Register`, `UserCenter` (Order/Passenger) 等全流程业务。
-- 引擎与设置：PostgreSQL 14+；启用扩展 `citext`, `pg_trgm`；时区 `Asia/Shanghai`；字符集 `UTF8`。
+- 引擎与设置：PostgreSQL 14+, 使用docker compose部署；启用扩展 `citext`, `pg_trgm`；时区 `Asia/Shanghai`；字符集 `UTF8`。
 - 命名约定：表名小写下划线，主键 `id`，时间 `created_at`, `updated_at`，金额单位 `price_cents`，货币 `currency` 采用 `CNY`。
 - 统一类型：采用枚举类型表示列车类型、席别、订单状态、票种等。
 

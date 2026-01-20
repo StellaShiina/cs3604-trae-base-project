@@ -1,51 +1,106 @@
-# CS3604 12306 Project - Database Module
+# CS3604 12306 Train Ticket Booking System
 
-本项目为 CS3604 12306 复刻项目的主数据库模块，基于 PostgreSQL 构建。该模块独立封装，为主项目提供完整的数据库服务支持，包括表结构、预置数据及核心业务逻辑（触发器/存储过程）。
+本项目是 CS3604 课程的 12306 铁路购票系统复刻项目，包含完整的全栈实现。
 
-## � Docker 部署（集成指南）
+## 📚 项目简介
 
-主项目接入此数据库模块时，请参考以下步骤启动服务。
+这是一个基于现代技术栈构建的铁路购票系统，旨在还原 12306 的核心业务流程，包括用户注册登录、车票查询、订单预订、客票管理等功能。
 
-### 1. 启动服务
+## 🛠️ 技术栈 (Tech Stack)
 
-在本项目根目录下直接运行：
+### Backend (后端)
+- **Language**: Go (Golang)
+- **Framework**: Gin Web Framework
+- **ORM**: GORM
+- **Database Driver**: PostgreSQL Driver
+
+### Frontend (前端)
+- **Framework**: Vue 3
+- **Build Tool**: Vite
+- **Language**: TypeScript
+- **State Management**: Pinia
+- **Styling**: SCSS / Sass
+- **HTTP Client**: Axios
+
+### Database (数据库)
+- **Database**: PostgreSQL
+- **Tools**: Docker, PL/pgSQL (Stored Procedures/Triggers)
+
+## 📂 项目结构
+
+- `backend/`: Go 后端 API 服务
+- `frontend/`: Vue 3 前端应用
+- `db/`: 数据库工具与测试模块
+- `db-init/`: 数据库初始化 SQL 脚本
+- `docs/`: 项目需求与设计文档
+
+## 🚀 快速开始 (Getting Started)
+
+### 前置要求
+- Docker & Docker Compose
+- Go 1.25+
+- Node.js 18+ & npm
+
+### 1. 启动数据库
+
+使用 Docker Compose 启动 PostgreSQL 数据库服务。该命令会自动执行初始化脚本（建表、视图、触发器、种子数据导入）。
 
 ```bash
 docker compose up -d
 ```
 
-该命令将：
-- 启动 PostgreSQL 容器
-- 自动执行初始化脚本（建表、视图、触发器、种子数据导入）
-
-### 2. 连接信息
-
-数据库服务启动后，后端应用可通过以下配置进行连接：
-
-- **Host**: `localhost` (容器间通信请使用 service name: `postgres` 或 `railway12306-postgres`)
+**数据库连接信息:**
+- **Host**: `localhost`
 - **Port**: `5432`
 - **Database**: `railway_12306`
 - **User**: `postgres`
 - **Password**: `postgres`
 
-> ⚠️ **注意**：具体的连接参数可在 `docker-compose.yml` 中查看或修改。
+### 2. 启动后端服务
 
-## 📚 核心文档
+进入后端目录，安装依赖并启动服务：
 
-对于主项目开发人员，以下两份文档至关重要：
+```bash
+cd backend
+go mod tidy
+go run main.go
+```
 
-1. **[数据库需求与设计文档 (DB Requirements)](docs/db-requirements-12306-postgresql.md)**
-   - 包含完整的 ER 图设计、表结构定义、枚举类型说明。
-   - 详细描述了用户中心、订单系统（状态机）、客票库存管理等核心业务逻辑的数据库层实现。
+服务将在 `http://localhost:8081` 启动。
 
-2. **[后端对接指南 (Backend Tech Guide)](docs/backend-tech-guide-12306.md)**
-   - 提供了后端 API 与数据库交互的映射关系。
-   - 说明了如何利用数据库视图（如 `v_user_orders`）和触发器简化后端逻辑。
+### 3. 启动前端应用
 
-## 🛠️ 模块维护与测试
+进入前端目录，安装依赖并启动开发服务器：
 
-本模块包含独立的测试套件，用于验证数据库逻辑的正确性（仅供本模块维护参考，主项目集成无需关注）。
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-- **测试代码**: 位于 `db/` 目录下，使用 Go `testing` 模块编写。
-- **概况脚本**: `db/database_info.py` 可用于快速查看数据库统计信息。
-- **CI/CD**: 配置了 GitHub Actions (`.github/workflows`)，在 push 和 PR 时自动运行集成测试，保障 Schema 变更的稳定性。
+访问控制台输出的本地地址（通常是 `http://localhost:5173`）即可体验应用。
+
+## � 核心文档
+
+详细的设计与需求文档位于 `docs/` 目录下：
+
+- **[数据库需求与设计 (DB Requirements)](docs/db-requirements-12306-postgresql.md)**: ER 图、表结构、核心业务逻辑。
+- **[后端技术指南 (Backend Tech Guide)](docs/backend-tech-guide-12306.md)**: API 映射、数据库交互说明。
+- **[前端 API 指南](docs/frontend-api-guide-12306.md)**: 前端接口调用说明。
+
+## 🧪 测试
+
+### 后端测试
+```bash
+cd backend
+go test ./...
+```
+
+### 数据库模块测试
+```bash
+cd db
+go test -v
+```
+
+## 🤝 贡献与维护
+本项目由 CS3604 课程小组维护。
